@@ -28,6 +28,7 @@ const eslintConfig = defineConfig([
     'node_modules',
     'public',
     'components/ui/*',
+    'postcss.config.mjs',
   ]),
   {
     languageOptions: {
@@ -53,7 +54,7 @@ const eslintConfig = defineConfig([
         },
         {
           selector: 'function',
-          format: ['strictCamelCase'],
+          format: ['strictCamelCase', 'StrictPascalCase'],
         },
 
         {
@@ -99,10 +100,12 @@ const eslintConfig = defineConfig([
         'error',
         {
           devDependencies: [
-            '**/*.test.{ts,js}',
-            '**/*.spec.{ts,js}',
-            './test/**.{ts,js}',
+            '**/*.test.{ts,js,tsx,jsx}',
+            '**/*.spec.{ts,js,tsx,jsx}',
+            './test/**/*.{ts,js,tsx,jsx}',
             './scripts/**/*.{ts,js}',
+            'vitest.config.ts',
+            'vitest.setup.ts',
           ],
         },
       ],
