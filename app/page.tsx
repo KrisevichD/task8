@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import Image from "next/image";
 
 export default function Home() {
@@ -12,6 +14,11 @@ export default function Home() {
           height={20}
           priority
         />
+        <Button>button</Button>
+        <Button>button</Button>
+        <Button>button</Button>
+        <Button>button</Button>
+        <Input />
       </main>
     </div>
   );
