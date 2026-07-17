@@ -1,18 +1,43 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
+
+const TEST_QUERY = gql`
+  query GetUsers {
+    users {
+      id
+    }
+  }
+`;
+
+export default function TestPage() {
+  const { loading: isLoading, error, data } = useQuery(TEST_QUERY);
+
+  if (isLoading) {
+    return (
+      <div className="p-5 font-medium text-gray-600">
+        Loading data from Backend...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-5 text-red-600 font-semibold">
+        Error: {error.message}
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-      </main>
+    <div className="p-6">
+      <h1 className="text-xl font-bold mb-4">
+        Apollo Client Connection Success! 🎉
+      </h1>
+      <pre className="bg-gray-100 p-4 rounded font-mono text-sm">
+        {JSON.stringify(data, null, 2)}
+      </pre>
     </div>
   );
 }
