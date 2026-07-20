@@ -7,6 +7,7 @@ import { cn } from "@/utils/shadcn"
 import { Button } from "@/components/ui/button"
 import { Input, inputVariants } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { FloatingInput, FloatingInputProps } from "../floating-input"
 
 function InputGroup({ className, variant, ...props }: React.ComponentProps<"div"> & VariantProps<typeof inputVariants>) {
   return (
@@ -14,7 +15,7 @@ function InputGroup({ className, variant, ...props }: React.ComponentProps<"div"
       data-slot="input-group"
       role="group"
       className={cn(
-        "group/input-group relative flex h-12 w-full min-w-0 items-center rounded-none border border-input/23 transition-colors outline-none in-data-[slot=combobox-content]:focus-within:border-inherit in-data-[slot=combobox-content]:focus-within:ring-0 has-disabled:bg-input/8 has-disabled:opacity-50 has-[[data-slot=input-group-control]:focus-visible]:border-ring has-[[data-slot=input-group-control]:focus-visible]:ring-1 has-[[data-slot=input-group-control]:focus-visible]:ring-ring/50 has-[[data-slot][aria-invalid=true]]:border-destructive has-[[data-slot][aria-invalid=true]]:ring-1 has-[[data-slot][aria-invalid=true]]:ring-destructive/20 has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>textarea]:h-auto dark:has-disabled:bg-input/8 dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40 has-[>[data-align=block-end]]:[&>input]:pt-3 has-[>[data-align=block-start]]:[&>input]:pb-3 has-[>[data-align=inline-end]]:[&>input]:pr-1 has-[>[data-align=inline-start]]:[&>input]:pl-1", 
+        "group/input-group relative flex h-12 w-full min-w-0 items-center rounded-none border border-input/23 transition-colors outline-none in-data-[slot=combobox-content]:focus-within:border-inherit in-data-[slot=combobox-content]:focus-within:ring-0 has-disabled:bg-input/8 has-disabled:opacity-50 has-[[data-slot=input-group-control]:focus-visible]:border-ring has-[[data-slot=input-group-control]:focus-visible]:ring-1 has-[[data-slot=input-group-control]:focus-visible]:ring-ring/50 has-[[data-slot][aria-invalid=true]]:border-destructive has-[[data-slot][aria-invalid=true]]:ring-1 has-[[data-slot][aria-invalid=true]]:ring-destructive/20 has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>textarea]:h-auto dark:has-disabled:bg-input/8 dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40 has-[>[data-align=block-end]]:[&>input]:pt-3 has-[>[data-align=block-start]]:[&>input]:pb-3 has-[>[data-align=inline-end]]:[&>input]:pr-1 has-[>[data-align=inline-start]]:[&>input]:pl-1",
         inputVariants({
           variant,
           className
@@ -26,12 +27,12 @@ function InputGroup({ className, variant, ...props }: React.ComponentProps<"div"
 }
 
 const inputGroupAddonVariants = cva(
-  "flex h-auto cursor-text items-center justify-center gap-2 py-0 text-xs font-medium select-none group-data-[disabled=true]/input-group:opacity-50 [&>kbd]:rounded-none [&>svg:not([class*='size-'])]:size-4",
+  "flex h-auto cursor-text items-center justify-center gap-2 text-xs font-medium select-none group-data-[disabled=true]/input-group:opacity-50 [&>kbd]:rounded-none [&>svg:not([class*='size-'])]:size-4",
   {
     variants: {
       align: {
         "inline-start":
-          "order-first pl-0 has-[>button]:ml-[-0.3rem] has-[>kbd]:ml-[-0.15rem]",
+          "order-first pl-0 has-[>button]:ml-[-0.4rem] has-[>kbd]:ml-[-0.15rem]",
         "inline-end":
           "order-last pr-0 has-[>button]:mr-[-0.3rem] has-[>kbd]:mr-[-0.15rem]",
         "block-start":
@@ -118,13 +119,33 @@ function InputGroupText({ className, ...props }: React.ComponentProps<"span">) {
   )
 }
 
+type InputGroupInputProps = 
+  | ({ label?: never } & React.ComponentProps<"input">)
+  | ({ label: string } & FloatingInputProps)
+
 function InputGroupInput({
   className,
+  label,
   ...props
-}: React.ComponentProps<"input">) {
+}: InputGroupInputProps) {
+  if (!label) {
+
+    return (
+      <Input
+        data-slot="input-group-control"
+        className={cn(
+          "flex-1 border-0 bg-transparent shadow-none ring-0 focus-visible:ring-0 disabled:bg-transparent aria-invalid:ring-0 dark:bg-transparent dark:disabled:bg-transparent",
+          className
+        )}
+        {...props}
+      />
+    )
+  }
+
   return (
-    <Input
+    <FloatingInput
       data-slot="input-group-control"
+      label={label}
       className={cn(
         "flex-1 border-0 bg-transparent shadow-none ring-0 focus-visible:ring-0 disabled:bg-transparent aria-invalid:ring-0 dark:bg-transparent dark:disabled:bg-transparent",
         className

@@ -5,11 +5,11 @@ import "./globals.css";
 
 import { cn } from "@/utils/shadcn";
 
-const roboto = Roboto({ 
-  weight: ['300', '400', '500', '700'],
-  subsets: ['latin', 'cyrillic'],  
-  display: 'swap',
-  variable: '--font-roboto',
+const roboto = Roboto({
+  weight: ["300", "400", "500", "700"],
+  subsets: ["latin", "cyrillic"],
+  display: "swap",
+  variable: "--font-roboto",
 });
 
 export const metadata: Metadata = {
@@ -25,14 +25,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn(
-        "h-full",
-        "antialiased",
-        "font-sans",
-        roboto.variable,
-      )}
+      className={cn("h-full", "antialiased", "font-sans", roboto.variable)}
     >
-      <body className="dark min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }

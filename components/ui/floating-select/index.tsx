@@ -20,7 +20,7 @@ export function FloatingSelect({
   ...props
 }: FloatingSelectProps) {
   return (
-    <div className="relative w-full border-none bg-transparent pt-3 group/select">
+    <div className="relative w-full border-none bg-transparent group/select">
       <Select {...props}>
         <SelectTrigger
           className={cn(
@@ -35,8 +35,8 @@ export function FloatingSelect({
 
       <Label
         className="
-          absolute left-2 top-0.5 z-10
-            pointer-events-none transition-all duration-200
+          absolute left-2 -top-2.5 z-10
+            pointer-events-none transition-all duration-200 will-change-transform
           
           peer-data-placeholder:translate-y-5.5
           peer-data-placeholder:text-[16px]

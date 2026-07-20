@@ -11,7 +11,7 @@ const buttonVariants = cva(
         default: "bg-transparent rounded-full p-0 border-none",
         primary: "bg-primary text-primary-foreground hover:bg-[color-mix(in_oklch,var(--primary),var(--primary-foreground)_8%)] text-sm rounded-full border-none shadow-[0_3px_1px_-2px_rgba(0,0,0,0.2),0_2px_2px_rgba(0,0,0,0.14),0_1px_5px_rgba(0,0,0,0.12)] disabled:bg-input/12 disabled:text-input/26 disabled:opacity-100 disabled:shadow-none",
         outline:
-          "border-border bg-transparent text-muted-foreground rounded-full hover:bg-input/8 hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground",
+          "border-muted-foreground bg-transparent text-muted-foreground rounded-full hover:bg-input/8 hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground",
         secondary:
           "bg-input/12 text-input/26 rounded-full hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         ghost:

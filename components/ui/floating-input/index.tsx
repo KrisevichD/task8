@@ -25,7 +25,7 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
     }
 
     return (
-      <div className="relative w-full border-none bg-transparent pt-3">
+      <div className="relative w-full border-none bg-transparent">
         <Input
           id={id}
           ref={ref}
@@ -42,8 +42,8 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
         <Label
           htmlFor={id}
           className={cn(
-            `absolute left-2 top-0.5 z-10 
-            pointer-events-none transition-all duration-200
+            `absolute left-2 -top-2.5 z-10 
+            pointer-events-none transition-all duration-200 will-change-transform
             
             peer-focus:translate-y-0
             peer-focus:text-xs

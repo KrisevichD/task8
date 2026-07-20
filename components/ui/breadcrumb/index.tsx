@@ -5,6 +5,7 @@ import ArrowBCSvg from "@/public/arrow-breadcrumb.svg"
 
 import { cn } from "@/utils/shadcn"
 import { ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
+import { Icon } from "../icon"
 
 function Breadcrumb({ className, ...props }: React.ComponentProps<"nav">) {
   return (
@@ -87,7 +88,7 @@ function BreadcrumbSeparator({
       {...props}
     >
       {children ?? (
-        <ArrowBCSvg className={'text-input/26 dark:text-input/30'}/>
+        <Icon variant="arrow-breadcrumb" className={'text-input/26 dark:text-input/30'}/>
       )}
     </li>
   )
