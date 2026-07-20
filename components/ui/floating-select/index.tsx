@@ -1,0 +1,54 @@
+"use client"
+
+import * as React from "react"
+import { Select, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
+import { cn } from "@/utils/shadcn"
+
+interface FloatingSelectProps extends React.ComponentProps<typeof Select> {
+  label: string
+  placeholder?: string
+  children: React.ReactNode
+  className?: string
+}
+
+export function FloatingSelect({
+  label,
+  placeholder = " ",
+  children,
+  className,
+  ...props
+}: FloatingSelectProps) {
+  return (
+    <div className="relative w-full border-none bg-transparent pt-3 group/select">
+      <Select {...props}>
+        <SelectTrigger
+          className={cn(
+            "peer",
+            className
+          )}
+        >
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>{children}</SelectContent>
+      </Select>
+
+      <Label
+        className="
+          absolute left-2 top-0.5 z-10
+            pointer-events-none transition-all duration-200
+          
+          peer-data-placeholder:translate-y-5.5
+          peer-data-placeholder:text-[16px]
+          
+          peer-data-popup-open:translate-y-0
+          peer-data-popup-open:text-xs
+          
+          peer-focus:translate-y-0
+        "
+      >
+        {label}
+      </Label>
+    </div>
+  )
+}

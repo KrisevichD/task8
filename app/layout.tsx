@@ -1,20 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Roboto } from "next/font/google";
+import { Roboto } from "next/font/google";
 
 import "./globals.css";
 
 import { cn } from "@/utils/shadcn";
 
-const roboto = Roboto({ subsets: ["latin"], variable: "--font-sans" });
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const roboto = Roboto({ 
+  weight: ['300', '400', '500', '700'],
+  subsets: ['latin', 'cyrillic'],  
+  display: 'swap',
+  variable: '--font-roboto',
 });
 
 export const metadata: Metadata = {
@@ -33,13 +28,11 @@ export default function RootLayout({
       className={cn(
         "h-full",
         "antialiased",
-        geistSans.variable,
-        geistMono.variable,
         "font-sans",
         roboto.variable,
       )}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="dark min-h-full flex flex-col">{children}</body>
     </html>
   );
 }
