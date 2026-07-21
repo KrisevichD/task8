@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -16,14 +15,21 @@ import {
 
 import { cn } from "@/utils/shadcn";
 
+export interface IAppError {
+  message: string;
+}
+
 type TAuthFormProps = {
   className?: string;
+  // Сделали password опциональным в аргументах onSubmit
   onSubmit: (variables: {
-    auth: { email: string; password: string };
+    auth: { email: string; password?: string };
   }) => Promise<void>;
   isLoading: boolean;
-  errorText: string;
+  errorText?: string;
   buttonText: string;
+  // 👇 Флаг: показывать ли поле пароля (по умолчанию true)
+  showPasswordInput?: boolean;
 };
 
 const AuthForm = ({
@@ -31,6 +37,7 @@ const AuthForm = ({
   onSubmit,
   isLoading,
   buttonText,
+  showPasswordInput = true,
 }: TAuthFormProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -57,13 +64,21 @@ const AuthForm = ({
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formPromise = onSubmit({ auth: { email, password } });
+
+    const authPayload = showPasswordInput ? { email, password } : { email };
+
+    const formPromise = onSubmit({ auth: authPayload });
 
     toast.promise(formPromise, {
       position: "top-right",
-      loading: "Loading...",
-      success: "Success",
-      error: (err) => err.message || "Error",
+      loading: "Sending request...",
+      success: "Instructions sent to your email!",
+      error: (err: IAppError | Error | unknown) => {
+        if (err && typeof err === "object" && "message" in err) {
+          return (err as IAppError).message;
+        }
+        return "An unexpected error occurred";
+      },
     });
   };
 
@@ -80,40 +95,43 @@ const AuthForm = ({
         disabled={isLoading}
         required
       />
-      <InputGroup>
-        <InputGroupInput
-          id="login:password"
-          type={isShowPassword ? "text" : "password"}
-          label="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          disabled={isLoading}
-          required
-        />
-        <InputGroupAddon align="inline-end">
-          <InputGroupButton
-            variant="ghost"
-            size="icon"
-            type="button"
-            onMouseDown={startShowPassword}
-            onMouseUp={stopShowPassword}
-            onMouseLeave={stopShowPassword}
-            onTouchStart={startShowPassword}
-            onTouchEnd={stopShowPassword}
-            onClick={toggleShowPassword}
-            disabled={isLoading}
-          >
-            <Icon variant="eye" label="Show password" />
-          </InputGroupButton>
-        </InputGroupAddon>
-      </InputGroup>
 
-      {/* Кнопка отправки формы */}
+      {/* Поле Password (только если showPasswordInput === true) */}
+      {showPasswordInput && (
+        <InputGroup>
+          <InputGroupInput
+            id="login:password"
+            type={isShowPassword ? "text" : "password"}
+            label="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading}
+            required
+          />
+          <InputGroupAddon align="inline-end">
+            <InputGroupButton
+              variant="ghost"
+              size="icon"
+              type="button"
+              onMouseDown={startShowPassword}
+              onMouseUp={stopShowPassword}
+              onMouseLeave={stopShowPassword}
+              onTouchStart={startShowPassword}
+              onTouchEnd={stopShowPassword}
+              onClick={toggleShowPassword}
+              disabled={isLoading}
+            >
+              <Icon variant="eye" label="Show password" />
+            </InputGroupButton>
+          </InputGroupAddon>
+        </InputGroup>
+      )}
+
       <Button
         type="submit"
         variant="primary"
         size="default"
-        className="mt-10 uppercase"
+        className="mt-10 uppercase w-full"
         disabled={isLoading}
       >
         {buttonText}

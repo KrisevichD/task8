@@ -19,7 +19,7 @@ export function useForgotPassword<TData, TVariables extends OperationVariables>(
 
       if (result.error) {
         setErrorText(result.error.message || "Failed to send reset link.");
-        return;
+        throw new Error(result.error.message);
       }
 
       setErrorText("");

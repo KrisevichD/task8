@@ -22,6 +22,7 @@ const ForgotContent = ({ className }: TForgotContentProps) => {
       isLoading={isLoading}
       errorText={errorText}
       buttonText="reset password"
+      showPasswordInput={false}
     />
   );
 };
