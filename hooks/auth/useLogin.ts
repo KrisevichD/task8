@@ -1,5 +1,7 @@
 import { OperationVariables, TypedDocumentNode } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client/react";
+import Cookies from "js-cookie";
+
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -23,19 +25,27 @@ export function useLogin<
       const result = await executeLogin({ variables });
 
       if (result.error) {
-        setErrorText(result.error.message || "An error occurred during login.");
-        return;
+        const message =
+          result.error.message || "An error occurred during login.";
+        setErrorText(message);
+        throw new Error(message);
       }
 
       const authData = result.data?.login;
 
       if (authData?.access_token && authData?.refresh_token) {
-        localStorage.setItem("access_token", authData.access_token);
-        localStorage.setItem("refresh_token", authData.refresh_token);
+        Cookies.set("access_token", authData.access_token, { expires: 7 });
+        Cookies.set("refresh_token", authData.refresh_token, { expires: 7 });
         router.push(redirectTo);
+      } else {
+        const noTokenError = "Invalid response structure from server.";
+        setErrorText(noTokenError);
+        throw new Error(noTokenError);
       }
     } catch (err) {
-      setErrorText(err instanceof Error ? err.message : "Unknown error");
+      const message = err instanceof Error ? err.message : "Unknown error";
+      setErrorText(message);
+      throw err;
     }
   };
 

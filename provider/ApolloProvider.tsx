@@ -1,11 +1,25 @@
 "use client";
 
-import { HttpLink } from "@apollo/client";
+import { ApolloLink, HttpLink } from "@apollo/client";
+import { SetContextLink } from "@apollo/client/link/context";
 import {
   ApolloNextAppProvider,
   ApolloClient,
   InMemoryCache,
 } from "@apollo/client-integration-nextjs";
+import Cookies from "js-cookie";
+
+// token for headers
+const authLink = new SetContextLink((prevContext) => {
+  const token = Cookies.get("access_token");
+
+  return {
+    headers: {
+      ...prevContext.headers,
+      authorization: token ? `Bearer ${token}` : "",
+    },
+  };
+});
 
 // Factory function to create a new client per request/session
 function makeClient() {
@@ -16,7 +30,7 @@ function makeClient() {
 
   return new ApolloClient({
     cache: new InMemoryCache(),
-    link: httpLink,
+    link: ApolloLink.from([authLink, httpLink]),
   });
 }
 

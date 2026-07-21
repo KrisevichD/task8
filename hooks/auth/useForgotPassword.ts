@@ -19,13 +19,14 @@ export function useForgotPassword<TData, TVariables extends OperationVariables>(
 
       if (result.error) {
         setErrorText(result.error.message || "Failed to send reset link.");
-        return;
+        throw new Error(result.error.message);
       }
 
       setErrorText("");
       setSuccessText("Instructions have been sent if the email exists.");
     } catch (err) {
       setErrorText(err instanceof Error ? err.message : "Unknown error");
+      throw err;
     }
   };
 
