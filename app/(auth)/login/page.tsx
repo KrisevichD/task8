@@ -1,29 +1,29 @@
 "use server";
 
-import { Button } from "@/components/ui/button";
-import LoginContent from "@/contents/auth/loginContent";
 import Link from "next/link";
 
+import { buttonVariants } from "@/components/ui/button";
+import LoginContent from "@/contents/login";
+import { cn } from "@/utils/shadcn";
+
 export default async function LoginPage() {
-
   return (
-    <div className="w-full text-center space-y-8">
-      <div className="space-y-2">
-        <h2 className="text-3xl font-normal tracking-wide">
-          Welcome back
-        </h2>
-        <p>Hello again! Log in to continue</p>
-      </div>
+    <div className="w-full text-center">
+      <h2 className="mb-6.5 text-[34px] font-normal tracking-wide">
+        Welcome back
+      </h2>
+      <p className="mb-10 text-[16px] font-normal">
+        Hello again! Log in to continue
+      </p>
 
-      <LoginContent />
+      <LoginContent className="mb-2" />
 
-      <Button variant={"ghost"} render={
-        <Link
-          href="/forgot-password"
-        >
-          FORGOT PASSWORD
-        </Link>
-      } />
+      <Link
+        href="/forgot-password"
+        className={cn(buttonVariants({ variant: "ghost" }))}
+      >
+        FORGOT PASSWORD
+      </Link>
     </div>
   );
 }
