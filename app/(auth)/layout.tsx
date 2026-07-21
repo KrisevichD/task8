@@ -17,7 +17,7 @@ export default function AuthLayout({
   const isForgot = pathname === "/forgot-password";
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#444444] text-white font-sans">
+    <div className="flex min-h-screen flex-col">
       {!isForgot && (
         <div className="flex justify-center border-b border-zinc-700/50 bg-[#444444]">
           <div className="flex w-full max-w-md">
