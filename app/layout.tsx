@@ -5,6 +5,7 @@ import "./globals.css";
 
 import { Providers } from "@/provider/ApolloProvider";
 import { cn } from "@/utils/shadcn";
+import { Toaster } from "@/components/ui/sonner";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
@@ -27,6 +28,8 @@ export default function RootLayout({
     <html lang="en" className={cn("h-full", "antialiased", roboto.variable)}>
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
+
+      <Toaster />
       </body>
     </html>
   );

@@ -13,10 +13,11 @@ import {
 } from "@/components/ui/input-group";
 
 import { cn } from "@/utils/shadcn";
+import { toast } from "sonner";
 
 type TAuthFormProps = {
   className?: string;
-  onSubmit: (variables: OperationVariables) => Promise<void>;
+  onSubmit: (variables: { auth: { email: string; password: string } }) => Promise<void>;
   isLoading: boolean;
   errorText: string;
   buttonText: string;
@@ -26,7 +27,6 @@ const AuthForm = ({
   className,
   onSubmit,
   isLoading,
-  errorText,
   buttonText,
 }: TAuthFormProps) => {
   const [email, setEmail] = useState("");
@@ -35,7 +35,14 @@ const AuthForm = ({
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit({ auth: { email, password } });
+    const formPromise = onSubmit({ auth: { email, password } });
+
+    toast.promise(formPromise, {
+        position: "top-right",
+        loading: "Loading...",
+        success: "Success",
+        error: (err) => err.message || "Error"
+    })
   };
 
   return (
@@ -43,12 +50,6 @@ const AuthForm = ({
       onSubmit={handleSubmit}
       className={cn("space-y-5 max-w-md mx-auto", className)}
     >
-      {errorText && (
-        <div className="text-sm text-destructive bg-destructive/10 border border-destructive/20 p-3 text-center">
-          {errorText}
-        </div>
-      )}
-
       <FloatingInput
         type="email"
         label="Email"
@@ -71,6 +72,7 @@ const AuthForm = ({
           <Button
             variant="ghost"
             size="icon"
+            type="button"
             onMouseDown={() => setShowPassword(true)}
             onMouseUp={() => setShowPassword(false)}
             onMouseLeave={() => setShowPassword(false)}

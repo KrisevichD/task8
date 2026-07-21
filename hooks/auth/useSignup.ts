@@ -35,6 +35,7 @@ export function useSignup<
       }
     } catch (err) {
       setErrorText(err instanceof Error ? err.message : "Unknown error");
+      throw err;
     }
   };
 

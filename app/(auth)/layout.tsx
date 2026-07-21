@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import React from "react";
 
 import { cn } from "@/utils/shadcn";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function AuthLayout({
   children,
