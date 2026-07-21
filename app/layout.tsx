@@ -3,6 +3,7 @@ import { Roboto } from "next/font/google";
 
 import "./globals.css";
 
+import { Toaster } from "@/components/ui/sonner";
 import { Providers } from "@/provider/ApolloProvider";
 import { cn } from "@/utils/shadcn";
 
@@ -24,12 +25,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={cn("h-full", "antialiased", "font-sans", roboto.variable)}
-    >
+    <html lang="en" className={cn("h-full", "antialiased", roboto.variable)}>
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
+
+        <Toaster />
       </body>
     </html>
   );

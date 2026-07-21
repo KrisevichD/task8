@@ -26,6 +26,7 @@ export function useForgotPassword<TData, TVariables extends OperationVariables>(
       setSuccessText("Instructions have been sent if the email exists.");
     } catch (err) {
       setErrorText(err instanceof Error ? err.message : "Unknown error");
+      throw err;
     }
   };
 
