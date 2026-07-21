@@ -1,7 +1,8 @@
 "use client";
 
-import { OperationVariables } from "@apollo/client";
 import { useRef, useState } from "react";
+
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { FloatingInput } from "@/components/ui/floating-input";
@@ -14,11 +15,12 @@ import {
 } from "@/components/ui/input-group";
 
 import { cn } from "@/utils/shadcn";
-import { toast } from "sonner";
 
 type TAuthFormProps = {
   className?: string;
-  onSubmit: (variables: { auth: { email: string; password: string } }) => Promise<void>;
+  onSubmit: (variables: {
+    auth: { email: string; password: string };
+  }) => Promise<void>;
   isLoading: boolean;
   errorText: string;
   buttonText: string;
@@ -59,11 +61,11 @@ const AuthForm = ({
     const formPromise = onSubmit({ auth: { email, password } });
 
     toast.promise(formPromise, {
-        position: "top-right",
-        loading: "Loading...",
-        success: "Success",
-        error: (err) => err.message || "Error"
-    })
+      position: "top-right",
+      loading: "Loading...",
+      success: "Success",
+      error: (err) => err.message || "Error",
+    });
   };
 
   return (

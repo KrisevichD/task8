@@ -11,8 +11,9 @@ type TForgotContentProps = {
 };
 
 const ForgotContent = ({ className }: TForgotContentProps) => {
-  const { resetPassword, isLoading, errorText } =
-    useForgotPassword(FORGOT_PASSWORD_MUTATION);
+  const { resetPassword, isLoading, errorText } = useForgotPassword(
+    FORGOT_PASSWORD_MUTATION,
+  );
 
   return (
     <AuthForm

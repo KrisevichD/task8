@@ -3,9 +3,9 @@ import { Roboto } from "next/font/google";
 
 import "./globals.css";
 
+import { Toaster } from "@/components/ui/sonner";
 import { Providers } from "@/provider/ApolloProvider";
 import { cn } from "@/utils/shadcn";
-import { Toaster } from "@/components/ui/sonner";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
@@ -29,7 +29,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
 
-      <Toaster />
+        <Toaster />
       </body>
     </html>
   );
