@@ -4,7 +4,7 @@ import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/utils/shadcn"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { FloatingInput, FloatingInputProps } from "../floating-input"
@@ -108,7 +108,7 @@ function InputGroupButton({
   size = "xs",
   ...props
 }: Omit<React.ComponentProps<typeof Button>, "size" | "type"> &
-  VariantProps<typeof inputGroupButtonVariants> & {
+  VariantProps<typeof buttonVariants> & {
     type?: "button" | "submit" | "reset"
   }) {
   return (
@@ -116,7 +116,7 @@ function InputGroupButton({
       type={type}
       data-size={size}
       variant={variant}
-      className={cn(inputGroupButtonVariants({ size }), className)}
+      className={cn(buttonVariants({ variant, size }), className)}
       {...props}
     />
   )

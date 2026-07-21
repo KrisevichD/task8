@@ -24,7 +24,7 @@ export default function AuthLayout({
           <Link
             href="/login"
             className={cn(
-              "w-37.5 h-12.5 text-center py-4 text-xs font-semibold uppercase border-b-2 border-transparent tracking-widest transition-colors hover:bg-input/8",
+              "w-37.5 h-12.5 text-center py-4 text-sm font-semibold tracking-widest uppercase border-b-2 border-transparent transition-colors hover:bg-input/8",
               isLogin && "border-primary text-primary",
             )}
           >
@@ -33,7 +33,7 @@ export default function AuthLayout({
           <Link
             href="/signup"
             className={cn(
-              "w-37.5 h-12.5 text-center py-4 text-xs font-semibold uppercase border-b-2 border-transparent tracking-widest transition-colors hover:bg-input/8",
+              "w-37.5 h-12.5 text-center py-4 text-sm font-semibold tracking-widest uppercase border-b-2 border-transparent transition-colors hover:bg-input/8",
               isSignup && "border-primary text-primary",
             )}
           >

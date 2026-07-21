@@ -10,6 +10,7 @@ import {
   InputGroup,
   InputGroupInput,
   InputGroupAddon,
+  InputGroupButton,
 } from "@/components/ui/input-group";
 
 import { cn } from "@/utils/shadcn";
@@ -69,7 +70,7 @@ const AuthForm = ({
           required
         />
         <InputGroupAddon align="inline-end">
-          <Button
+          <InputGroupButton
             variant="ghost"
             size="icon"
             type="button"
@@ -81,7 +82,7 @@ const AuthForm = ({
             disabled={isLoading}
           >
             <Icon variant="eye" label="Show password" />
-          </Button>
+          </InputGroupButton>
         </InputGroupAddon>
       </InputGroup>
 
@@ -93,7 +94,7 @@ const AuthForm = ({
         className="mt-10 uppercase"
         disabled={isLoading}
       >
-        {isLoading ? "..." : buttonText}
+        {buttonText}
       </Button>
     </form>
   );
