@@ -48,6 +48,7 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
             peer-focus:translate-y-0
             peer-focus:text-xs
             peer-focus:pointer-events-auto
+            px-1 bg-[#444444]
             
             peer-placeholder-shown:translate-y-5.5
             peer-placeholder-shown:text-[16px]`,
