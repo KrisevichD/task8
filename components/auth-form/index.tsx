@@ -37,8 +37,7 @@ const AuthForm = ({
   const [isShowPassword, setIsShowPassword] = useState(false);
   const isInteractingWithMouse = useRef(false);
 
-  const startShowPassword = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
+  const startShowPassword = () => {
     isInteractingWithMouse.current = true;
     setIsShowPassword(true);
   };
@@ -50,7 +49,7 @@ const AuthForm = ({
     }
   };
 
-  const handleToggleClick = (e: React.MouseEvent) => {
+  const toggleShowPassword = (e: React.MouseEvent) => {
     if (e.detail === 0) {
       setIsShowPassword((prev) => !prev);
     }
@@ -101,7 +100,7 @@ const AuthForm = ({
             onMouseLeave={stopShowPassword}
             onTouchStart={startShowPassword}
             onTouchEnd={stopShowPassword}
-            onClick={handleToggleClick}
+            onClick={toggleShowPassword}
             disabled={isLoading}
           >
             <Icon variant="eye" label="Show password" />
