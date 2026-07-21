@@ -1,7 +1,7 @@
 "use client";
 
 import { OperationVariables } from "@apollo/client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { FloatingInput } from "@/components/ui/floating-input";
@@ -32,7 +32,27 @@ const AuthForm = ({
 }: TAuthFormProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isShowPassword, setShowPassword] = useState(false);
+  const [isShowPassword, setIsShowPassword] = useState(false);
+  const isInteractingWithMouse = useRef(false);
+
+  const startShowPassword = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    isInteractingWithMouse.current = true;
+    setIsShowPassword(true);
+  };
+
+  const stopShowPassword = () => {
+    if (isInteractingWithMouse.current) {
+      setIsShowPassword(false);
+      isInteractingWithMouse.current = false;
+    }
+  };
+
+  const handleToggleClick = (e: React.MouseEvent) => {
+    if (e.detail === 0) {
+      setIsShowPassword((prev) => !prev);
+    }
+  };
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -74,11 +94,12 @@ const AuthForm = ({
             variant="ghost"
             size="icon"
             type="button"
-            onMouseDown={() => setShowPassword(true)}
-            onMouseUp={() => setShowPassword(false)}
-            onMouseLeave={() => setShowPassword(false)}
-            onTouchStart={() => setShowPassword(true)}
-            onTouchEnd={() => setShowPassword(false)}
+            onMouseDown={startShowPassword}
+            onMouseUp={stopShowPassword}
+            onMouseLeave={stopShowPassword}
+            onTouchStart={startShowPassword}
+            onTouchEnd={stopShowPassword}
+            onClick={handleToggleClick}
             disabled={isLoading}
           >
             <Icon variant="eye" label="Show password" />
