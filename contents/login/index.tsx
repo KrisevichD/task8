@@ -18,7 +18,7 @@ const LoginContent = ({ className }: TLoginContentProps) => {
       onSubmit={login}
       isLoading={isLoading}
       errorText={errorText}
-      buttonText="create account"
+      buttonText="log in"
     />
   );
 };

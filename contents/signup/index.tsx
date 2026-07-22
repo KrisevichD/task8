@@ -19,7 +19,7 @@ const SignUpContent = ({ className }: TSignUpContentProps) => {
       onSubmit={signup}
       isLoading={isLoading}
       errorText={errorText}
-      buttonText="log in"
+      buttonText="create account"
     />
   );
 };
