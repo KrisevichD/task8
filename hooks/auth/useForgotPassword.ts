@@ -4,28 +4,28 @@ import { useState } from "react";
 
 export function useForgotPassword<TData, TVariables extends OperationVariables>(
   mutation: TypedDocumentNode<TData, TVariables>,
+  successText = "Instructions have been sent if the email exists.",
 ) {
   const [errorText, setErrorText] = useState("");
-  const [successText, setSuccessText] = useState("");
 
   const [executeReset, { loading: isLoading }] = useMutation(mutation);
 
   const resetPassword = async (variables: TVariables) => {
     setErrorText("");
-    setSuccessText("");
 
     try {
       const result = await executeReset({ variables });
 
       if (result.error) {
-        setErrorText(result.error.message || "Failed to send reset link.");
-        throw new Error(result.error.message);
+        const message = result.error.message || "Failed to send reset link.";
+        setErrorText(message);
+        throw new Error(message);
       }
 
       setErrorText("");
-      setSuccessText("Instructions have been sent if the email exists.");
     } catch (err) {
-      setErrorText(err instanceof Error ? err.message : "Unknown error");
+      const message = err instanceof Error ? err.message : "Unknown error";
+      setErrorText(message);
       throw err;
     }
   };

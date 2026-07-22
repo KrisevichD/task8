@@ -11,9 +11,8 @@ type TForgotContentProps = {
 };
 
 const ForgotContent = ({ className }: TForgotContentProps) => {
-  const { resetPassword, isLoading, errorText } = useForgotPassword(
-    FORGOT_PASSWORD_MUTATION,
-  );
+  const { resetPassword, isLoading, errorText, successText } =
+    useForgotPassword(FORGOT_PASSWORD_MUTATION);
 
   return (
     <AuthForm
@@ -21,6 +20,7 @@ const ForgotContent = ({ className }: TForgotContentProps) => {
       onSubmit={resetPassword}
       isLoading={isLoading}
       errorText={errorText}
+      successText={successText}
       buttonText="reset password"
       showPasswordInput={false}
     />

@@ -10,7 +10,11 @@ import { ILoginResponse } from "@/types/auth";
 export function useLogin<
   TData extends ILoginResponse,
   TVariables extends OperationVariables,
->(query: TypedDocumentNode<TData, TVariables>, redirectTo = "/employees") {
+>(
+  query: TypedDocumentNode<TData, TVariables>,
+  redirectTo = "/employees",
+  successText = "Welcome back! Successfully logged in",
+) {
   const router = useRouter();
   const [errorText, setErrorText] = useState("");
 
@@ -49,5 +53,5 @@ export function useLogin<
     }
   };
 
-  return { login, isLoading, errorText };
+  return { login, isLoading, errorText, successText };
 }

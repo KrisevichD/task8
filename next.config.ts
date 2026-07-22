@@ -2,6 +2,7 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  devIndicators:false,
   webpack(config) {
     // Grab the internal Webpack rule type mapped directly from Next.js types
     type WebpackRule = NonNullable<NonNullable<typeof config.module>['rules']>[number];
