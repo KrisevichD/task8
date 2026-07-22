@@ -131,7 +131,7 @@ const AuthForm = ({
         type="submit"
         variant="primary"
         size="default"
-        className="mt-10 uppercase w-full"
+        className="mt-10 uppercase"
         disabled={isLoading}
       >
         {buttonText}
