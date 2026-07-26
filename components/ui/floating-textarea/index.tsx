@@ -4,12 +4,13 @@ import * as React from "react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/utils/shadcn"
+import { Textarea } from "../textarea"
 
-export interface FloatingInputProps extends React.ComponentProps<typeof Input> {
+export interface FloatingTextareaProps extends React.ComponentProps<typeof Textarea> {
   label: string
 }
 
-const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
+const FloatingTextarea = React.forwardRef<HTMLTextAreaElement, FloatingTextareaProps>(
   ({ className, label, id, value, defaultValue, onChange, ...props }, ref) => {
     const [hasValue, setHasValue] = React.useState(
       Boolean(value) || Boolean(defaultValue)
@@ -19,14 +20,14 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
       setHasValue(Boolean(value) || Boolean(defaultValue))
     }, [value, defaultValue])
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setHasValue(e.target.value.length > 0)
       if (onChange) onChange(e) 
     }
 
     return (
       <div className="relative w-full border-none bg-transparent">
-        <Input
+        <Textarea
           id={id}
           ref={ref}
           value={value}
@@ -62,6 +63,6 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
     )
   }
 )
-FloatingInput.displayName = "FloatingInput"
+FloatingTextarea.displayName = "FloatingTextarea"
 
-export { FloatingInput }
+export { FloatingTextarea }

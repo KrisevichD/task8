@@ -40,11 +40,16 @@ export function FloatingSelect({
           
           peer-data-placeholder:translate-y-5.5
           peer-data-placeholder:text-[16px]
+
+          peer-data-placeholder:peer-focus:translate-y-0
+          peer-data-placeholder:peer-focus:text-xs
           
           peer-data-popup-open:translate-y-0
           peer-data-popup-open:text-xs
           
           peer-focus:translate-y-0
+          peer-focus:text-xs
+          peer-focus:text-primary
         "
       >
         {label}
