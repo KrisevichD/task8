@@ -28,6 +28,7 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-successful: var(--successful)
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -50,6 +51,16 @@
   --inset-shadow-btn-sm: inset  0 -10px 2px 0;
   --inset-shadow-btn-md: inset  0 10px 2px 0;
   --inset-shadow-btn-lg: inset  -10px 2px 2px 0;
+  
+  --color-mastery-1: var(--mastery-1);
+  --color-mastery-2: var(--mastery-2);
+  --color-mastery-3: var(--mastery-3);
+  --color-mastery-4: var(--mastery-4);
+
+  --color-mastery-bg-1: var(--mastery-bg-1);
+  --color-mastery-bg-2: var(--mastery-bg-2);
+  --color-mastery-bg-3: var(--mastery-bg-3);
+  --color-mastery-bg-4: var(--mastery-bg-4);
 }
 
 :root {
@@ -67,7 +78,8 @@
   --muted-foreground: #767676;
   --accent: rgba(0,0,0,0.08);
   --accent-foreground: #2E2E2E;
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: var(--color-red-100);
+  --successful: var(--color-green-100);
   --border: #E0E0E0;
   --input: #000000;
   --ring: #C63031;
@@ -89,6 +101,16 @@
   --shadow-xs: 0 3px 1px -2px;
   --shadow-md: 0 2px 2px 0;
   --shadow-lg: 0 1px 5px 0;
+
+  --mastery-1: #767676;
+  --mastery-2: #0288D1;
+  --mastery-3: #2E7D32;
+  --mastery-4: #FFB800;
+
+  --mastery-bg-1: #CACACA;
+  --mastery-bg-2: #9ED1ED;
+  --mastery-bg-3: #AFCDB1;
+  --mastery-bg-4: #FFE49E;
 }
 
 .dark {
@@ -106,7 +128,8 @@
   --muted-foreground: #767676;
   --accent: rgba(255,255,255,0.08);
   --accent-foreground: #FFFFFF;
-  --destructive: oklch(0.704 0.191 22.216);
+  --destructive: var(--color-red-900);
+  --successful: var(--color-green-900);
   --border: #767676;
   --input: #FFFFFF;
   --ring: #C63031;

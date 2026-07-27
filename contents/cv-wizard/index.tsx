@@ -7,7 +7,6 @@ import { usePathname, useSearchParams } from "next/navigation";
 import CVDetailsForm from "@/components/cv/details-form";
 import CVPreview from "@/components/cv/preview";
 import CVProjects from "@/components/cv/projects";
-import CVSkillsList from "@/components/cv/skills-list";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -17,6 +16,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CVSkills from "@/components/cv/skills";
 
 const VALID_TABS = ["details", "projects", "skills", "preview"] as const;
 const DEFAULT_TAB = "details";
@@ -78,7 +78,7 @@ const CVWizard = () => {
           <CVProjects />
         </TabsContent>
         <TabsContent value={"skills"}>
-          <CVSkillsList />
+          <CVSkills />
         </TabsContent>
         <TabsContent value={"preview"}>
           <CVPreview />
