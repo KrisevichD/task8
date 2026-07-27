@@ -21,15 +21,14 @@ export interface IAppError {
 
 type TAuthFormProps = {
   className?: string;
-  // Сделали password опциональным в аргументах onSubmit
   onSubmit: (variables: {
     auth: { email: string; password?: string };
   }) => Promise<void>;
   isLoading: boolean;
   errorText?: string;
   buttonText: string;
-  // 👇 Флаг: показывать ли поле пароля (по умолчанию true)
   showPasswordInput?: boolean;
+  successText?: string;
 };
 
 const AuthForm = ({
@@ -38,6 +37,7 @@ const AuthForm = ({
   isLoading,
   buttonText,
   showPasswordInput = true,
+  successText = "Operation completed successfully!",
 }: TAuthFormProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -72,7 +72,7 @@ const AuthForm = ({
     toast.promise(formPromise, {
       position: "top-right",
       loading: "Sending request...",
-      success: "Instructions sent to your email!",
+      success: successText,
       error: (err: IAppError | Error | unknown) => {
         if (err && typeof err === "object" && "message" in err) {
           return (err as IAppError).message;
@@ -96,7 +96,6 @@ const AuthForm = ({
         required
       />
 
-      {/* Поле Password (только если showPasswordInput === true) */}
       {showPasswordInput && (
         <InputGroup>
           <InputGroupInput

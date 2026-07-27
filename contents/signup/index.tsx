@@ -11,7 +11,8 @@ type TSignUpContentProps = {
 };
 
 const SignUpContent = ({ className }: TSignUpContentProps) => {
-  const { signup, isLoading, errorText } = useSignup(SIGN_UP_MUTATION);
+  const { signup, isLoading, errorText, successText } =
+    useSignup(SIGN_UP_MUTATION);
 
   return (
     <AuthForm
@@ -19,6 +20,7 @@ const SignUpContent = ({ className }: TSignUpContentProps) => {
       onSubmit={signup}
       isLoading={isLoading}
       errorText={errorText}
+      successText={successText}
       buttonText="create account"
     />
   );

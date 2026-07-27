@@ -9,7 +9,11 @@ import { ISignupResponse } from "@/types/auth";
 export function useSignup<
   TData extends ISignupResponse,
   TVariables extends OperationVariables,
->(mutation: TypedDocumentNode<TData, TVariables>, redirectTo = "/employees") {
+>(
+  mutation: TypedDocumentNode<TData, TVariables>,
+  redirectTo = "/employees",
+  successText = "Account created successfully!",
+) {
   const router = useRouter();
   const [errorText, setErrorText] = useState("");
 
@@ -45,5 +49,5 @@ export function useSignup<
     }
   };
 
-  return { signup, isLoading, errorText };
+  return { signup, isLoading, errorText, successText };
 }
