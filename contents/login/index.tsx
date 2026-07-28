@@ -10,13 +10,14 @@ type TLoginContentProps = {
 };
 
 const LoginContent = ({ className }: TLoginContentProps) => {
-  const { login, isLoading, errorText } = useLogin(SIGN_IN_QUERY);
+  const { login, isLoading, errorText, successText } = useLogin(SIGN_IN_QUERY);
 
   return (
     <AuthForm
       className={className}
       onSubmit={login}
       isLoading={isLoading}
+      successText={successText}
       errorText={errorText}
       buttonText="log in"
     />

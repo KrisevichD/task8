@@ -32,3 +32,12 @@ export const FORGOT_PASSWORD_MUTATION = gql`
     forgotPassword(auth: $auth)
   }
 `;
+
+export const REFRESH_TOKEN = gql`
+  mutation RefreshToken($refreshToken: String!) {
+    refreshToken(refresh_token: $refreshToken) {
+      access_token
+      refresh_token
+    }
+  }
+`;
