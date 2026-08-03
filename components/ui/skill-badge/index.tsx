@@ -8,6 +8,7 @@ const skillBadgeVariants = cva(
 {
     variants: {
       variant: {
+        pressed: "bg-muted",
         Novice: "bg-mastery-bg-1",
         Advanced: "bg-mastery-bg-2",
         Competent: "bg-mastery-bg-3",
@@ -26,6 +27,7 @@ const skillBarVariants = cva(
 {
     variants: {
       variant: {
+        pressed: "bg-transparent",
         Novice: "w-[20%] bg-mastery-1",
         Advanced: "w-[40%] bg-mastery-2",
         Competent: "w-[60%] bg-mastery-3",
@@ -39,7 +41,7 @@ const skillBarVariants = cva(
   },
 );
 
-const SkillBadge = ({ variant }: { variant: TSkillMastery}) => {
+const SkillBadge = ({ variant }: { variant: TSkillMastery | "pressed"}) => {
     return (
         <div className={cn(skillBadgeVariants({ variant: variant }))}>
             <span aria-hidden className={cn(skillBarVariants({ variant: variant}))}></span>

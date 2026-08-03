@@ -1,5 +1,5 @@
 import { ILanguage, IProfileLanguage } from "./languages";
-import { ISkill } from "./skills";
+import { IProfileSkill, ISkill } from "./skills";
 
 export interface ICvProject {
   id: string;
@@ -18,7 +18,7 @@ export interface ICvResponce {
   education: string;
   description: string;
   projects: ICvProject[];
-  skills: ISkill[];
+  skills: IProfileSkill[];
   languages: IProfileLanguage[];
 }
 
@@ -64,6 +64,10 @@ export interface IAddCvProjectInput {
   responsibilities: string[];
 }
 
+export interface ICreateCvProjectForm extends ICreateProjectInput {
+  responsibilities: string;
+}
+
 export interface IUpdateCvInput {
     cvId: string;
     name: string;
@@ -86,9 +90,25 @@ export interface IDeleteCvProjectVariables {
     }
 }
 
+export interface IAddCvSkillInput extends IProfileSkill {
+    cvId: string;
+}
+
+export interface IAddCvSkillVariables {
+    skill: IAddCvSkillInput;
+}
+
 export interface IDeleteCvSkillVariables {
     skill: {
         cvId: string;
         name: string[];
     }
+}
+
+export interface IProjectVariables {
+    projectId: string;
+}
+
+export interface IDeleteProjectVariables { 
+    project:  IProjectVariables
 }

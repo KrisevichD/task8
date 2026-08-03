@@ -3,6 +3,7 @@ import { gql, TypedDocumentNode } from "@apollo/client";
 import {
   IDeleteProfileSkillVariables,
   IGetAllSkillsResponce,
+  IGetSkillsCategoriesResponce,
   IProfileResponce,
   IProfileSkillVariables,
 } from "@/types/skills";
@@ -21,6 +22,23 @@ export const GET_ALL_SKILLS: TypedDocumentNode<
       }
       category_name
       category_parent_name
+    }
+  }
+`;
+
+export const GET_SKILLS_CATEGORIES: TypedDocumentNode<
+  IGetSkillsCategoriesResponce,
+  Record<string, never>
+> = gql`
+  query SkillCategories {
+    skillCategories {
+      id
+      name
+      order
+      parent {
+        id 
+        name
+      }
     }
   }
 `;
@@ -46,38 +64,6 @@ export const DELETE_PROFILE_SKILL: TypedDocumentNode<
 > = gql`
   mutation DeleteProfileSkill($skill: DeleteProfileSkillInput!) {
     deleteProfileSkill(skill: $skill) {
-      id
-      skills {
-        name
-        categoryId
-        mastery
-      }
-    }
-  }
-`;
-
-export const ADD_CV_SKILL: TypedDocumentNode<
-  ICvResponce,
-  IProfileSkillVariables
-> = gql`
-  mutation AddCvSkill($skill: AddCvSkillInput!) {
-    addCvSkill(skill: $skill) {
-      id
-      skills {
-        name
-        categoryId
-        mastery
-      }
-    }
-  }
-`;
-
-export const DELETE_CV_SKILL: TypedDocumentNode<
-  ICvResponce,
-  IDeleteProfileSkillVariables
-> = gql`
-  mutation DeleteCvSkill($skill: DeleteCvSkillInput!) {
-    deleteCvSkill(skill: $skill) {
       id
       skills {
         name

@@ -20,7 +20,7 @@ import { Icon } from "@/components/ui/icon";
 import { SelectItem } from "@/components/ui/select";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import useSkills from "@/hooks/skills/useSkills";
-import { ICreateProjectInput } from "@/types/cv-constructor";
+import { ICreateCvProjectForm, ICreateProjectInput } from "@/types/cv-constructor";
 import { validateDateString } from "@/utils/helpers";
 
 interface FormData extends ICreateProjectInput {
@@ -37,13 +37,13 @@ const INITIAL_FORM_DATA = {
       responsibilities: "",
     }
 
-const CvProjectsForm = ({initialData}: {initialData?: FormData}) => {
+const CvProjectsForm = ({initialData}: {initialData?: ICreateCvProjectForm}) => {
   const [isOpen, setIsOpen] = useState(false);
   const params = useParams();
-  const { createProject, addCvProject } = useCvConstructor();
+  const { addCvProject } = useCvConstructor();
   const { getAllSkills, skills } = useSkills();
 
-  const { register, control, handleSubmit } = useForm<FormData>({
+  const { register, control, handleSubmit } = useForm<ICreateCvProjectForm>({
     defaultValues: initialData ?? INITIAL_FORM_DATA
   });
 
@@ -53,28 +53,9 @@ const CvProjectsForm = ({initialData}: {initialData?: FormData}) => {
     }
   }, [isOpen]);
 
-  const onSubmit = async (formData: FormData) => {
-    setIsOpen(false);
-    const { responsibilities, ...projectVariables } = {
-      ...formData,
-      start_date: validateDateString(formData.start_date),
-      end_date: validateDateString(formData.end_date),
-    };
-    console.log(formData);
-    const project = await createProject({
-      variables: { project: projectVariables },
-    });
-    if (!project.data) return;
-    console.log(project);
-    const cvProject = await addCvProject({
-          cvId: params.id as string,
-          projectId: project.data.createProject.id,
-          start_date: validateDateString(formData.start_date),
-          end_date: validateDateString(formData.end_date),
-          roles: [],
-          responsibilities: responsibilities.split("\n"),
-        });
-    console.log(cvProject);
+  const onSubmit = async (formData: ICreateCvProjectForm) => {
+      await addCvProject(formData)
+      setIsOpen(false);
   };
 
   return (

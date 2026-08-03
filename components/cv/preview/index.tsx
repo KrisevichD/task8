@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -18,7 +20,7 @@ const CvPreview = () => {
   const { fullName, positionName, languages, isLoading, error } = useMe(userId);
   const { printRef, isExporting, handleDownloadPdf } = useExportPdf();
 
-  if (!cvData) return <>Loading...</>;
+  if (!cvData) return <Spinner />;
 
   const data = cvData.cv;
 
@@ -63,7 +65,7 @@ const CvPreview = () => {
         <article className="py-4 pl-6.25 pr-3 border-l border-primary">
           <h2>{data.name}</h2>
           <p>{data.description}</p>
-          {/* {filteredList.map((category) => {
+          {/* {data.skills.map((category) => {
             return (
               <>
                 <h3>{category.name}</h3>
@@ -99,7 +101,7 @@ const CvPreview = () => {
       </section>
       <section>
         <h2>Professional skills</h2>
-        <Table>
+        {/* <Table>
           <TableHeader>
             <TableRow className="px-4 py-2.5 border-primary">
               <TableHead className="align-top">SKILLS</TableHead>
@@ -113,7 +115,7 @@ const CvPreview = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {/* {filteredList.map((category) => {
+            {data.skills.map((category) => {
               return (
                 <TableRow key={`category-${category.name}`}>
                   <TableCell className="text-primary">
@@ -128,9 +130,9 @@ const CvPreview = () => {
                   <TableCell>2025</TableCell>
                 </TableRow>
               );
-            })} */}
+            })}
           </TableBody>
-        </Table>
+        </Table> */}
       </section>
     </article>
   );

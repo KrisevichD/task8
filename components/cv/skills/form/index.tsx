@@ -18,21 +18,38 @@ import { useMe } from "@/hooks/auth/useMe";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 
 import { getUserIdFromToken } from "@/utils/jwt";
+import { IProfileSkill, ISkill } from "@/types/skills";
+import { IAddCvSkillInput } from "@/types/cv-constructor";
 
 const CvSkillsForm = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { cvData } = useCvConstructor();
+  const [skill, setSkill] = useState("");
+  const { cvData, addCvSkill } = useCvConstructor();
 
   const userId = getUserIdFromToken();
   const { skills, isLoading } = useMe(userId);
-  const { handleSubmit, control, reset } = useForm<{ name: string }>({
-    defaultValues: {
-      name: "",
-    },
-  });
 
-  const isInList = (name: string) =>
-    cvData?.cv.skills.some((e) => e.name === name);
+  const isInList = (name: string) => {
+
+  }
+
+  const filteredSkills = skills?.filter(profileSkill => !(cvData?.cv.skills.map(e => e.name).includes(profileSkill.name)))
+
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!cvData || !skills) return;
+    const newSkill = skills.find(e => e.name === skill);
+    if (!newSkill) return;
+    const data = {
+      cvId: cvData.cv.id,
+      name: newSkill.name,
+      mastery: newSkill.mastery,
+      categoryId: newSkill.categoryId
+    } as IAddCvSkillInput;
+    
+    await addCvSkill(data);
+    setIsOpen(false);
+  }
 
   return (
     <>
@@ -52,20 +69,15 @@ const CvSkillsForm = () => {
           <form
             id="cv-skill-form"
             className="space-y-8"
-            // onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleSubmit}
           >
-            <Controller
-              name="name"
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <FloatingSelect
+            <FloatingSelect
                   label="Skill"
-                  value={field.value}
-                  onValueChange={field.onChange}
+                  value={skill}
+                  onValueChange={(value) => setSkill(value as string)}
                   disabled={isLoading}
                 >
-                  {skills?.map((skill) => (
+                  {filteredSkills?.map((skill) => (
                     <SelectItem
                       key={"cv-skill-select-" + skill.name}
                       value={skill.name}
@@ -74,8 +86,6 @@ const CvSkillsForm = () => {
                     </SelectItem>
                   ))}
                 </FloatingSelect>
-              )}
-            />
           </form>
           <DialogFooter>
             <DialogClose render={<Button variant={"outline"}>CANCEL</Button>} />

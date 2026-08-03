@@ -1,15 +1,17 @@
-import { useLazyQuery, useMutation } from "@apollo/client/react";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
 
 import {
   ADD_PROFILE_SKILL,
   DELETE_PROFILE_SKILL,
   GET_ALL_SKILLS,
+  GET_SKILLS_CATEGORIES,
 } from "@/graphql/skills";
 import { IProfileSkillInput } from "@/types/skills";
 import { getUserIdFromToken } from "@/utils/jwt";
 
 export default function useSkills() {
   const userId = getUserIdFromToken();
+  const { data: skillCategories } = useQuery(GET_SKILLS_CATEGORIES);
   const [getAllSkills, { data: skills, loading: isSkillsLoading }] =
     useLazyQuery(GET_ALL_SKILLS);
   const [executeAddProfileSkill, { loading: isAddingLoading }] =
@@ -40,6 +42,7 @@ export default function useSkills() {
 
   return {
     getAllSkills,
+    skillCategories,
     skills,
     isSkillsLoading,
     addProfileSkill,

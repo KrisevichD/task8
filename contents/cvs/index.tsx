@@ -10,8 +10,7 @@ const CvsContent = () => {
   const { createCv, isLoading } = useCreateCv(CREATE_CV_MUTATION);
 
   const handleCreateCv = async () => {
-    console.log(">>>");
-    const responce = await createCv({
+    await createCv({
       cv: {
         userId: "610",
         name: "CV",
@@ -19,8 +18,6 @@ const CvsContent = () => {
         education: "CV education",
       },
     });
-
-    console.log(responce);
   };
 
   return (

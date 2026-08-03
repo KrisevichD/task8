@@ -2,11 +2,15 @@ import { gql, TypedDocumentNode } from "@apollo/client";
 
 import {
   IAddCvProjectVariables,
+  IAddCvSkillVariables,
   ICreateProjectVariables,
   ICvResponce,
   ICvVariables,
   IDeleteCvProjectVariables,
+  IDeleteCvSkillVariables,
+  IDeleteProjectVariables,
   IProjectData,
+  IProjectVariables,
   IUpdateCvVariables,
 } from "@/types/cv-constructor";
   
@@ -22,6 +26,8 @@ import {
           name
           domain
           description
+          start_date
+          end_date
           environment
           responsibilities
         }
@@ -49,6 +55,17 @@ export const CREATE_PROJECT_MUTATION: TypedDocumentNode<
   }
 `;
 
+export const DELETE_PROJECT: TypedDocumentNode<
+  { affected: number },
+  IDeleteProjectVariables
+> = gql`
+  mutation DeleteProject($project: DeleteProjectInput!) {
+    deleteProject(project: $project) {
+      affected
+    }
+  }
+`;
+
 export const UPDATE_CV: TypedDocumentNode<
   ICvResponce,
   IUpdateCvVariables
@@ -63,6 +80,23 @@ export const UPDATE_CV: TypedDocumentNode<
   }
 `;
 
+export const GET_PROJECT: TypedDocumentNode<
+  IProjectData,
+  IProjectVariables
+> = gql`
+  query Project($projectId: ID!) {
+    project(projectId: $projectId) {
+      id
+      name
+      domain
+      start_date
+      end_date
+      description
+      environment
+    }
+  }
+`;
+
 export const ADD_CV_PROJECT_MUTATION: TypedDocumentNode<
   ICvResponce,
   IAddCvProjectVariables
@@ -70,7 +104,10 @@ export const ADD_CV_PROJECT_MUTATION: TypedDocumentNode<
   mutation AddCvProject($project: AddCvProjectInput!) {
     addCvProject(project: $project) {
       id
-      name
+      projects {
+        id
+        name
+      }
     }
   }
 `;
@@ -84,6 +121,37 @@ export const DELETE_CV_PROJECT: TypedDocumentNode<
       id
       projects {
         id
+        name
+      }
+    }
+  }
+`
+
+export const ADD_CV_SKILL: TypedDocumentNode<
+  ICvResponce,
+  IAddCvSkillVariables
+> = gql`
+  mutation AddCvSkill($skill: AddCvSkillInput!) {
+    addCvSkill(skill: $skill) {
+      id
+      skills {
+        name
+        mastery
+      }
+    }
+  }
+`;
+
+export const DELETE_CV_SKILL: TypedDocumentNode<
+  ICvResponce,
+  IDeleteCvSkillVariables
+> = gql`
+  mutation DeleteCvSkill($skill: DeleteCvSkillInput!) {
+    deleteCvSkill(skill: $skill) {
+      id
+      skills {
+        name
+        mastery
       }
     }
   }

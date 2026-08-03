@@ -48,3 +48,10 @@ export interface IDeleteProfileSkillVariables {
     name: string[];
   };
 }
+
+export interface IGetSkillsCategoriesResponce {
+    id: string;
+    name: string;
+    order: number;
+    parent: IGetSkillsCategoriesResponce | null;
+}

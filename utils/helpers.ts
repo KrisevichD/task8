@@ -3,6 +3,7 @@ export function validateProjectDate(
   variant?: "cv-projects" | "preview",
 ): string | "Till now" {
   const dateObject = new Date(date);
+  console.log(date, dateObject)
   if (new Date(dateObject).getTime() > Date.now()) return "Till now";
   switch (variant) {
     case "cv-projects":

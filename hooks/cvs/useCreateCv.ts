@@ -25,7 +25,6 @@ export default function useCreateCv(
       }
 
       if (!result.data) throw new Error("No data");
-      console.log(result);
       router.push(`/cvs/${result.data.createCv.id}`);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";

@@ -73,7 +73,7 @@ const SkillsContent = () => {
                 pressed={selectedSkills.includes(skill.name)}
                 onPressedChange={(pressed) => handleToggle(pressed, skill.name)}
               >
-                <SkillBadge variant={skill.mastery} />
+                <SkillBadge variant={selectedSkills.includes(skill.name) ? "pressed" : skill.mastery} />
                 {skill.name}
               </Toggle>
             );

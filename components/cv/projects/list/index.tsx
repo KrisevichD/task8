@@ -22,6 +22,7 @@ import {
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import { validateProjectDate } from "@/utils/helpers";
 import CvProjectsForm from "../form";
+import { Spinner } from "@/components/ui/spinner";
 
 const CvProjectsList = () => {
   const { cvData, deleteCvProject } = useCvConstructor();
@@ -30,8 +31,11 @@ const CvProjectsList = () => {
     deleteCvProject({
         cvId: cvData!.cv.id,
         projectId: id
-    })
+    });
+    
   }
+
+  if (!cvData) return <Spinner />
 
   return (
     <Table>
@@ -45,7 +49,7 @@ const CvProjectsList = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {cvData?.cv.projects?.map((project) => {
+        {cvData.cv.projects.map((project) => {
           return (
             <TableRow
               key={`cv-projects-${project.id}`}
@@ -58,8 +62,8 @@ const CvProjectsList = () => {
                 </p>
                 <div className="w-[calc(100vw-280px)] flex flex-wrap gap-2">
                   {project.responsibilities.length > 0 &&
-                    project.responsibilities.map((tag) => {
-                      return <Badge key={`tag-${tag}`}>{tag}</Badge>;
+                    project.responsibilities.map((tag, index) => {
+                      return <Badge key={`tag-${tag}${index}`}>{tag}</Badge>;
                     })}
                 </div>
               </TableCell>
