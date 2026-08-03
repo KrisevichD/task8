@@ -3,6 +3,7 @@ import { TypedDocumentNode, gql } from "@apollo/client";
 export type UserQueryResponse = {
   id: string;
   email: string;
+  role?: string;
   department_name?: string;
   position_name?: string;
   profile: {
@@ -21,6 +22,7 @@ export const GET_EMPLOYEES: TypedDocumentNode<IGetUsersData> = gql`
     users {
       id
       email
+      role
       department_name
       position_name
       profile {

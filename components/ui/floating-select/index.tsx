@@ -17,11 +17,13 @@ export function FloatingSelect({
   placeholder = " ",
   children,
   className,
+  value,
   ...props
 }: FloatingSelectProps) {
+  const safeValue = value ?? ""
   return (
     <div className="relative w-full border-none bg-transparent group/select">
-      <Select {...props}>
+      <Select  value={safeValue} {...props}>
         <SelectTrigger
           className={cn(
             "peer",

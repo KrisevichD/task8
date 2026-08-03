@@ -8,11 +8,12 @@ export const useMe = (userId1?: string) => {
 
   const {
     data,
-    loading: isLoading,
+    loading: isQueryLoading,
     error,
   } = useQuery(GET_USER, {
     variables: { userId: userId! },
     skip: !userId,
+    fetchPolicy: "cache-and-network",
   });
 
   const user = data?.user;
@@ -25,6 +26,7 @@ export const useMe = (userId1?: string) => {
     `${firstName[0] || ""}${lastName[0] || ""}`.toUpperCase() ||
     user?.email?.[0]?.toUpperCase() ||
     "U";
+  const isLoading = isQueryLoading && !user;
 
   const positionName = user?.position_name || "";
 
