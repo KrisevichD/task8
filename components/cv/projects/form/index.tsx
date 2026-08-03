@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,30 +18,63 @@ import { FloatingSelect } from "@/components/ui/floating-select";
 import { FloatingTextarea } from "@/components/ui/floating-textarea";
 import { Icon } from "@/components/ui/icon";
 import { SelectItem } from "@/components/ui/select";
-import { useCVContext } from "@/context/cv";
-import { ICVProject } from "@/types/cv";
+import useCvConstructor from "@/hooks/cvs/useCvConstructor";
+import useSkills from "@/hooks/skills/useSkills";
+import { ICreateProjectInput } from "@/types/cv-constructor";
+import { validateDateString } from "@/utils/helpers";
 
-const CVProjectsForm = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { data, updateDataByKey } = useCVContext();
+interface FormData extends ICreateProjectInput {
+  responsibilities: string;
+}
 
-  const { register, reset, handleSubmit } = useForm<ICVProject>({
-    defaultValues: {
-      project: "",
+const INITIAL_FORM_DATA = {
+      name: "",
       domain: "",
-      startDate: new Date(),
-      endDate: new Date(),
+      start_date: new Date().toLocaleString(),
+      end_date: new Date().toLocaleString(),
       description: "",
-      enviroment: [],
+      environment: [],
       responsibilities: "",
-    },
+    }
+
+const CvProjectsForm = ({initialData}: {initialData?: FormData}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const params = useParams();
+  const { createProject, addCvProject } = useCvConstructor();
+  const { getAllSkills, skills } = useSkills();
+
+  const { register, control, handleSubmit } = useForm<FormData>({
+    defaultValues: initialData ?? INITIAL_FORM_DATA
   });
 
-  const onSubmit = (formData: ICVProject) => {
-    updateDataByKey("projects", [...data.projects, formData as ICVProject]);
-    reset();
+  useEffect(() => {
+    if (isOpen) {
+      getAllSkills();
+    }
+  }, [isOpen]);
+
+  const onSubmit = async (formData: FormData) => {
     setIsOpen(false);
-    console.log("formData");
+    const { responsibilities, ...projectVariables } = {
+      ...formData,
+      start_date: validateDateString(formData.start_date),
+      end_date: validateDateString(formData.end_date),
+    };
+    console.log(formData);
+    const project = await createProject({
+      variables: { project: projectVariables },
+    });
+    if (!project.data) return;
+    console.log(project);
+    const cvProject = await addCvProject({
+          cvId: params.id as string,
+          projectId: project.data.createProject.id,
+          start_date: validateDateString(formData.start_date),
+          end_date: validateDateString(formData.end_date),
+          roles: [],
+          responsibilities: responsibilities.split("\n"),
+        });
+    console.log(cvProject);
   };
 
   return (
@@ -48,6 +82,8 @@ const CVProjectsForm = () => {
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger
           render={
+            !initialData 
+            ?
             <Button
               variant={"ghost"}
               type="button"
@@ -56,6 +92,8 @@ const CVProjectsForm = () => {
               <Icon variant="add" />
               Add project
             </Button>
+            :
+            <DialogTrigger onClick={() => setIsOpen(true)}>Edit</DialogTrigger>
           }
         />
         <DialogContent>
@@ -68,15 +106,15 @@ const CVProjectsForm = () => {
             className="space-y-3"
           >
             <div className="grid grid-cols-2 gap-3">
-              <FloatingInput {...register("project")} label="Project" />
+              <FloatingInput {...register("name")} label="Project" />
               <FloatingInput {...register("domain")} label="Domain" />
               <FloatingInput
-                {...register("startDate")}
+                {...register("start_date")}
                 type="date"
                 label="Start Date"
               />
               <FloatingInput
-                {...register("endDate")}
+                {...register("end_date")}
                 type="date"
                 label="End Date"
               />
@@ -85,10 +123,27 @@ const CVProjectsForm = () => {
               {...register("description")}
               label="Description"
             />
-            <FloatingSelect label="Enviroment">
-              <SelectItem value={1}>Tag</SelectItem>
-              <SelectItem value={2}>Tag</SelectItem>
-            </FloatingSelect>
+            <Controller
+              name="environment"
+              control={control}
+              render={({ field }) => (
+                <FloatingSelect
+                  label="Environment"
+                  multiple
+                  value={field.value}
+                  onValueChange={field.onChange}
+                >
+                  {skills?.skills.map((skill) => (
+                    <SelectItem
+                      key={`environment-${skill.id}`}
+                      value={skill.name}
+                    >
+                      {skill.name}
+                    </SelectItem>
+                  ))}
+                </FloatingSelect>
+              )}
+            />
             <FloatingTextarea
               {...register("responsibilities")}
               label="Responsibilities"
@@ -112,4 +167,4 @@ const CVProjectsForm = () => {
   );
 };
 
-export default CVProjectsForm;
+export default CvProjectsForm;

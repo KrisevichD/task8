@@ -45,7 +45,7 @@ export const EmployeesContent = () => {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden py-4">
-      <div className="shrink-0 pl-[44px] pr-8 space-y-3 pb-2">
+      <div className="shrink-0 pl-11 pr-8 space-y-3 pb-2">
         <h1 className="text-base font-normal text-muted-foreground">
           Employees
         </h1>

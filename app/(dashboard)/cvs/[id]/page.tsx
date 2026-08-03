@@ -1,12 +1,9 @@
-import CVWizard from "@/contents/cv-wizard";
-import CVProvider from "@/context/cv";
+import CvConstructor from "@/contents/cv-constructor";
 
 export default async function CvPage() {
   return (
     <>
-      <CVProvider>
-        <CVWizard />
-      </CVProvider>
+      <CvConstructor />
     </>
   );
 }

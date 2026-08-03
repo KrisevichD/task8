@@ -1,32 +1,50 @@
 import React, { useEffect } from "react";
 
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 import { FloatingInput } from "../../ui/floating-input";
 
 import { Button } from "@/components/ui/button";
 import { FloatingTextarea } from "@/components/ui/floating-textarea";
-import { useCVContext } from "@/context/cv";
-import { ICVDetails } from "@/types/cv";
+import useCvConstructor from "@/hooks/cvs/useCvConstructor";
+import { ICvDetailsForm } from "@/types/cv-constructor";
+import { toast } from "sonner";
 
-const CVDetailsForm = () => {
-  const { data, updateDataByKey } = useCVContext();
+const CvDetailsForm = () => {
+  const { cvData, updateCv, isCvLoading, cvError } = useCvConstructor();
 
-  const { register, control, handleSubmit } = useForm<ICVDetails>({
-    defaultValues: data.details,
+  const { register, reset, handleSubmit } = useForm<ICvDetailsForm>({
+    defaultValues: {
+      name: "",
+      description: "",
+      education: "",
+    },
   });
 
-  const formData = useWatch({ control });
-
-  const onSubmit = () => {
-    console.log(formData);
-  };
-
   useEffect(() => {
-    if (formData) {
-      updateDataByKey("details", formData as ICVDetails);
-    }
-  }, [formData, updateDataByKey]);
+    if(cvData) reset({
+      name: cvData.cv.name,
+      description: cvData.cv.description,
+      education: cvData.cv.education,
+    })
+  }, [cvData])
+
+  const onSubmit = (formData: ICvDetailsForm) => {
+    if (!cvData) return;
+    const data = {
+        cvId: cvData.cv.id,
+        ...formData
+    };
+    const status = updateCv(data);
+    toast.promise(status, {
+        loading: "Updating data",
+        success: "CV successfully updated",
+        error: (error) => {
+            return error.message;
+        },
+        position: "top-right"
+    })
+  };
 
   return (
     <form
@@ -47,4 +65,4 @@ const CVDetailsForm = () => {
   );
 };
 
-export default CVDetailsForm;
+export default CvDetailsForm;

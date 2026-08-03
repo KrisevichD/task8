@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={cn("h-full", "antialiased", roboto.variable)}>
-      <body className="min-h-full flex flex-col">
+      <body className="dark min-h-full flex flex-col">
         <Providers>{children}</Providers>
 
         <Toaster />

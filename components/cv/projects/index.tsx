@@ -1,7 +1,7 @@
 import React from "react";
 
-import CVProjectsForm from "./form";
-import CVProjectsList from "./list";
+import CvProjectsForm from "./form";
+import CvProjectsList from "./list";
 
 import { Icon } from "@/components/ui/icon";
 import {
@@ -11,7 +11,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 
-const CVProjects = () => {
+const CvProjects = () => {
   return (
     <>
       <div className="flex justify-between px-5 py-2">
@@ -23,11 +23,11 @@ const CVProjects = () => {
             </InputGroupButton>
           </InputGroupAddon>
         </InputGroup>
-        <CVProjectsForm />
+        <CvProjectsForm />
       </div>
-      <CVProjectsList />
+      <CvProjectsList />
     </>
   );
 };
 
-export default CVProjects;
+export default CvProjects;

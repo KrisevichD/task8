@@ -29,7 +29,7 @@ export const Sidebar = () => {
   const { fullName, initials, avatarUrl, isLoading } = useMe(userId);
 
   return (
-    <aside className="w-[200px] shrink-0 bg-background min-h-screen flex flex-col pt-11 pb-1 mr-6">
+    <aside className="w-50 shrink-0 bg-background min-h-screen flex flex-col pt-11 pb-1 mr-6">
       <nav className="space-y-1 w-full">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname.startsWith(item.href);

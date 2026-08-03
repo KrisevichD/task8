@@ -4,9 +4,10 @@ import Link from "next/link";
 
 import { usePathname, useSearchParams } from "next/navigation";
 
-import CVDetailsForm from "@/components/cv/details-form";
-import CVPreview from "@/components/cv/preview";
-import CVProjects from "@/components/cv/projects";
+import CvDetailsForm from "@/components/cv/details-form";
+import CvPreview from "@/components/cv/preview";
+import CvProjects from "@/components/cv/projects";
+import CvSkills from "@/components/cv/skills";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,20 +16,20 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import CVSkills from "@/components/cv/skills";
+import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 
 const VALID_TABS = ["details", "projects", "skills", "preview"] as const;
 const DEFAULT_TAB = "details";
 type TTab = (typeof VALID_TABS)[number];
 
-const CVWizard = () => {
+const CvConstructor = () => {
   const searchParams = useSearchParams();
-
   const pathname = usePathname();
   const tab = searchParams.get("tab") ?? "";
-
   const activeTab = VALID_TABS.includes(tab as TTab) ? tab : DEFAULT_TAB;
+  const { cvData, isCvLoading } = useCvConstructor();
 
   const handleTabChange = (nextTab: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -43,6 +44,8 @@ const CVWizard = () => {
     window.history.replaceState(null, "", newUrl);
   };
 
+  if (isCvLoading) return <Spinner />;
+
   return (
     <div className="pl-6 pr-6.5">
       <Breadcrumb>
@@ -51,7 +54,7 @@ const CVWizard = () => {
             <BreadcrumbLink render={<Link href={"/cvs"}>CVs</Link>} />
           </BreadcrumbItem>
           <BreadcrumbSeparator />
-          <BreadcrumbPage>{1}</BreadcrumbPage>
+          <BreadcrumbPage>{cvData?.cv.name}</BreadcrumbPage>
           {activeTab !== "details" && (
             <>
               <BreadcrumbSeparator />
@@ -72,20 +75,20 @@ const CVWizard = () => {
           <TabsTrigger value={"preview"}>Preview</TabsTrigger>
         </TabsList>
         <TabsContent value={"details"}>
-          <CVDetailsForm />
+          <CvDetailsForm />
         </TabsContent>
         <TabsContent value={"projects"}>
-          <CVProjects />
+          <CvProjects />
         </TabsContent>
         <TabsContent value={"skills"}>
-          <CVSkills />
+          <CvSkills />
         </TabsContent>
         <TabsContent value={"preview"}>
-          <CVPreview />
+          <CvPreview />
         </TabsContent>
       </Tabs>
     </div>
   );
 };
 
-export default CVWizard;
+export default CvConstructor;

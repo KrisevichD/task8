@@ -39,8 +39,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast: "cn-toast transitions-colors",
-          success: "group-[.toaster]:!bg-successful",
-          error: "group-[.toaster]:!bg-destructive",
+          success: "group-[.toaster]:!bg-successful/10",
+          error: "group-[.toaster]:!bg-destructive/10",
         },
       }}
       {...props}
