@@ -2,7 +2,7 @@
 
 import { Controller } from "react-hook-form";
 
-import { AvatarSection } from "./AvatarSection";
+import { AvatarSection } from "./avatarSection";
 
 import { Button } from "@/components/ui/button";
 import { FloatingInput } from "@/components/ui/floating-input";
@@ -11,6 +11,7 @@ import { SelectItem } from "@/components/ui/select";
 import { IUserData } from "@/graphql/user/queries";
 
 import { useEmployeeDetailsForm } from "@/hooks/employees/useEmployeeDetailsForm";
+import { cn } from "@/utils/shadcn";
 interface IEmployeeDetailsContentProps {
   userId: string;
   initialUser?: IUserData;
@@ -145,11 +146,12 @@ export const EmployeeDetailsContent = ({
             <Button
               type="submit"
               disabled={!canSubmit || isUpdating}
-              className={`w-full max-w-90 h-12 rounded-full font-semibold text-sm tracking-wider uppercase transition-colors ${
+              className={cn(
+                "w-full max-w-90 h-12 rounded-full font-semibold text-sm tracking-wider uppercase transition-colors",
                 canSubmit
                   ? "bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
-                  : "bg-border text-muted-foreground cursor-not-allowed opacity-100"
-              }`}
+                  : "bg-muted text-muted-foreground cursor-not-allowed opacity-60",
+              )}
             >
               {isUpdating ? "UPDATING..." : "UPDATE"}
             </Button>

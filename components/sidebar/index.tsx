@@ -73,7 +73,7 @@ export const Sidebar = () => {
           <div className="flex items-center gap-3 overflow-hidden transition-all duration-300">
             <Avatar size="lg" className="max-lg:size-7">
               <AvatarImage src={avatarUrl} alt={fullName} />
-              <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+              <AvatarFallback className="bg-muted text-muted-foreground font-semibold">
                 {initials || "U"}
               </AvatarFallback>
             </Avatar>
