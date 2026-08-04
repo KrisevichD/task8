@@ -132,8 +132,8 @@ export const UPDATE_CV_PROJECT: TypedDocumentNode<
   ICvResponce,
   IAddCvProjectVariables
 > = gql`
-  mutation AddCvProject($project: AddCvProjectInput!) {
-    addCvProject(project: $project) {
+  mutation UpdateCvProject($project: UpdateCvProjectInput!) {
+    updateCvProject(project: $project) {
       id
       projects {
         id

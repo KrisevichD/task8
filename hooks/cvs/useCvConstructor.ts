@@ -13,6 +13,7 @@ import {
   GET_CV,
   GET_PROJECT,
   UPDATE_CV,
+  UPDATE_CV_PROJECT,
 } from "@/graphql/cv-constructor";
 import { IAddCvProjectInput, IAddCvSkillInput, ICreateCvProjectForm, ICvProject, IProjectData, IUpdateCvInput } from "@/types/cv-constructor";
 import { validateDateString } from "@/utils/helpers";
@@ -24,13 +25,13 @@ export default function useCvConstructor() {
     refetchQueries: ["GetCv"],
   });
   const [getProject, { }] = useLazyQuery(GET_PROJECT);
+  const [getAllProjects, { data: projects }] = useLazyQuery(GET_ALL_PROJECTS)
   const [executeAddCvProject, { loading: isCvProjectLoading, error: cvProjecterror }] = useMutation(ADD_CV_PROJECT_MUTATION);
-  const [updateCvProject] = useMutation(ADD_CV_PROJECT_MUTATION);
+  const [executeUpdateCvProject] = useMutation(UPDATE_CV_PROJECT);
   const [executeDeleteCvProject, { loading: isProjectDeleting, error: projectDeletingError }] = useMutation(DELETE_CV_PROJECT);
   const [executeUpdateCv, { loading: isCvUpdating, error: cvUpdatingError }] = useMutation(UPDATE_CV);
   const [executeAddCvSkill, { loading: isCvSkillLoading, error: cvSkillError }] = useMutation(ADD_CV_SKILL);
   const [executeDeleteCvSkill, { loading: isCvSkillDeleting, error: skillDeletingError }] = useMutation(DELETE_CV_SKILL);
-  const [getAllProjects, { data: projects }] = useLazyQuery(GET_ALL_PROJECTS)
   const {
     data: cvData,
     loading: isCvLoading,
@@ -39,6 +40,7 @@ export default function useCvConstructor() {
     variables: { cvId: cvId },
     skip: !cvId
   });
+  
 
   const addCvProject = async (input: ICreateCvProjectForm) => {
     const { responsibilities, ...createProjectData } = input;
@@ -52,27 +54,41 @@ export default function useCvConstructor() {
           start_date: validateDateString(project.start_date),
           end_date: validateDateString(project.end_date),
           roles: [],
-          responsibilities: responsibilities.split("\n"),
+          responsibilities: responsibilities.trim().length > 0 ? responsibilities.trim().split("\n") : [],
         };
     executeAddCvProject({variables: { project: addProjectData }});
   }
 
-  const deleteCvProject = async (input: { cvId: string; project: ICvProject }) => {
-    console.log(input)
-    const response = await getAllProjects();
-    console.log(response)
-    const idToDelete = response.data?.projects.find(project => {
-      const matchesName = project.name === input.project.name;
-      const matchesDomain = project.domain === input.project.domain;
-      const matchesDescription = project.description === input.project.description;
-      const matchesStartDate = project.start_date === input.project.start_date;
-      const matchesEndDate = project.end_date === input.project.end_date;
+  const updateCvProject = async (id: string, input: ICreateCvProjectForm) => {
+    const { responsibilities, start_date, end_date } = input;
+    console.log(start_date, end_date, responsibilities)
+    executeUpdateCvProject({ variables: { project: {
+      cvId: cvId,
+      projectId: id,
+      start_date: start_date,
+      end_date: end_date,
+      roles: [],
+      responsibilities: responsibilities.trim().length > 0 ? responsibilities.trim().split("\n") : [],
+    }}})
+  }
 
-      return matchesName && matchesDomain && matchesDescription && matchesStartDate && matchesEndDate;
-    })?.id;
-    console.log("!",idToDelete)
-    if(!idToDelete) return;
-    deleteProject({ variables: { project: { projectId: idToDelete }}});
+  const deleteCvProject = async (input: { cvId: string; project: ICvProject }) => {
+    // console.log(input)
+    // const response = await getAllProjects();
+    // console.log(response)
+    // const idToDelete = response.data?.projects.find(project => {
+    //   const matchesName = project.name === input.project.name;
+    //   const matchesDomain = project.domain === input.project.domain;
+    //   const matchesDescription = project.description === input.project.description;
+    //   const matchesStartDate = project.start_date === input.project.start_date;
+    //   const matchesEndDate = project.end_date === input.project.end_date;
+
+    //   return matchesName && matchesDomain && matchesDescription && matchesStartDate && matchesEndDate;
+    // })?.id;
+    // console.log("!",idToDelete)
+    // if(!idToDelete) return;
+    // deleteProject({ variables: { project: { projectId: idToDelete }}});
+    executeDeleteCvProject({ variables: { project: { cvId: input.cvId, projectId: input.project.id }}})
   }
 
   const addCvSkill = (input: IAddCvSkillInput) => {

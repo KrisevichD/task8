@@ -30,6 +30,7 @@ import { ICvProject } from "@/types/cv-constructor";
 const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
   const { cvData, deleteCvProject } = useCvConstructor();
   const [isEditing, setIsEditing] = useState(false);
+  const [hoveredProjectId, setHoveredProjectId] = useState<string | null>(null)
 
   const handleDeleteProject = async (project: ICvProject) => {
     deleteCvProject({
@@ -67,33 +68,28 @@ const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
       </TableHeader>
       <TableBody>
         {filteredList.map((project) => {
+          const isCurrentHovered = project.id === hoveredProjectId;
           return (
+            <React.Fragment key={`cv-projects-${project.id}`}>
             <TableRow
-              key={`cv-projects-${project.id}`}
-              className="last:border-b-0"
+              className={(isCurrentHovered ? "bg-muted/50" : "bg-background") + " border-b-0"}
+              onMouseEnter={() => setHoveredProjectId(project.id)}
+              onMouseLeave={() => setHoveredProjectId(null)}
             >
-              <TableCell className="max-w-89 space-y-4 pt-7">
-                <p>{project.name}</p>
-                <p className="w-[calc(100vw-280px)] opacity-50 whitespace-normal wrap-break-word">
-                  {project.description}
-                </p>
-                <div className="w-[calc(100vw-280px)] flex flex-wrap gap-2">
-                  {project.responsibilities.length > 0 &&
-                    project.responsibilities.map((tag, index) => {
-                      return <Badge key={`tag-${tag}${index}`}>{tag}</Badge>;
-                    })}
-                </div>
+              <TableCell className="max-w-89 pt-7 align-top w-[30%]">
+                <p className="align-top">{project.name}</p>
+                
               </TableCell>
-              <TableCell className="align-top h-18 pt-7">
+              <TableCell className="align-top h-18 pt-7 w-[30%]">
                 {project.domain}
               </TableCell>
-              <TableCell className="align-top h-18 pt-7">
+              <TableCell className="align-top h-18 pt-7 w-[15%]">
                 {validateProjectDate(project.start_date, "cv-projects")}
               </TableCell>
-              <TableCell className="align-top h-18 pt-7">
+              <TableCell className="align-top h-18 pt-7 w-[15%]">
                 {validateProjectDate(project.end_date, "cv-projects")}
               </TableCell>
-              <TableCell className="align-top h-18 pt-4">
+              <TableCell className="align-top h-18 pt-4 w-[10%]">
                 <DropdownMenu>
                   <DropdownMenuTrigger
                     render={
@@ -116,7 +112,11 @@ const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
                     </DropdownMenuGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <CvProjectsForm isEditing={isEditing} setIsEditing={setIsEditing} initialData={{
+                <CvProjectsForm 
+                id={project.id}
+                isEditing={isEditing} 
+                closeEditing={() => setIsEditing(false)} 
+                initialData={{
                             name: project.name,
                             domain: project.domain,
                             start_date: project.start_date,
@@ -127,6 +127,24 @@ const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
                         }}/>
               </TableCell>
             </TableRow>
+            <TableRow 
+            className={(isCurrentHovered ? "bg-muted/50" : "bg-background") + " last:border-b-0"}
+              onMouseEnter={() => setHoveredProjectId(project.id)}
+              onMouseLeave={() => setHoveredProjectId(null)}
+            >
+              <TableCell colSpan={5} className="space-y-4 pt-0 align-top">
+                <p className="w-full block opacity-50 whitespace-normal wrap-break-word">
+                  {project.description}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {project.responsibilities.length !== 0 &&
+                    project.responsibilities.map((tag, index) => {
+                      return <Badge key={`tag-${tag}${index}`}>{tag}</Badge>;
+                    })}
+                </div>
+              </TableCell>
+            </TableRow>
+            </React.Fragment>
           );
         })}
       </TableBody>

@@ -39,8 +39,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast: "cn-toast transitions-colors",
-          success: "group-[.toaster]:!bg-successful/10",
-          error: "group-[.toaster]:!bg-destructive/10",
+          success: "group-[.toaster]:!bg-[color-mix(in_oklch,var(--popover),var(--successful)_20%)]",
+          error: "group-[.toaster]:!bg-[color-mix(in_oklch,var(--popover),var(--destructive)_20%)]",
         },
       }}
       {...props}
