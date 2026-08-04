@@ -17,6 +17,8 @@ export type IconVariants =
     | "search"
     | "skills"
     | "upload"
+    | "user"
+
 
 const iconVariants = cva(
     "inline-block shrink-0 select-none fill-current text-current",

@@ -2,27 +2,15 @@
 
 import { useState } from "react";
 
-import { EmployeeSearch } from "./employee-search";
-import { EmployeeTable } from "./employee-table";
+import { EmployeeSearch } from "./search";
+import { EmployeeTable } from "./table";
 
 import { useEmployees } from "@/hooks/employees/useEmployees";
 import { useDebounce } from "@/hooks/useDebounce";
 
-export type Employee = {
-  id: string;
-  avatarUrl?: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  department: string;
-  position?: string;
-};
-
 export const EmployeesContent = () => {
   const [search, setSearch] = useState("");
-
   const debouncedSearch = useDebounce(search, 300);
-
   const { employees, isLoading, error } = useEmployees();
 
   const filteredEmployees = employees.filter((emp) => {
@@ -44,8 +32,8 @@ export const EmployeesContent = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden py-4">
-      <div className="shrink-0 pl-11 pr-8 space-y-3 pb-2">
+    <div className="flex flex-col h-full py-4">
+      <div className="shrink-0 pl-11 pr-8 space-y-3 pb-3">
         <h1 className="text-base font-normal text-muted-foreground">
           Employees
         </h1>

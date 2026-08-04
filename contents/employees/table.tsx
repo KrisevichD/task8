@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -30,6 +31,7 @@ interface IEmployeeTableProps {
 type SortOrder = "asc" | "desc";
 
 export const EmployeeTable = ({ employees }: IEmployeeTableProps) => {
+  const router = useRouter();
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
 
   const toggleSort = () => {
@@ -46,13 +48,12 @@ export const EmployeeTable = ({ employees }: IEmployeeTableProps) => {
     return deptB.localeCompare(deptA);
   });
 
+  const handleRowClick = (id: string) => {
+    router.push(`/employees/${id}`);
+  };
+
   return (
-    // Контейнер, который реально скроллится
     <div className="w-full h-full overflow-y-auto">
-      {/* 
-        ВАЖНО: [&>div]:overflow-visible отключает скролл-обертку внутри shadcn UI Table,
-        благодаря чему sticky top-0 начинает работать намертво!
-      */}
       <Table className="[&>div]:overflow-visible border-collapse">
         <TableHeader>
           <TableRow className="hover:bg-transparent border-b border-border">
@@ -100,6 +101,7 @@ export const EmployeeTable = ({ employees }: IEmployeeTableProps) => {
               return (
                 <TableRow
                   key={emp.id}
+                  onClick={() => handleRowClick(emp.id)}
                   className="h-16 hover:bg-secondary/30 transition-colors cursor-pointer border-b border-border/50"
                 >
                   <TableCell className="py-2">
@@ -134,6 +136,10 @@ export const EmployeeTable = ({ employees }: IEmployeeTableProps) => {
                   <TableCell className="pr-6 text-right">
                     <button
                       type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRowClick(emp.id);
+                      }}
                       className="p-1 text-muted-foreground hover:text-foreground transition-colors"
                       aria-label="Actions"
                     >

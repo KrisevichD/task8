@@ -15,8 +15,10 @@ export interface IUserProfile {
 export interface IUserData {
   id: string;
   email: string;
-  profile?: IUserProfile;
+  created_at?: string;
+  department_name?: string;
   position_name?: string;
+  profile?: IUserProfile;
 }
 
 export interface IGetUserResponse {
@@ -33,6 +35,9 @@ export const GET_USER: TypedDocumentNode<IGetUserResponse, IGetUserVariables> =
       user(userId: $userId) {
         id
         email
+        created_at
+        department_name
+        position_name
         profile {
           id
           first_name
@@ -48,7 +53,6 @@ export const GET_USER: TypedDocumentNode<IGetUserResponse, IGetUserVariables> =
             proficiency
           }
         }
-        position_name
       }
     }
   `;
