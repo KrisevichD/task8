@@ -11,13 +11,15 @@ import { getUserIdFromToken } from "@/utils/jwt";
 
 export default function useSkills() {
   const userId = getUserIdFromToken();
-  const { data: skillCategories } = useQuery(GET_SKILLS_CATEGORIES);
+  const { data: skillCategoriesData, loading: isCategoriesLoading } = useQuery(GET_SKILLS_CATEGORIES);
   const [getAllSkills, { data: skills, loading: isSkillsLoading }] =
     useLazyQuery(GET_ALL_SKILLS);
   const [executeAddProfileSkill, { loading: isAddingLoading }] =
     useMutation(ADD_PROFILE_SKILL);
   const [executeDeleteProfileSkills, { loading: isUpdatingLoading }] =
     useMutation(DELETE_PROFILE_SKILL);
+
+  const skillCategories = skillCategoriesData?.skillCategories;
 
   const addProfileSkill = (input: IProfileSkillInput) => {
     if (!userId) return;
@@ -43,6 +45,7 @@ export default function useSkills() {
   return {
     getAllSkills,
     skillCategories,
+    isCategoriesLoading,
     skills,
     isSkillsLoading,
     addProfileSkill,

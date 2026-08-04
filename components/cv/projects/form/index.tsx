@@ -1,5 +1,5 @@
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import { Controller, useForm } from "react-hook-form";
 
@@ -22,10 +22,7 @@ import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import useSkills from "@/hooks/skills/useSkills";
 import { ICreateCvProjectForm, ICreateProjectInput } from "@/types/cv-constructor";
 import { validateDateString } from "@/utils/helpers";
-
-interface FormData extends ICreateProjectInput {
-  responsibilities: string;
-}
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 const INITIAL_FORM_DATA = {
       name: "",
@@ -37,21 +34,29 @@ const INITIAL_FORM_DATA = {
       responsibilities: "",
     }
 
-const CvProjectsForm = ({initialData}: {initialData?: ICreateCvProjectForm}) => {
+const CvProjectsForm = ({
+  isEditing, 
+  setIsEditing, 
+  initialData
+}: { 
+  isEditing?: boolean, 
+  setIsEditing?: Dispatch<SetStateAction<boolean>>, 
+  initialData?: ICreateCvProjectForm
+}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const params = useParams();
   const { addCvProject } = useCvConstructor();
   const { getAllSkills, skills } = useSkills();
 
-  const { register, control, handleSubmit } = useForm<ICreateCvProjectForm>({
+  const { register, reset, control, handleSubmit } = useForm<ICreateCvProjectForm>({
     defaultValues: initialData ?? INITIAL_FORM_DATA
   });
 
   useEffect(() => {
     if (isOpen) {
       getAllSkills();
+      reset(initialData ?? INITIAL_FORM_DATA)
     }
-  }, [isOpen]);
+  }, [isOpen, initialData, reset, getAllSkills]);
 
   const onSubmit = async (formData: ICreateCvProjectForm) => {
       await addCvProject(formData)
@@ -60,11 +65,8 @@ const CvProjectsForm = ({initialData}: {initialData?: ICreateCvProjectForm}) => 
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger
-          render={
-            !initialData 
-            ?
+      <Dialog open={isEditing !== undefined ? isEditing : isOpen} onOpenChange={isEditing !== undefined ? setIsEditing : setIsOpen}>
+        {!isEditing && <DialogTrigger render={
             <Button
               variant={"ghost"}
               type="button"
@@ -73,10 +75,8 @@ const CvProjectsForm = ({initialData}: {initialData?: ICreateCvProjectForm}) => 
               <Icon variant="add" />
               Add project
             </Button>
-            :
-            <DialogTrigger onClick={() => setIsOpen(true)}>Edit</DialogTrigger>
           }
-        />
+        />}
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add project</DialogTitle>
@@ -87,8 +87,16 @@ const CvProjectsForm = ({initialData}: {initialData?: ICreateCvProjectForm}) => 
             className="space-y-3"
           >
             <div className="grid grid-cols-2 gap-3">
-              <FloatingInput {...register("name")} label="Project" />
-              <FloatingInput {...register("domain")} label="Domain" />
+              <FloatingInput 
+              {...register("name")} 
+              label="Project" 
+              disabled={isEditing}
+              />
+              <FloatingInput 
+              {...register("domain")} 
+              label="Domain" 
+              disabled={isEditing}
+              />
               <FloatingInput
                 {...register("start_date")}
                 type="date"
@@ -103,14 +111,16 @@ const CvProjectsForm = ({initialData}: {initialData?: ICreateCvProjectForm}) => 
             <FloatingTextarea
               {...register("description")}
               label="Description"
+              disabled={isEditing}
             />
             <Controller
               name="environment"
               control={control}
               render={({ field }) => (
                 <FloatingSelect
-                  label="Environment"
-                  multiple
+                label="Environment"
+                multiple
+                disabled={isEditing}
                   value={field.value}
                   onValueChange={field.onChange}
                 >

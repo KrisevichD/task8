@@ -15,11 +15,14 @@ import { Icon } from "@/components/ui/icon";
 import { SelectItem } from "@/components/ui/select";
 import useSkills from "@/hooks/skills/useSkills";
 import { ISkill, TSkillMastery } from "@/types/skills";
+import { useMe } from "@/hooks/auth/useMe";
+import { Spinner } from "../ui/spinner";
 
 const SkillsForm = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [skill, setSkill] = useState<ISkill | null>(null);
   const [skillMastery, setSkillMastery] = useState<TSkillMastery>("Novice");
+  const { skills: selectedSkills } = useMe();
   const {
     getAllSkills,
     skills,
@@ -47,6 +50,8 @@ const SkillsForm = () => {
     setIsOpen(false);
   };
 
+  const filteredSkills = skills?.skills.filter(skill => !(selectedSkills?.some(e => e.name === skill.name)));
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -71,7 +76,7 @@ const SkillsForm = () => {
               }
               disabled={isSkillsLoading || isAddingLoading}
             >
-              {skills?.skills.map((skill) => {
+              {filteredSkills?.map((skill) => {
                 return (
                   <SelectItem
                     key={`select-skill-${skill.name}`}

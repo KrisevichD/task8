@@ -146,6 +146,16 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  --mastery-1: #767676;
+  --mastery-2: #0288D1;
+  --mastery-3: #2E7D32;
+  --mastery-4: #FFB800;
+
+  --mastery-bg-1: #CACACA;
+  --mastery-bg-2: #9ED1ED;
+  --mastery-bg-3: #AFCDB1;
+  --mastery-bg-4: #FFE49E;
 }
 
 @layer base {
@@ -157,6 +167,9 @@
   }
   html {
     @apply font-sans;
+  }
+  h2 {
+    @apply font-bold text-[16px]
   }
   h3 {
     @apply font-bold

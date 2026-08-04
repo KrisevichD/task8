@@ -14,7 +14,7 @@ import {
   IUpdateCvVariables,
 } from "@/types/cv-constructor";
   
-  export const GET_CV_QUERY: TypedDocumentNode<{cv:ICvResponce}, ICvVariables> = gql`
+  export const GET_CV: TypedDocumentNode<{cv:ICvResponce}, ICvVariables> = gql`
     query GetCv($cvId: ID!) {
       cv(cvId: $cvId) {
         id
@@ -32,8 +32,24 @@ import {
           responsibilities
         }
         skills {
+          categoryId
+          mastery
           name
         }
+      }
+    }
+  `;
+
+  export const GET_ALL_PROJECTS: TypedDocumentNode<{projects:IProjectData[]}, Record<string, never>> = gql`
+    query Projects {
+      projects {
+        id
+      name
+      domain
+      start_date
+      end_date
+      description
+      environment
       }
     }
   `;
@@ -98,6 +114,21 @@ export const GET_PROJECT: TypedDocumentNode<
 `;
 
 export const ADD_CV_PROJECT_MUTATION: TypedDocumentNode<
+  ICvResponce,
+  IAddCvProjectVariables
+> = gql`
+  mutation AddCvProject($project: AddCvProjectInput!) {
+    addCvProject(project: $project) {
+      id
+      projects {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const UPDATE_CV_PROJECT: TypedDocumentNode<
   ICvResponce,
   IAddCvProjectVariables
 > = gql`

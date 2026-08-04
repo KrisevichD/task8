@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import CvProjectsForm from "./form";
 import CvProjectsList from "./list";
@@ -12,20 +12,22 @@ import {
 } from "@/components/ui/input-group";
 
 const CvProjects = () => {
+  const [searchQuery, setSearchQuery] = useState("");
   return (
     <>
       <div className="flex justify-between px-5 py-2">
         <InputGroup variant={"search"} className="w-80">
-          <InputGroupInput />
+          <InputGroupInput value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
           <InputGroupAddon align={"inline-start"}>
-            <InputGroupButton variant={"ghost"} size={"icon"}>
-              <Icon variant="search" label="Search" />
-            </InputGroupButton>
+              <Icon 
+              variant="search" 
+              className="text-muted-foreground" 
+              />
           </InputGroupAddon>
         </InputGroup>
         <CvProjectsForm />
       </div>
-      <CvProjectsList />
+      <CvProjectsList searchQuery={searchQuery}/>
     </>
   );
 };

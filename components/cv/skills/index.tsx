@@ -22,10 +22,12 @@ import SkillBadge from "@/components/ui/skill-badge";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Icon } from "@/components/ui/icon";
+import useSkills from "@/hooks/skills/useSkills";
 
 const CvSkills = () => {
   const [isOpen, setIsOpen] = useState(false);
   const userId = getUserIdFromToken();
+  const { skillCategories } = useSkills();
   const { cvData, deleteCvSkill } = useCvConstructor();
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const skills = cvData?.cv.skills;
@@ -50,23 +52,37 @@ const CvSkills = () => {
     setIsOpen(false);
   };
 
-  if (!skills) return <Spinner />
+  if (!skills || !skillCategories) return <Spinner />
+
+  const filteredList = skillCategories
+    .filter(category => skills.some(skill => skill.categoryId === category.id))
+    .map(category => ({ ...category, skills: skills.filter(skill => skill.categoryId === category.id) }));
 
   return (
     <div className="pl-6 pt-8 ml-42.25 mr-42.75">
-      {skills.map(skill => (
-        <Toggle
-                key={`profile-skill-${skill.name}`}
-                variant={"ghost"}
-                pressed={selectedSkills.includes(skill.name)}
-                onPressedChange={(pressed) => handleToggle(pressed, skill.name)}
-              >
-                <SkillBadge variant={selectedSkills.includes(skill.name) ? "pressed" : skill.mastery} />
-                {skill.name}
-              </Toggle>
-      ))}
+      {filteredList.map(category => (
+            <div key={`category-${category.id}`}>
+              <h2 className="font-normal">{category.name}</h2>
+              <ul className="flex flex-wrap">
+                {category.skills.map((skill) => {
+                return (
+                  <li key={`profile-skill-${skill.name}`}>
+                    <Toggle
+                    variant={"ghost"}
+                    pressed={selectedSkills.includes(skill.name)}
+                    onPressedChange={(pressed) => handleToggle(pressed, skill.name)}
+                  >
+                    <SkillBadge variant={selectedSkills.includes(skill.name) ? "pressed" : skill.mastery} />
+                    {skill.name}
+                  </Toggle>
+                  </li>
+                );
+              })}
+              </ul>
+            </div>
+          ))}
 
-      <div className="flex justify-end w-fill">
+      <div className="flex justify-end w-fill gap-4">
         <CvSkillsForm />
 
        {selectedSkills.length > 0 ? (

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,19 +23,36 @@ import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import { validateProjectDate } from "@/utils/helpers";
 import CvProjectsForm from "../form";
 import { Spinner } from "@/components/ui/spinner";
+import { useLazyQuery } from "@apollo/client/react";
+import { GET_ALL_PROJECTS } from "@/graphql/cv-constructor";
+import { ICvProject } from "@/types/cv-constructor";
 
-const CvProjectsList = () => {
+const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
   const { cvData, deleteCvProject } = useCvConstructor();
+  const [isEditing, setIsEditing] = useState(false);
 
-  const handleDeleteProject = (id: string) => {
+  const handleDeleteProject = async (project: ICvProject) => {
     deleteCvProject({
         cvId: cvData!.cv.id,
-        projectId: id
+        project: project
     });
     
   }
 
   if (!cvData) return <Spinner />
+
+  const projects = cvData.cv.projects;
+  const filteredList = !searchQuery ? projects : projects.filter(project => {
+    const lowerQuery = searchQuery.trim().toLowerCase();
+    const matchesName = project.name.toLowerCase().includes(lowerQuery);
+    const matchesDomain = project.domain.toLowerCase().includes(lowerQuery);
+    const matchesDescription = project.description.toLowerCase().includes(lowerQuery);
+    const matchesResponsibilities = project.responsibilities.join(" ").toLowerCase().includes(lowerQuery);
+
+    return matchesName || matchesDomain || matchesDescription || matchesResponsibilities;
+  } )
+
+  if (filteredList.length === 0 && !!searchQuery) return <div className="w-full text-xl text-primary text-center">No matches found</div>
 
   return (
     <Table>
@@ -49,7 +66,7 @@ const CvProjectsList = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {cvData.cv.projects.map((project) => {
+        {filteredList.map((project) => {
           return (
             <TableRow
               key={`cv-projects-${project.id}`}
@@ -87,8 +104,19 @@ const CvProjectsList = () => {
                   />
                   <DropdownMenuContent>
                     <DropdownMenuGroup>
-                      <DropdownMenuItem>
-                        <CvProjectsForm initialData={{
+                      <DropdownMenuItem onClick={() => setIsEditing(true)}>
+                        Edit
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem variant="destructive" onClick={() => handleDeleteProject(project)}>
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <CvProjectsForm isEditing={isEditing} setIsEditing={setIsEditing} initialData={{
                             name: project.name,
                             domain: project.domain,
                             start_date: project.start_date,
@@ -97,16 +125,6 @@ const CvProjectsList = () => {
                             environment: project.environment,
                             responsibilities: project.responsibilities.join('\n'),
                         }}/>
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem variant="destructive"  onClick={() => handleDeleteProject(project.id)}>
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </TableCell>
             </TableRow>
           );

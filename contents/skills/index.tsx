@@ -33,9 +33,11 @@ import { getUserIdFromToken } from "@/utils/jwt";
 const SkillsContent = () => {
   const [isOpen, setIsOpen] = useState(false);
   const userId = getUserIdFromToken();
-  const { deleteProfileSkills } = useSkills();
+  const { skillCategories, isCategoriesLoading, deleteProfileSkills } = useSkills();
   const { skills, isLoading, error } = useMe(userId);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+
+
 
   const handleToggle = (isPressed: boolean, name: string) => {
     if (isPressed) {
@@ -58,26 +60,39 @@ const SkillsContent = () => {
   };
 
   if (error) return <>Error</>;
-  if (!skills || isLoading) return <Spinner />;
+  if (!skills || isLoading || !skillCategories || isCategoriesLoading) return <Spinner />;
+
+  const filteredList = skillCategories
+    .filter(category => skills.some(skill => skill.categoryId === category.id))
+    .map(category => ({ ...category, skills: skills.filter(skill => skill.categoryId === category.id) }));
 
   return (
     <>
-      
+
       <div className="ml-6 mr-6.5 lg:ml-42.25 lg:mr-42.75">
-        <div className="pl-6 pt-8 flex flex-wrap">
-          {skills?.map((skill) => {
-            return (
-              <Toggle
-                key={`profile-skill-${skill.name}`}
-                variant={"ghost"}
-                pressed={selectedSkills.includes(skill.name)}
-                onPressedChange={(pressed) => handleToggle(pressed, skill.name)}
-              >
-                <SkillBadge variant={selectedSkills.includes(skill.name) ? "pressed" : skill.mastery} />
-                {skill.name}
-              </Toggle>
-            );
-          })}
+        <div className="pl-6 pt-8">
+          {filteredList.map(category => (
+            <div key={`category-${category.id}`}>
+              <h2 className="font-normal">{category.name}</h2>
+              <ul className="flex flex-wrap">
+                {category.skills.map((skill) => {
+                return (
+                  <li key={`profile-skill-${skill.name}`}>
+                    <Toggle
+                    variant={"ghost"}
+                    pressed={selectedSkills.includes(skill.name)}
+                    onPressedChange={(pressed) => handleToggle(pressed, skill.name)}
+                  >
+                    <SkillBadge variant={selectedSkills.includes(skill.name) ? "pressed" : skill.mastery} />
+                    {skill.name}
+                  </Toggle>
+                  </li>
+                );
+              })}
+              </ul>
+            </div>
+          ))}
+
         </div>
 
         <div className="flex justify-end gap-4 w-fill">

@@ -9,23 +9,36 @@ import {
   DELETE_CV_PROJECT,
   DELETE_CV_SKILL,
   DELETE_PROJECT,
-  GET_CV_QUERY,
+  GET_ALL_PROJECTS,
+  GET_CV,
   GET_PROJECT,
   UPDATE_CV,
 } from "@/graphql/cv-constructor";
-import { IAddCvProjectInput, IAddCvSkillInput, ICreateCvProjectForm, IProjectData, IUpdateCvInput } from "@/types/cv-constructor";
+import { IAddCvProjectInput, IAddCvSkillInput, ICreateCvProjectForm, ICvProject, IProjectData, IUpdateCvInput } from "@/types/cv-constructor";
 import { validateDateString } from "@/utils/helpers";
 
 export default function useCvConstructor() {
   const cvId = useParams().id as string;
   const [createProject, { loading: isProjectLoading, error: projecterror }] = useMutation(CREATE_PROJECT_MUTATION);
-  const [deleteProject, { }] = useMutation(DELETE_PROJECT);
+  const [deleteProject, { }] = useMutation(DELETE_PROJECT, {
+    refetchQueries: ["GetCv"],
+  });
   const [getProject, { }] = useLazyQuery(GET_PROJECT);
   const [executeAddCvProject, { loading: isCvProjectLoading, error: cvProjecterror }] = useMutation(ADD_CV_PROJECT_MUTATION);
+  const [updateCvProject] = useMutation(ADD_CV_PROJECT_MUTATION);
   const [executeDeleteCvProject, { loading: isProjectDeleting, error: projectDeletingError }] = useMutation(DELETE_CV_PROJECT);
   const [executeUpdateCv, { loading: isCvUpdating, error: cvUpdatingError }] = useMutation(UPDATE_CV);
   const [executeAddCvSkill, { loading: isCvSkillLoading, error: cvSkillError }] = useMutation(ADD_CV_SKILL);
   const [executeDeleteCvSkill, { loading: isCvSkillDeleting, error: skillDeletingError }] = useMutation(DELETE_CV_SKILL);
+  const [getAllProjects, { data: projects }] = useLazyQuery(GET_ALL_PROJECTS)
+  const {
+    data: cvData,
+    loading: isCvLoading,
+    error: cvError,
+  } = useQuery(GET_CV, {
+    variables: { cvId: cvId },
+    skip: !cvId
+  });
 
   const addCvProject = async (input: ICreateCvProjectForm) => {
     const { responsibilities, ...createProjectData } = input;
@@ -44,13 +57,22 @@ export default function useCvConstructor() {
     executeAddCvProject({variables: { project: addProjectData }});
   }
 
-  const deleteCvProject = async (input: { cvId: string; projectId: string }) => {
+  const deleteCvProject = async (input: { cvId: string; project: ICvProject }) => {
     console.log(input)
-    // const project = await getProject({ variables: { projectId: input.projectId }});
-    // if (!project.data) return;
-    // console.log(project.data.id)
-    await executeDeleteCvProject({variables: { project: input }});
-    // deleteProject({ variables: { project: { projectId: input.projectId }}})
+    const response = await getAllProjects();
+    console.log(response)
+    const idToDelete = response.data?.projects.find(project => {
+      const matchesName = project.name === input.project.name;
+      const matchesDomain = project.domain === input.project.domain;
+      const matchesDescription = project.description === input.project.description;
+      const matchesStartDate = project.start_date === input.project.start_date;
+      const matchesEndDate = project.end_date === input.project.end_date;
+
+      return matchesName && matchesDomain && matchesDescription && matchesStartDate && matchesEndDate;
+    })?.id;
+    console.log("!",idToDelete)
+    if(!idToDelete) return;
+    deleteProject({ variables: { project: { projectId: idToDelete }}});
   }
 
   const addCvSkill = (input: IAddCvSkillInput) => {
@@ -68,20 +90,13 @@ export default function useCvConstructor() {
     return executeUpdateCv({variables: {cv: input}})
   }
 
-  const {
-    data: cvData,
-    loading: isCvLoading,
-    error: cvError,
-  } = useQuery(GET_CV_QUERY, {
-    variables: { cvId: cvId },
-    skip: !cvId
-  });
 
   return {
     cvData,
     isCvLoading,
     cvError,
     addCvProject,
+    updateCvProject,
     isCvProjectLoading,
     cvProjecterror,
     deleteCvProject,
