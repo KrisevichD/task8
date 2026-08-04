@@ -22,8 +22,8 @@ export function makeClient() {
               },
             },
           },
-        }
-      }
+        },
+      },
     }),
 
     link: ApolloLink.from([errorLink, authLink, httpLink]),

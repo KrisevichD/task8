@@ -15,11 +15,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-} from "@/components/ui/breadcrumb";
+
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import SkillBadge from "@/components/ui/skill-badge";
@@ -33,11 +29,10 @@ import { getUserIdFromToken } from "@/utils/jwt";
 const SkillsContent = () => {
   const [isOpen, setIsOpen] = useState(false);
   const userId = getUserIdFromToken();
-  const { skillCategories, isCategoriesLoading, deleteProfileSkills } = useSkills();
+  const { skillCategories, isCategoriesLoading, deleteProfileSkills } =
+    useSkills();
   const { skills, isLoading, error } = useMe(userId);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-
-
 
   const handleToggle = (isPressed: boolean, name: string) => {
     if (isPressed) {
@@ -60,39 +55,51 @@ const SkillsContent = () => {
   };
 
   if (error) return <>Error</>;
-  if (!skills || isLoading || !skillCategories || isCategoriesLoading) return <Spinner />;
+  if (!skills || isLoading || !skillCategories || isCategoriesLoading)
+    return <Spinner />;
 
   const filteredList = skillCategories
-    .filter(category => skills.some(skill => skill.categoryId === category.id))
-    .map(category => ({ ...category, skills: skills.filter(skill => skill.categoryId === category.id) }));
+    .filter((category) =>
+      skills.some((skill) => skill.categoryId === category.id),
+    )
+    .map((category) => ({
+      ...category,
+      skills: skills.filter((skill) => skill.categoryId === category.id),
+    }));
 
   return (
     <>
-
       <div className="ml-6 mr-6.5 lg:ml-42.25 lg:mr-42.75">
         <div className="pl-6 pt-8">
-          {filteredList.map(category => (
+          {filteredList.map((category) => (
             <div key={`category-${category.id}`}>
               <h2 className="font-normal">{category.name}</h2>
               <ul className="flex flex-wrap">
                 {category.skills.map((skill) => {
-                return (
-                  <li key={`profile-skill-${skill.name}`}>
-                    <Toggle
-                    variant={"ghost"}
-                    pressed={selectedSkills.includes(skill.name)}
-                    onPressedChange={(pressed) => handleToggle(pressed, skill.name)}
-                  >
-                    <SkillBadge variant={selectedSkills.includes(skill.name) ? "pressed" : skill.mastery} />
-                    {skill.name}
-                  </Toggle>
-                  </li>
-                );
-              })}
+                  return (
+                    <li key={`profile-skill-${skill.name}`}>
+                      <Toggle
+                        variant={"ghost"}
+                        pressed={selectedSkills.includes(skill.name)}
+                        onPressedChange={(pressed) =>
+                          handleToggle(pressed, skill.name)
+                        }
+                      >
+                        <SkillBadge
+                          variant={
+                            selectedSkills.includes(skill.name)
+                              ? "pressed"
+                              : skill.mastery
+                          }
+                        />
+                        {skill.name}
+                      </Toggle>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
-
         </div>
 
         <div className="flex justify-end gap-4 w-fill">
@@ -101,7 +108,10 @@ const SkillsContent = () => {
           {selectedSkills.length > 0 ? (
             <Button variant={"primary"} onClick={deletePressedSkills}>
               DELETE
-              <Badge variant={'primary'} className="bg-primary-foreground text-primary font-bold">
+              <Badge
+                variant={"primary"}
+                className="bg-primary-foreground text-primary font-bold"
+              >
                 {selectedSkills.length}
               </Badge>
             </Button>

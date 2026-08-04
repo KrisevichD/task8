@@ -11,7 +11,9 @@ import { getUserIdFromToken } from "@/utils/jwt";
 
 export default function useSkills() {
   const userId = getUserIdFromToken();
-  const { data: skillCategoriesData, loading: isCategoriesLoading } = useQuery(GET_SKILLS_CATEGORIES);
+  const { data: skillCategoriesData, loading: isCategoriesLoading } = useQuery(
+    GET_SKILLS_CATEGORIES,
+  );
   const [getAllSkills, { data: skills, loading: isSkillsLoading }] =
     useLazyQuery(GET_ALL_SKILLS);
   const [executeAddProfileSkill, { loading: isAddingLoading }] =

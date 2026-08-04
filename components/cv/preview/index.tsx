@@ -1,33 +1,37 @@
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import { useMe } from "@/hooks/auth/useMe";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import useExportPdf from "@/hooks/cvs/useExportPdf";
+import useSkills from "@/hooks/skills/useSkills";
 import { validateProjectDate } from "@/utils/helpers";
 import { getUserIdFromToken } from "@/utils/jwt";
 
 const CvPreview = () => {
   const { cvData } = useCvConstructor();
   const userId = getUserIdFromToken();
-  const { fullName, positionName, languages, isLoading, error } = useMe(userId);
-  const { printRef, isExporting, handleDownloadPdf } = useExportPdf();
+  const { skillCategories } = useSkills();
+  const { fullName, positionName, languages } = useMe(userId);
+  const { printRef, handleDownloadPdf } = useExportPdf();
 
-  if (!cvData) return <Spinner />;
+  if (!cvData || !skillCategories) return <Spinner />;
 
   const data = cvData.cv;
+  const skills = data.skills;
+  const filteredSkills = skillCategories
+    .filter((category) =>
+      skills.some((skill) => skill.categoryId === category.id),
+    )
+    .map((category) => ({
+      ...category,
+      skills: skills.filter((skill) => skill.categoryId === category.id),
+    }));
 
   return (
     <article
       ref={printRef}
-      className="px-12 xl:px-48.25 space-y-8 text-[16px] font-normal"
+      className="px-12 xl:px-48.25 space-y-8 pt-8 text-[16px] font-normal"
     >
       <header className="flex justify-between">
         <div>
@@ -51,7 +55,11 @@ const CvPreview = () => {
             <h3>Language proficiency</h3>
             <ul>
               {languages?.map((language) => {
-                return <li>{`${language.name}, ${language.proficiency}`}</li>;
+                return (
+                  <li
+                    key={`languages-${language.name}`}
+                  >{`${language.name}, ${language.proficiency}`}</li>
+                );
               })}
             </ul>
             <h3>Domains</h3>
@@ -65,14 +73,14 @@ const CvPreview = () => {
         <article className="py-4 pl-6.25 pr-3 border-l border-primary">
           <h2>{data.name}</h2>
           <p>{data.description}</p>
-          {/* {data.skills.map((category) => {
+          {filteredSkills.map((category) => {
             return (
               <>
                 <h3>{category.name}</h3>
-                <p>{category.list.map((skill) => skill.name).join(", ")}</p>
+                <p>{category.skills.map((skill) => skill.name).join(", ")}</p>
               </>
             );
-          })} */}
+          })}
         </article>
       </section>
       <section>

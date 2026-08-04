@@ -13,46 +13,49 @@ import {
   IProjectVariables,
   IUpdateCvVariables,
 } from "@/types/cv-constructor";
-  
-  export const GET_CV: TypedDocumentNode<{cv:ICvResponce}, ICvVariables> = gql`
-    query GetCv($cvId: ID!) {
-      cv(cvId: $cvId) {
-        id
-        name
-        description
-        education
-        projects {
-          id
-          name
-          domain
-          description
-          start_date
-          end_date
-          environment
-          responsibilities
-        }
-        skills {
-          categoryId
-          mastery
-          name
-        }
-      }
-    }
-  `;
 
-  export const GET_ALL_PROJECTS: TypedDocumentNode<{projects:IProjectData[]}, Record<string, never>> = gql`
-    query Projects {
+export const GET_CV: TypedDocumentNode<{ cv: ICvResponce }, ICvVariables> = gql`
+  query GetCv($cvId: ID!) {
+    cv(cvId: $cvId) {
+      id
+      name
+      description
+      education
       projects {
         id
+        name
+        domain
+        description
+        start_date
+        end_date
+        environment
+        responsibilities
+      }
+      skills {
+        categoryId
+        mastery
+        name
+      }
+    }
+  }
+`;
+
+export const GET_ALL_PROJECTS: TypedDocumentNode<
+  { projects: IProjectData[] },
+  Record<string, never>
+> = gql`
+  query Projects {
+    projects {
+      id
       name
       domain
       start_date
       end_date
       description
       environment
-      }
     }
-  `;
+  }
+`;
 
 export const CREATE_PROJECT_MUTATION: TypedDocumentNode<
   { createProject: IProjectData },
@@ -82,36 +85,32 @@ export const DELETE_PROJECT: TypedDocumentNode<
   }
 `;
 
-export const UPDATE_CV: TypedDocumentNode<
-  ICvResponce,
-  IUpdateCvVariables
-> = gql`
-  mutation UpdateCv($cv: UpdateCvInput!) {
-    updateCv(cv: $cv) {
-      id
-      name
-      description
-      education
+export const UPDATE_CV: TypedDocumentNode<ICvResponce, IUpdateCvVariables> =
+  gql`
+    mutation UpdateCv($cv: UpdateCvInput!) {
+      updateCv(cv: $cv) {
+        id
+        name
+        description
+        education
+      }
     }
-  }
-`;
+  `;
 
-export const GET_PROJECT: TypedDocumentNode<
-  IProjectData,
-  IProjectVariables
-> = gql`
-  query Project($projectId: ID!) {
-    project(projectId: $projectId) {
-      id
-      name
-      domain
-      start_date
-      end_date
-      description
-      environment
+export const GET_PROJECT: TypedDocumentNode<IProjectData, IProjectVariables> =
+  gql`
+    query Project($projectId: ID!) {
+      project(projectId: $projectId) {
+        id
+        name
+        domain
+        start_date
+        end_date
+        description
+        environment
+      }
     }
-  }
-`;
+  `;
 
 export const ADD_CV_PROJECT_MUTATION: TypedDocumentNode<
   ICvResponce,
@@ -156,7 +155,7 @@ export const DELETE_CV_PROJECT: TypedDocumentNode<
       }
     }
   }
-`
+`;
 
 export const ADD_CV_SKILL: TypedDocumentNode<
   ICvResponce,
@@ -186,4 +185,4 @@ export const DELETE_CV_SKILL: TypedDocumentNode<
       }
     }
   }
-`
+`;

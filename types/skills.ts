@@ -20,11 +20,11 @@ export interface ISkill {
 }
 
 export interface ISkillCategory {
-      id: string;
-    name: string;
-    order: number;
-    parent: ISkillCategory | null;
-    }
+  id: string;
+  name: string;
+  order: number;
+  parent: ISkillCategory | null;
+}
 
 export interface IGetAllSkillsResponce {
   skills: ISkill[];
@@ -52,5 +52,5 @@ export interface IDeleteProfileSkillVariables {
 }
 
 export interface IGetSkillsCategoriesResponce {
-    skillCategories: ISkillCategory[]
+  skillCategories: ISkillCategory[];
 }

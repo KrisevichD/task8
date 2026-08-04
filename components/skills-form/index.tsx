@@ -13,10 +13,9 @@ import {
 import { FloatingSelect } from "@/components/ui/floating-select";
 import { Icon } from "@/components/ui/icon";
 import { SelectItem } from "@/components/ui/select";
+import { useMe } from "@/hooks/auth/useMe";
 import useSkills from "@/hooks/skills/useSkills";
 import { ISkill, TSkillMastery } from "@/types/skills";
-import { useMe } from "@/hooks/auth/useMe";
-import { Spinner } from "../ui/spinner";
 
 const SkillsForm = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,7 +49,9 @@ const SkillsForm = () => {
     setIsOpen(false);
   };
 
-  const filteredSkills = skills?.skills.filter(skill => !(selectedSkills?.some(e => e.name === skill.name)));
+  const filteredSkills = skills?.skills.filter(
+    (skill) => !selectedSkills?.some((e) => e.name === skill.name),
+  );
 
   return (
     <>

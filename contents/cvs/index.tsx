@@ -7,7 +7,7 @@ import { CREATE_CV_MUTATION } from "@/graphql/cvs";
 import useCreateCv from "@/hooks/cvs/useCreateCv";
 
 const CvsContent = () => {
-  const { createCv, isLoading } = useCreateCv(CREATE_CV_MUTATION);
+  const { createCv } = useCreateCv(CREATE_CV_MUTATION);
 
   const handleCreateCv = async () => {
     await createCv({

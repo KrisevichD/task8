@@ -15,11 +15,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-} from "@/components/ui/breadcrumb";
+
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Spinner } from "@/components/ui/spinner";
@@ -75,7 +71,13 @@ const SkillsContent = () => {
                   handleToggle(pressed, language.name)
                 }
               >
-                <span className={language.proficiency ? "text-successful" : "text-primary"}>{language.proficiency}</span>
+                <span
+                  className={
+                    language.proficiency ? "text-successful" : "text-primary"
+                  }
+                >
+                  {language.proficiency}
+                </span>
                 <span className="">{language.name}</span>
               </Toggle>
             );
@@ -88,7 +90,10 @@ const SkillsContent = () => {
           {selectedLangueages.length > 0 ? (
             <Button variant={"primary"} onClick={deletePressedLanguages}>
               DELETE
-              <Badge variant={'primary'} className="bg-primary-foreground text-primary font-bold">
+              <Badge
+                variant={"primary"}
+                className="bg-primary-foreground text-primary font-bold"
+              >
                 {selectedLangueages.length}
               </Badge>
             </Button>

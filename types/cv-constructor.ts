@@ -1,5 +1,5 @@
-import { ILanguage, IProfileLanguage } from "./languages";
-import { IProfileSkill, ISkill } from "./skills";
+import { IProfileLanguage } from "./languages";
+import { IProfileSkill } from "./skills";
 
 export interface ICvProject {
   id: string;
@@ -69,14 +69,14 @@ export interface ICreateCvProjectForm extends ICreateProjectInput {
 }
 
 export interface IUpdateCvInput {
-    cvId: string;
-    name: string;
-    education: string;
-    description: string;
+  cvId: string;
+  name: string;
+  education: string;
+  description: string;
 }
 
 export interface IUpdateCvVariables {
-    cv: IUpdateCvInput;
+  cv: IUpdateCvInput;
 }
 
 export interface IAddCvProjectVariables {
@@ -84,31 +84,31 @@ export interface IAddCvProjectVariables {
 }
 
 export interface IDeleteCvProjectVariables {
-    project: {
-        cvId: string;
-        projectId: string;
-    }
+  project: {
+    cvId: string;
+    projectId: string;
+  };
 }
 
 export interface IAddCvSkillInput extends IProfileSkill {
-    cvId: string;
+  cvId: string;
 }
 
 export interface IAddCvSkillVariables {
-    skill: IAddCvSkillInput;
+  skill: IAddCvSkillInput;
 }
 
 export interface IDeleteCvSkillVariables {
-    skill: {
-        cvId: string;
-        name: string[];
-    }
+  skill: {
+    cvId: string;
+    name: string[];
+  };
 }
 
 export interface IProjectVariables {
-    projectId: string;
+  projectId: string;
 }
 
-export interface IDeleteProjectVariables { 
-    project:  IProjectVariables
+export interface IDeleteProjectVariables {
+  project: IProjectVariables;
 }
