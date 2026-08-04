@@ -1,9 +1,5 @@
 import CvsContent from "@/contents/cvs";
 
-export default async function CvsPage() {
-  return (
-    <>
-      <CvsContent />
-    </>
-  );
+export default function CvsPage() {
+  return <CvsContent />;
 }

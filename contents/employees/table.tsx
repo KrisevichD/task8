@@ -13,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useLanguage } from "@/context/language";
 
 export type Employee = {
   id: string;
@@ -32,6 +33,7 @@ type SortOrder = "asc" | "desc";
 
 export const EmployeeTable = ({ employees }: IEmployeeTableProps) => {
   const router = useRouter();
+  const { t } = useLanguage();
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
 
   const toggleSort = () => {
@@ -59,13 +61,13 @@ export const EmployeeTable = ({ employees }: IEmployeeTableProps) => {
           <TableRow className="hover:bg-transparent border-b border-border">
             <TableHead className="w-18.5 sticky top-0 z-30 bg-background" />
             <TableHead className="text-foreground font-medium text-xs sticky top-0 z-30 bg-background">
-              First Name
+              {t("firstName")}
             </TableHead>
             <TableHead className="text-foreground font-medium text-xs sticky top-0 z-30 bg-background">
-              Last Name
+              {t("lastName")}
             </TableHead>
             <TableHead className="text-foreground font-medium text-xs sticky top-0 z-30 bg-background">
-              Email
+              {t("email")}
             </TableHead>
 
             <TableHead className="text-foreground font-medium text-xs sticky top-0 z-30 bg-background">
@@ -74,7 +76,7 @@ export const EmployeeTable = ({ employees }: IEmployeeTableProps) => {
                 onClick={toggleSort}
                 className="flex items-center gap-1 cursor-pointer select-none hover:text-foreground/80 transition-colors"
               >
-                <span>Department</span>
+                <span>{t("department")}</span>
                 <Icon
                   variant="arrow-back"
                   className={`size-3 transition-transform duration-200 ${
@@ -85,7 +87,7 @@ export const EmployeeTable = ({ employees }: IEmployeeTableProps) => {
             </TableHead>
 
             <TableHead className="text-foreground font-medium text-xs sticky top-0 z-30 bg-background">
-              Position
+              {t("position")}
             </TableHead>
             <TableHead className="w-12 pr-6 sticky top-0 z-30 bg-background" />
           </TableRow>
@@ -158,7 +160,7 @@ export const EmployeeTable = ({ employees }: IEmployeeTableProps) => {
                 colSpan={7}
                 className="h-24 text-center text-muted-foreground text-sm"
               >
-                No employees found.
+                {t("search")}...
               </TableCell>
             </TableRow>
           )}

@@ -8,27 +8,32 @@ import { UserSkeleton } from "../ui/user-skeleton";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Icon, IconVariants } from "@/components/ui/icon";
+import { TranslationKeys } from "@/constants/translations";
+import { useLanguage } from "@/context/language";
+import { useLogout } from "@/hooks/auth/useLogout";
 import { useMe } from "@/hooks/auth/useMe";
 import { getUserIdFromToken } from "@/utils/jwt";
 import { cn } from "@/utils/shadcn";
 
 interface INavItem {
-  label: string;
+  key: TranslationKeys;
   href: string;
   icon: IconVariants;
 }
 
 const NAV_ITEMS: INavItem[] = [
-  { label: "Employees", href: "/employees", icon: "employees" },
-  { label: "Skills", href: "/skills", icon: "skills" },
-  { label: "Languages", href: "/languages", icon: "languages" },
-  { label: "CVs", href: "/cvs", icon: "cvs" },
+  { key: "employees", href: "/employees", icon: "employees" },
+  { key: "skills", href: "/skills", icon: "skills" },
+  { key: "languages", href: "/languages", icon: "languages" },
+  { key: "cvs", href: "/cvs", icon: "cvs" },
 ];
 
 const emptySubscribe = () => () => {};
 
 export const Sidebar = () => {
   const pathname = usePathname();
+  const { t } = useLanguage();
+  const { logout } = useLogout();
 
   const userId = useSyncExternalStore(
     emptySubscribe,
@@ -60,7 +65,7 @@ export const Sidebar = () => {
               )}
             >
               <Icon variant={item.icon} size="md" />
-              <span>{item.label}</span>
+              <span>{t(item.key)}</span>
             </Link>
           );
         })}
@@ -70,23 +75,27 @@ export const Sidebar = () => {
         {isProfileLoading ? (
           <UserSkeleton />
         ) : (
-          <div className="flex items-center gap-3 overflow-hidden transition-all duration-300">
-            <Avatar size="lg" className="max-lg:size-7">
+          <Link
+            href="/settings"
+            className="flex items-center gap-3 overflow-hidden p-1.5 -ml-1.5 rounded-lg transition-all duration-200 hover:bg-secondary/50 group cursor-pointer"
+          >
+            <Avatar size="lg" className="max-lg:size-7 shrink-0">
               <AvatarImage src={avatarUrl} alt={fullName} />
               <AvatarFallback className="bg-muted text-muted-foreground font-semibold">
                 {initials || "U"}
               </AvatarFallback>
             </Avatar>
-            <span className="text-sm font-medium text-foreground truncate max-lg:text-xs">
+            <span className="text-sm font-medium text-foreground group-hover:text-primary truncate max-lg:text-xs transition-colors">
               {fullName}
             </span>
-          </div>
+          </Link>
         )}
 
         <button
           type="button"
-          className="p-1 text-muted-foreground hover:text-foreground transition-colors max-lg:hidden"
-          aria-label="Collapse sidebar"
+          onClick={logout}
+          className="p-1 text-muted-foreground hover:text-foreground transition-colors max-lg:hidden cursor-pointer"
+          aria-label="Logout"
         >
           <Icon variant="arrow-back" size="sm" />
         </button>

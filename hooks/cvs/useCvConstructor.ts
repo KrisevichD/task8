@@ -1,5 +1,4 @@
 import { useMutation, useQuery } from "@apollo/client/react";
-
 import { useParams } from "next/navigation";
 
 import {
@@ -13,6 +12,7 @@ import {
   UPDATE_CV_PROJECT,
 } from "@/graphql/cv-constructor";
 import {
+  IAddCvProjectInput,
   IAddCvSkillInput,
   ICreateCvProjectForm,
   ICvProject,
@@ -22,21 +22,35 @@ import { validateDateString } from "@/utils/helpers";
 
 export default function useCvConstructor() {
   const cvId = useParams().id as string;
-  const [createProject] = useMutation(CREATE_PROJECT_MUTATION);
-  // const [deleteProject, {}] = useMutation(DELETE_PROJECT, {
-  //   refetchQueries: ["GetCv"],
-  // });
-  // const [getProject, {}] = useLazyQuery(GET_PROJECT);
-  // const [getAllProjects, { data: projects }] = useLazyQuery(GET_ALL_PROJECTS);
+
+  const [createProject, { loading: isProjectLoading, error: projectError }] =
+    useMutation(CREATE_PROJECT_MUTATION);
+
   const [
     executeAddCvProject,
-    { loading: isCvProjectLoading, error: cvProjecterror },
+    { loading: isCvProjectLoading, error: cvProjectError },
   ] = useMutation(ADD_CV_PROJECT_MUTATION);
+
   const [executeUpdateCvProject] = useMutation(UPDATE_CV_PROJECT);
-  const [executeDeleteCvProject] = useMutation(DELETE_CV_PROJECT);
-  const [executeUpdateCv] = useMutation(UPDATE_CV);
-  const [executeAddCvSkill] = useMutation(ADD_CV_SKILL);
-  const [executeDeleteCvSkill] = useMutation(DELETE_CV_SKILL);
+
+  const [
+    executeDeleteCvProject,
+    { loading: isProjectDeleting, error: projectDeletingError },
+  ] = useMutation(DELETE_CV_PROJECT);
+
+  const [executeUpdateCv, { loading: isCvUpdating, error: cvUpdatingError }] =
+    useMutation(UPDATE_CV);
+
+  const [
+    executeAddCvSkill,
+    { loading: isCvSkillLoading, error: cvSkillError },
+  ] = useMutation(ADD_CV_SKILL);
+
+  const [
+    executeDeleteCvSkill,
+    { loading: isCvSkillDeleting, error: skillDeletingError },
+  ] = useMutation(DELETE_CV_SKILL);
+
   const {
     data: cvData,
     loading: isCvLoading,
@@ -54,7 +68,7 @@ export default function useCvConstructor() {
     if (!response.data) return;
     const project = response.data.createProject;
 
-    const addProjectData = {
+    const addProjectData: IAddCvProjectInput = {
       cvId: cvId,
       projectId: project.id,
       start_date: validateDateString(project.start_date),
@@ -70,7 +84,6 @@ export default function useCvConstructor() {
 
   const updateCvProject = async (id: string, input: ICreateCvProjectForm) => {
     const { responsibilities, start_date, end_date } = input;
-    console.log(start_date, end_date, responsibilities);
     executeUpdateCvProject({
       variables: {
         project: {
@@ -92,21 +105,6 @@ export default function useCvConstructor() {
     cvId: string;
     project: ICvProject;
   }) => {
-    // console.log(input)
-    // const response = await getAllProjects();
-    // console.log(response)
-    // const idToDelete = response.data?.projects.find(project => {
-    //   const matchesName = project.name === input.project.name;
-    //   const matchesDomain = project.domain === input.project.domain;
-    //   const matchesDescription = project.description === input.project.description;
-    //   const matchesStartDate = project.start_date === input.project.start_date;
-    //   const matchesEndDate = project.end_date === input.project.end_date;
-
-    //   return matchesName && matchesDomain && matchesDescription && matchesStartDate && matchesEndDate;
-    // })?.id;
-    // console.log("!",idToDelete)
-    // if(!idToDelete) return;
-    // deleteProject({ variables: { project: { projectId: idToDelete }}});
     executeDeleteCvProject({
       variables: { project: { cvId: input.cvId, projectId: input.project.id } },
     });
@@ -138,10 +136,20 @@ export default function useCvConstructor() {
     addCvProject,
     updateCvProject,
     isCvProjectLoading,
-    cvProjecterror,
+    cvProjectError,
     deleteCvProject,
+    isProjectDeleting,
+    projectDeletingError,
     addCvSkill,
+    isCvSkillLoading,
+    cvSkillError,
     deleteCvSkill,
+    isCvSkillDeleting,
+    skillDeletingError,
     updateCv,
+    isCvUpdating,
+    cvUpdatingError,
+    isProjectLoading,
+    projectError,
   };
 }

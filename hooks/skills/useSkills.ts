@@ -6,11 +6,13 @@ import {
   GET_ALL_SKILLS,
   GET_SKILLS_CATEGORIES,
 } from "@/graphql/skills";
+import { GET_USER } from "@/graphql/user/queries";
 import { IProfileSkillInput } from "@/types/skills";
 import { getUserIdFromToken } from "@/utils/jwt";
 
-export default function useSkills() {
-  const userId = getUserIdFromToken();
+export default function useSkills(customUserId?: string) {
+  const userId = customUserId || getUserIdFromToken();
+
   const { data: skillCategoriesData, loading: isCategoriesLoading } = useQuery(
     GET_SKILLS_CATEGORIES,
   );
@@ -23,16 +25,16 @@ export default function useSkills() {
 
   const skillCategories = skillCategoriesData?.skillCategories;
 
-  const addProfileSkill = (input: IProfileSkillInput) => {
+  const addProfileSkill = (input: Omit<IProfileSkillInput, "userId">) => {
     if (!userId) return;
     const profileSkillInput = {
       userId: userId,
       ...input,
     };
-    const responce = executeAddProfileSkill({
+    return executeAddProfileSkill({
       variables: { skill: profileSkillInput },
+      refetchQueries: [{ query: GET_USER, variables: { userId } }],
     });
-    return responce;
   };
 
   const deleteProfileSkills = (input: string[]) => {
@@ -41,7 +43,10 @@ export default function useSkills() {
       userId: userId,
       name: input,
     };
-    executeDeleteProfileSkills({ variables: { skill: profileSkillInput } });
+    return executeDeleteProfileSkills({
+      variables: { skill: profileSkillInput },
+      refetchQueries: [{ query: GET_USER, variables: { userId } }],
+    });
   };
 
   return {
