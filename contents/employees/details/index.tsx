@@ -8,10 +8,12 @@ import { Button } from "@/components/ui/button";
 import { FloatingInput } from "@/components/ui/floating-input";
 import { FloatingSelect } from "@/components/ui/floating-select";
 import { SelectItem } from "@/components/ui/select";
+import { useLanguage } from "@/context/language";
 import { IUserData } from "@/graphql/user/queries";
 
 import { useEmployeeDetailsForm } from "@/hooks/employees/useEmployeeDetailsForm";
 import { cn } from "@/utils/shadcn";
+
 interface IEmployeeDetailsContentProps {
   userId: string;
   initialUser?: IUserData;
@@ -24,6 +26,7 @@ export const EmployeeDetailsContent = ({
   isLoading: isUserLoading,
 }: IEmployeeDetailsContentProps) => {
   const user = initialUser;
+  const { t } = useLanguage();
 
   const {
     form,
@@ -40,7 +43,7 @@ export const EmployeeDetailsContent = ({
   if (isUserLoading) {
     return (
       <div className="p-8 text-center text-muted-foreground">
-        Loading profile...
+        {t("search")}...
       </div>
     );
   }
@@ -76,7 +79,7 @@ export const EmployeeDetailsContent = ({
         </h2>
         <p className="text-sm text-muted-foreground">{user.email}</p>
         <p className="text-xs text-muted-foreground pt-1">
-          A member since {formattedDate}
+          {t("memberSince")} {formattedDate}
         </p>
       </div>
 
@@ -87,13 +90,13 @@ export const EmployeeDetailsContent = ({
         <div className="grid grid-cols-2 gap-6">
           <FloatingInput
             id="firstName"
-            label="First Name"
+            label={t("firstName")}
             disabled={!isOwner}
             {...form.register("firstName", { required: true })}
           />
           <FloatingInput
             id="lastName"
-            label="Last Name"
+            label={t("lastName")}
             disabled={!isOwner}
             {...form.register("lastName", { required: true })}
           />
@@ -106,7 +109,7 @@ export const EmployeeDetailsContent = ({
             rules={{ required: true }}
             render={({ field }) => (
               <FloatingSelect
-                label="Department"
+                label={t("department")}
                 value={field.value || ""}
                 onValueChange={field.onChange}
                 disabled={!isOwner}
@@ -126,7 +129,7 @@ export const EmployeeDetailsContent = ({
             rules={{ required: true }}
             render={({ field }) => (
               <FloatingSelect
-                label="Position"
+                label={t("position")}
                 value={field.value || ""}
                 onValueChange={field.onChange}
                 disabled={!isOwner}
@@ -153,7 +156,7 @@ export const EmployeeDetailsContent = ({
                   : "bg-muted text-muted-foreground cursor-not-allowed opacity-60",
               )}
             >
-              {isUpdating ? "UPDATING..." : "UPDATE"}
+              {isUpdating ? `${t("update")}...` : t("update")}
             </Button>
           </div>
         )}

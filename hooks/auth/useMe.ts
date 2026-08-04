@@ -1,10 +1,15 @@
+"use client";
+
 import { useQuery } from "@apollo/client/react";
 
 import { GET_USER } from "@/graphql/user/queries";
 import { getUserIdFromToken } from "@/utils/jwt";
 
-export const useMe = (userId1?: string) => {
-  const userId = getUserIdFromToken();
+export const useMe = (customUserId?: string) => {
+  const tokenUserId = getUserIdFromToken();
+  const userId =
+    customUserId ||
+    (tokenUserId !== undefined ? String(tokenUserId) : undefined);
 
   const {
     data,

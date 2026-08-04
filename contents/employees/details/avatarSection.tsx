@@ -1,9 +1,12 @@
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Icon } from "@/components/ui/icon";
+import { useLanguage } from "@/context/language";
 
 interface IAvatarSectionProps {
   avatarUrl?: string;
-  avatarPreview: string | null;
+  avatarPreview?: string | null;
   firstName?: string;
   initials: string;
   isOwner: boolean;
@@ -18,6 +21,8 @@ export const AvatarSection = ({
   isOwner,
   onAvatarChange,
 }: IAvatarSectionProps) => {
+  const { t } = useLanguage();
+
   return (
     <div className="flex items-center gap-8">
       <Avatar className="size-30">
@@ -38,11 +43,11 @@ export const AvatarSection = ({
 
           <div className="flex items-center gap-3 text-foreground font-medium text-[20px] leading-8 tracking-[0.15px] group-hover:text-primary transition-colors">
             <Icon variant="upload" size="default" className="shrink-0" />
-            <span>Upload avatar image</span>
+            <span>{t("uploadAvatar")}</span>
           </div>
 
           <span className="text-foreground/70 font-normal text-[16px] leading-7 tracking-[0.15px]">
-            png, jpg or gif no more than 0.5MB
+            {t("avatarRequirements")}
           </span>
         </label>
       )}

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-
 import { usePathname, useSearchParams } from "next/navigation";
 
 import CvDetailsForm from "@/components/cv/details-form";
@@ -24,7 +23,7 @@ const VALID_TABS = ["details", "projects", "skills", "preview"] as const;
 const DEFAULT_TAB = "details";
 type TTab = (typeof VALID_TABS)[number];
 
-const CvConstructor = () => {
+const CvConstructor = ({ cvId }: { cvId?: string }) => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const tab = searchParams.get("tab") ?? "";
@@ -40,7 +39,6 @@ const CvConstructor = () => {
     }
 
     const newUrl = `${pathname}?${params.toString()}`;
-
     window.history.replaceState(null, "", newUrl);
   };
 
@@ -48,42 +46,62 @@ const CvConstructor = () => {
 
   return (
     <div className="pl-6 pr-6.5">
-      <Breadcrumb>
+      <Breadcrumb className="mb-4">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink render={<Link href={"/cvs"}>CVs</Link>} />
+            <BreadcrumbLink render={<Link href="/cvs" />}>CVs</BreadcrumbLink>
           </BreadcrumbItem>
+
           <BreadcrumbSeparator />
-          <BreadcrumbPage>{cvData?.cv.name}</BreadcrumbPage>
-          {activeTab !== "details" && (
+
+          {activeTab === "details" ? (
+            <BreadcrumbItem>
+              <BreadcrumbPage>
+                {cvData?.cv.name || "CV Constructor"}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          ) : (
             <>
+              <BreadcrumbItem>
+                <BreadcrumbLink render={<Link href={pathname} />}>
+                  {cvData?.cv.name || "CV"}
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+
               <BreadcrumbSeparator />
-              <BreadcrumbItem>{activeTab}</BreadcrumbItem>
+
+              <BreadcrumbItem>
+                <BreadcrumbPage className="capitalize">
+                  {activeTab}
+                </BreadcrumbPage>
+              </BreadcrumbItem>
             </>
           )}
         </BreadcrumbList>
       </Breadcrumb>
+
       <Tabs
         defaultValue={DEFAULT_TAB}
         value={activeTab}
         onValueChange={handleTabChange}
       >
-        <TabsList>
-          <TabsTrigger value={"details"}>Details</TabsTrigger>
-          <TabsTrigger value={"projects"}>Projects</TabsTrigger>
-          <TabsTrigger value={"skills"}>Skills</TabsTrigger>
-          <TabsTrigger value={"preview"}>Preview</TabsTrigger>
+        <TabsList className="mb-4">
+          <TabsTrigger value="details">Details</TabsTrigger>
+          <TabsTrigger value="projects">Projects</TabsTrigger>
+          <TabsTrigger value="skills">Skills</TabsTrigger>
+          <TabsTrigger value="preview">Preview</TabsTrigger>
         </TabsList>
-        <TabsContent value={"details"}>
+
+        <TabsContent value="details">
           <CvDetailsForm />
         </TabsContent>
-        <TabsContent value={"projects"}>
+        <TabsContent value="projects">
           <CvProjects />
         </TabsContent>
-        <TabsContent value={"skills"}>
+        <TabsContent value="skills">
           <CvSkills />
         </TabsContent>
-        <TabsContent value={"preview"}>
+        <TabsContent value="preview">
           <CvPreview />
         </TabsContent>
       </Tabs>

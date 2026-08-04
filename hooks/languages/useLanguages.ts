@@ -5,11 +5,13 @@ import {
   DELETE_PROFILE_LANGUAGE,
   GET_ALL_LANGUAGES,
 } from "@/graphql/languages";
+import { GET_USER } from "@/graphql/user/queries";
 import { IProfileLanguage } from "@/types/languages";
 import { getUserIdFromToken } from "@/utils/jwt";
 
-export default function useLanguages() {
-  const userId = getUserIdFromToken();
+export default function useLanguages(customUserId?: string) {
+  const userId = customUserId || getUserIdFromToken();
+
   const [getAllLanguages, { data: languages, loading: isLanguagesLoading }] =
     useLazyQuery(GET_ALL_LANGUAGES);
   const [executeAddProfileLanguage, { loading: isAddingLoading }] =
@@ -23,10 +25,10 @@ export default function useLanguages() {
       userId: userId,
       ...input,
     };
-    const responce = executeAddProfileLanguage({
+    return executeAddProfileLanguage({
       variables: { language: profileLanguageInput },
+      refetchQueries: [{ query: GET_USER, variables: { userId } }],
     });
-    return responce;
   };
 
   const deleteProfileLanguages = (input: string[]) => {
@@ -35,8 +37,9 @@ export default function useLanguages() {
       userId: userId,
       name: input,
     };
-    executeDeleteProfileLanguages({
+    return executeDeleteProfileLanguages({
       variables: { language: profileLanguageInput },
+      refetchQueries: [{ query: GET_USER, variables: { userId } }],
     });
   };
 

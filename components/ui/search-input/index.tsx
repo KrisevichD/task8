@@ -6,15 +6,25 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { useLanguage } from "@/context/language";
 
-interface IEmployeeSearchProps {
+interface ISearchInputProps {
   value: string;
   onChange: (value: string) => void;
+  placeholder?: string;
+  className?: string;
 }
 
-export const EmployeeSearch = ({ value, onChange }: IEmployeeSearchProps) => {
+export const SearchInput = ({
+  value,
+  onChange,
+  placeholder,
+  className = "w-[320px]",
+}: ISearchInputProps) => {
+  const { t } = useLanguage();
+
   return (
-    <div className="w-[320px]">
+    <div className={className}>
       <InputGroup variant="search" className="h-10 bg-secondary/30">
         <InputGroupAddon align="inline-start">
           <Icon
@@ -24,7 +34,7 @@ export const EmployeeSearch = ({ value, onChange }: IEmployeeSearchProps) => {
           />
         </InputGroupAddon>
         <InputGroupInput
-          placeholder="Search"
+          placeholder={placeholder || t("search")}
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
