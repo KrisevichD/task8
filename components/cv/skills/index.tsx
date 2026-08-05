@@ -98,7 +98,7 @@ const CvSkills = () => {
       <div className="flex justify-end w-fill gap-4">
         {selectedSkills.length === 1
         ?
-        <SkillsForm selectedSkills={selectedSkills} cancelEditing={() => setSelectedSkills([])}/>
+        <SkillsForm cvId={cvData.cv.id} selectedSkills={selectedSkills} cancelEditing={() => setSelectedSkills([])}/>
         :
         <CvSkillsForm />
         }

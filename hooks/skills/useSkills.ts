@@ -14,9 +14,8 @@ import { getUserIdFromToken } from "@/utils/jwt";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 
-export default function useSkills(customUserId?: string) {
+export default function useSkills(customUserId?: string, cvId?: string) {
   const userId = customUserId || getUserIdFromToken();
-  const cvId = useParams().id as string;
 
   const { data: skillCategoriesData, loading: isCategoriesLoading } = useQuery(
     GET_SKILLS_CATEGORIES,
@@ -53,6 +52,7 @@ export default function useSkills(customUserId?: string) {
   };
 
   const updateProfileSkill = async (input: IProfileSkillInput) => {
+    console.log("!!!", input, userId)
     if (!userId) return;
     if (!cvId) {
       const dataProfile = {

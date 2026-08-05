@@ -92,7 +92,7 @@ export const LanguagesContent = ({
         })}
       </div>
 
-      <div className="flex justify-end gap-4 w-full border-t pt-4">
+      <div className="flex justify-end gap-4 w-full pt-4">
         <LanguagesForm userId={userId} />
 
         {selectedLanguages.length > 0 ? (

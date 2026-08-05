@@ -49,7 +49,8 @@ export const Sidebar = () => {
   const isProfileLoading = isLoading || !userId;
 
   return (
-    <aside className="w-50 min-h-screen flex flex-col pt-11 pb-1 mr-6 shrink-0 bg-background max-lg:w-full max-lg:min-h-0 max-lg:h-[60px] max-lg:sticky max-lg:bottom-0 max-lg:z-50 max-lg:flex-row max-lg:items-center max-lg:justify-between max-lg:p-3 max-lg:mr-0 max-lg:border-t max-lg:border-border">
+    <>
+    <aside className="w-50 h-screen flex flex-col pt-11 pb-1 mr-6 shrink-0 bg-background max-lg:w-full max-lg:h-15 fixed bottom-0 max-lg:z-50 max-lg:flex-row max-lg:items-center max-lg:justify-between max-lg:p-3 max-lg:mr-0 max-lg:border-t max-lg:border-border">
       <nav className="space-y-1 w-full max-lg:flex max-lg:space-y-0 max-lg:gap-1 max-lg:w-auto">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname.startsWith(item.href);
@@ -101,5 +102,6 @@ export const Sidebar = () => {
         </button>
       </div>
     </aside>
+    </>
   );
 };

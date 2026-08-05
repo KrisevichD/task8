@@ -20,7 +20,7 @@ import useLanguages from "@/hooks/languages/useLanguages";
 import { TLanguageProficiency } from "@/types/languages";
 
 interface ILanguagesFormProps {
-  userId?: string;
+  userId: string;
 }
 
 const LanguagesForm = ({ userId }: ILanguagesFormProps) => {

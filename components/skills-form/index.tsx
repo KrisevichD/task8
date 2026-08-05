@@ -18,18 +18,24 @@ import useSkills from "@/hooks/skills/useSkills";
 import { IProfileSkill, ISkill, TSkillMastery } from "@/types/skills";
 import { toast } from "sonner";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
+import { useLanguage } from "@/context/language";
 
 const SkillsForm = ({
   selectedSkills,
-  cancelEditing
+  cancelEditing,
+  userId,
+  cvId
 } : {
   selectedSkills: IProfileSkill[],
-  cancelEditing: () => void;
+  cancelEditing: () => void,
+  userId?: string,
+  cvId?:string
 }) => {
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [skill, setSkill] = useState<ISkill | null>(null);
   const [skillMastery, setSkillMastery] = useState<TSkillMastery>("Novice");
-  const { skills: profileSkills } = useMe();
+  const { skills: profileSkills } = useMe(userId);
   const isEditing = selectedSkills.length === 1;
   const action = isEditing ? 'Update' : 'Add';
   const {
@@ -40,7 +46,7 @@ const SkillsForm = ({
     isAddingLoading,
     updateProfileSkill, 
     isUpdatingLoading
-  } = useSkills();
+  } = useSkills(userId, cvId);
 
   useEffect(() => {
     if (isOpen) {
@@ -56,6 +62,7 @@ const SkillsForm = ({
 
   const onSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log(selectedSkills[0])
     const submitSkill = !isEditing 
       ? skill
       : {

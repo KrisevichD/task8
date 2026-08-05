@@ -27,13 +27,13 @@ import useSkills from "@/hooks/skills/useSkills";
 import { getUserIdFromToken } from "@/utils/jwt";
 import { IProfileSkill } from "@/types/skills";
 
-const SkillsContent = () => {
+const SkillsContent = ({userId}: { userId: string}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const userId = getUserIdFromToken();
-  const { skillCategories, isCategoriesLoading, deleteProfileSkills } =
-    useSkills();
+  const { skillCategories, isCategoriesLoading, deleteProfileSkills } = useSkills(userId);
   const { skills, isLoading, error } = useMe(userId);
   const [selectedSkills, setSelectedSkills] = useState<IProfileSkill[]>([]);
+
+  console.log(skills, skillCategories)
 
   const handleToggle = (isPressed: boolean, skill: IProfileSkill) => {
     if (isPressed) {
@@ -60,8 +60,7 @@ const SkillsContent = () => {
   }
 
   if (error) return <>Error</>;
-  if (!skills || isLoading || !skillCategories || isCategoriesLoading)
-    return <Spinner />;
+  if (!skills || isLoading || !skillCategories || isCategoriesLoading) return <Spinner />;
 
   const filteredList = skillCategories
     .filter((category) =>
@@ -71,6 +70,8 @@ const SkillsContent = () => {
       ...category,
       skills: skills.filter(skill => skill.categoryId === category.id),
     }));
+
+  console.log(">>>", filteredList)
 
   return (
     <>
@@ -108,7 +109,7 @@ const SkillsContent = () => {
         </div>
 
         <div className="flex justify-end gap-4 w-fill sticky bottom-1">
-          <SkillsForm selectedSkills={selectedSkills} cancelEditing={cancelEditing}/>
+          <SkillsForm userId={userId} selectedSkills={selectedSkills} cancelEditing={cancelEditing}/>
 
           {selectedSkills.length > 0 ? (
             <Button variant={"primary"} onClick={deletePressedSkills}>

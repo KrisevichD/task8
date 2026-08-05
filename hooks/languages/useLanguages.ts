@@ -7,9 +7,10 @@ import {
 } from "@/graphql/languages";
 import { IProfileLanguage } from "@/types/languages";
 import { getUserIdFromToken } from "@/utils/jwt";
+import { toast } from "sonner";
 
-export default function useLanguages() {
-  const userId = getUserIdFromToken();
+export default function useLanguages(customUserId: string) {
+  const userId = customUserId || getUserIdFromToken() || "";
   const [getAllLanguages, { data: languages, loading: isLanguagesLoading }] =
     useLazyQuery(GET_ALL_LANGUAGES);
   const [executeAddProfileLanguage, { loading: isAddingLoading }] =
@@ -23,10 +24,15 @@ export default function useLanguages() {
       userId: userId,
       ...input,
     };
-    const responce = executeAddProfileLanguage({
+    const promise = executeAddProfileLanguage({
       variables: { language: profileLanguageInput },
     });
-    return responce;
+    toast.promise(promise, {
+      loading: "Adding language",
+      success: "Successfully language",
+      error: (err) => err.message,
+      position: "top-right",
+    })
   };
 
   const deleteProfileLanguages = (input: string[]) => {
@@ -35,9 +41,15 @@ export default function useLanguages() {
       userId: userId,
       name: input,
     };
-    executeDeleteProfileLanguages({
+    const promise = executeDeleteProfileLanguages({
       variables: { language: profileLanguageInput },
     });
+    toast.promise(promise, {
+      loading: "Deleting language",
+      success: "Successfully deleted",
+      error: (err) => err.message,
+      position: "top-right",
+    })
   };
 
   return {
