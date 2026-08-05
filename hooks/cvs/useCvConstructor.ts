@@ -1,5 +1,4 @@
 import { useMutation, useQuery } from "@apollo/client/react";
-
 import { useParams } from "next/navigation";
 
 import {
@@ -14,6 +13,7 @@ import {
   UPDATE_CV_PROJECT,
 } from "@/graphql/cv-constructor";
 import {
+  IAddCvProjectInput,
   IAddCvSkillInput,
   ICreateCvProjectForm,
   ICvProject,
@@ -32,8 +32,9 @@ export default function useCvConstructor() {
   });
   const [
     executeAddCvProject,
-    { loading: isCvProjectLoading, error: cvProjecterror },
+    { loading: isCvProjectLoading, error: cvProjectError },
   ] = useMutation(ADD_CV_PROJECT_MUTATION);
+
   const [executeUpdateCvProject] = useMutation(UPDATE_CV_PROJECT);
   const [executeDeleteCvProject] = useMutation(DELETE_CV_PROJECT);
   const [executeUpdateCv] = useMutation(UPDATE_CV);
@@ -58,7 +59,7 @@ export default function useCvConstructor() {
     if (!response.data) return;
     const project = response.data.createProject;
 
-    const addProjectData = {
+    const addProjectData: IAddCvProjectInput = {
       cvId: cvId,
       projectId: project.id,
       start_date: validateDateString(project.start_date),
@@ -171,7 +172,7 @@ export default function useCvConstructor() {
     addCvProject,
     updateCvProject,
     isCvProjectLoading,
-    cvProjecterror,
+    cvProjectError,
     deleteCvProject,
     addCvSkill,
     deleteCvSkill,

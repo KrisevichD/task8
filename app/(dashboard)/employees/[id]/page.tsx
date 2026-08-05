@@ -4,8 +4,19 @@ import { useQuery } from "@apollo/client/react";
 import Link from "next/link";
 import { use, useState } from "react";
 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Icon } from "@/components/ui/icon";
 import { EmployeeDetailsContent } from "@/contents/employees/details";
+import LanguagesContent from "@/contents/languages"; // 🔑 Импортируем компонент языков
+import SkillsContent from "@/contents/skills";
+import { useLanguage } from "@/context/language";
 import { GET_USER } from "@/graphql/user/queries";
 
 type TabType = "PROFILE" | "SKILLS" | "LANGUAGES";
@@ -16,6 +27,7 @@ interface IPageProps {
 
 export default function EmployeeDetailsPage({ params }: IPageProps) {
   const { id } = use(params);
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<TabType>("PROFILE");
 
   const {
@@ -35,33 +47,38 @@ export default function EmployeeDetailsPage({ params }: IPageProps) {
   if (error) {
     return (
       <div className="p-8 text-center text-destructive">
-        Failed to load employee details: {error.message}
+        Error loading employee details: {error.message}
       </div>
     );
   }
 
+  const tabLabels: Record<TabType, string> = {
+    PROFILE: t("profile"),
+    SKILLS: t("skills"),
+    LANGUAGES: t("languages"),
+  };
+
   return (
     <div className="flex flex-col h-full w-full">
       <div className="shrink-0 pr-8">
-        <div className="flex items-center gap-2 text-[16px] leading-6 font-normal tracking-[0.15px]">
-          <Link
-            href="/employees"
-            className="text-muted-foreground hover:text-foreground transition-colors pl-5"
-          >
-            Employees
-          </Link>
+        <Breadcrumb className="pl-5">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink render={<Link href="/employees" />}>
+                {t("employees")}
+              </BreadcrumbLink>
+            </BreadcrumbItem>
 
-          <Icon
-            variant="arrow-breadcrumb"
-            size="xs"
-            className="text-muted-foreground"
-          />
+            <BreadcrumbSeparator />
 
-          <div className="flex items-center gap-1.5 text-primary">
-            <Icon variant="user" size="sm" />
-            <span>{isLoading ? "Loading..." : userName}</span>
-          </div>
-        </div>
+            <BreadcrumbItem>
+              <BreadcrumbPage className="flex items-center gap-1.5">
+                <Icon variant="user" size="sm" />
+                <span>{isLoading ? `${t("search")}...` : userName}</span>
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
 
         <div className="flex items-center mt-2">
           {(["PROFILE", "SKILLS", "LANGUAGES"] as TabType[]).map((tab) => {
@@ -78,7 +95,7 @@ export default function EmployeeDetailsPage({ params }: IPageProps) {
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <span>{tab}</span>
+                <span>{tabLabels[tab]}</span>
 
                 {isActive && (
                   <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary" />
@@ -99,14 +116,14 @@ export default function EmployeeDetailsPage({ params }: IPageProps) {
         )}
 
         {activeTab === "SKILLS" && (
-          <div className="p-8 text-center text-muted-foreground">
-            Skills for {userName}
+          <div className="px-5">
+            <SkillsContent userId={id} />
           </div>
         )}
 
         {activeTab === "LANGUAGES" && (
-          <div className="p-8 text-center text-muted-foreground">
-            Languages for {userName}
+          <div className="px-5">
+            <LanguagesContent userId={id} />
           </div>
         )}
       </div>

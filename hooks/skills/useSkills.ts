@@ -8,14 +8,16 @@ import {
   UPDATE_CV_SKILL,
   UPDATE_PROFILE_SKILL,
 } from "@/graphql/skills";
+import { GET_USER } from "@/graphql/user/queries";
 import { IProfileSkillInput } from "@/types/skills";
 import { getUserIdFromToken } from "@/utils/jwt";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 
-export default function useSkills() {
-  const userId = getUserIdFromToken();
+export default function useSkills(customUserId?: string) {
+  const userId = customUserId || getUserIdFromToken();
   const cvId = useParams().id as string;
+
   const { data: skillCategoriesData, loading: isCategoriesLoading } = useQuery(
     GET_SKILLS_CATEGORIES,
   );
@@ -32,7 +34,7 @@ export default function useSkills() {
 
   const skillCategories = skillCategoriesData?.skillCategories;
 
-  const addProfileSkill = (input: IProfileSkillInput) => {
+  const addProfileSkill = (input: Omit<IProfileSkillInput, "userId">) => {
     if (!userId) return;
     const profileSkillInput = {
       userId: userId,
@@ -40,6 +42,7 @@ export default function useSkills() {
     };
     const promise = executeAddProfileSkill({
       variables: { skill: profileSkillInput },
+      refetchQueries: [{ query: GET_USER, variables: { userId } }],
     });
     toast.promise(promise, {
       loading: "Adding skill",
