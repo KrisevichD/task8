@@ -1,80 +1,61 @@
-"use client";
+"use client"
 
-import * as React from "react";
+import * as React from "react"
+import { Select, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
+import { cn } from "@/utils/shadcn"
 
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { cn } from "@/utils/shadcn";
-
-interface FloatingSelectProps extends Omit<
-  React.ComponentProps<typeof Select>,
-  "onValueChange"
-> {
-  label: string;
-  placeholder?: string;
-  displayValue?: React.ReactNode;
-  children: React.ReactNode;
-  className?: string;
-  onValueChange?: (value: string) => void;
+interface FloatingSelectProps extends React.ComponentProps<typeof Select> {
+  label: string
+  placeholder?: string
+  children: React.ReactNode
+  className?: string
 }
 
 export function FloatingSelect({
   label,
-  placeholder,
-  displayValue,
+  placeholder = " ",
   children,
   className,
   value,
-  onValueChange,
   ...props
 }: FloatingSelectProps) {
-  const safeValue = value ?? "";
-  const hasValue = Boolean(safeValue);
-
-  const handleValueChange = (val: unknown) => {
-    if (typeof val === "string") {
-      onValueChange?.(val);
-    }
-  };
-
+  const safeValue = value ?? ""
   return (
     <div className="relative w-full border-none bg-transparent group/select">
-      <Select value={safeValue} onValueChange={handleValueChange} {...props}>
+      <Select  value={safeValue} {...props}>
         <SelectTrigger
           className={cn(
-            "peer h-16 text-lg font-normal px-4 pt-3 text-foreground flex items-center [&>span]:!text-lg [&>span]:!font-normal",
-            className,
+            "peer",
+            className
           )}
         >
-          <SelectValue placeholder={placeholder}>
-            {displayValue || undefined}
-          </SelectValue>
+          <SelectValue placeholder={placeholder} />
         </SelectTrigger>
-
-        <SelectContent
-          side="bottom"
-          sideOffset={6}
-          alignItemWithTrigger={false}
-        >
-          {children}
-        </SelectContent>
+        <SelectContent>{children}</SelectContent>
       </Select>
 
       <Label
-        className={cn(
-          "absolute left-3 z-10 pointer-events-none transition-all duration-200 bg-background px-1 text-muted-foreground",
-          hasValue
-            ? "-top-2.5 text-sm text-primary"
-            : "top-4.5 text-lg peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-primary peer-data-popup-open:-top-2.5 peer-data-popup-open:text-sm",
-        )}
+        className="
+          absolute left-2 -top-2.5 z-10
+            pointer-events-none transition-all duration-200 will-change-transform
+          
+          peer-data-placeholder:translate-y-5.5
+          peer-data-placeholder:text-[16px]
+
+          peer-data-placeholder:peer-focus:translate-y-0
+          peer-data-placeholder:peer-focus:text-xs
+          
+          peer-data-popup-open:translate-y-0
+          peer-data-popup-open:text-xs
+          
+          peer-focus:translate-y-0
+          peer-focus:text-xs
+          peer-focus:text-primary
+        "
       >
         {label}
       </Label>
     </div>
-  );
+  )
 }

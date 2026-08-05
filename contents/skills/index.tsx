@@ -15,27 +15,21 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
+
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import SkillBadge from "@/components/ui/skill-badge";
 import { Spinner } from "@/components/ui/spinner";
 import { Toggle } from "@/components/ui/toggle";
-import { useLanguage } from "@/context/language";
 import { useMe } from "@/hooks/auth/useMe";
 import useSkills from "@/hooks/skills/useSkills";
+
 import { getUserIdFromToken } from "@/utils/jwt";
 import { IProfileSkill } from "@/types/skills";
 
-interface ISkillsContentProps {
-  userId?: string;
-}
-
-export const SkillsContent = ({
-  userId: customUserId,
-}: ISkillsContentProps) => {
-  const { t } = useLanguage();
+const SkillsContent = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const userId = customUserId || getUserIdFromToken() || "";
+  const userId = getUserIdFromToken();
   const { skillCategories, isCategoriesLoading, deleteProfileSkills } =
     useSkills();
   const { skills, isLoading, error } = useMe(userId);
@@ -69,7 +63,6 @@ export const SkillsContent = ({
   if (!skills || isLoading || !skillCategories || isCategoriesLoading)
     return <Spinner />;
 
-  // Группируем скиллы пользователя по имеющимся категориям
   const filteredList = skillCategories
     .filter((category) =>
       skills.some((skill) => skill.categoryId === category.id),
@@ -115,7 +108,7 @@ export const SkillsContent = ({
         </div>
 
         <div className="flex justify-end gap-4 w-fill sticky bottom-1">
-          <SkillsForm selectedSkills={selectedSkills} cancelEditing={cancelEditing} />
+          <SkillsForm selectedSkills={selectedSkills} cancelEditing={cancelEditing}/>
 
           {selectedSkills.length > 0 ? (
             <Button variant={"primary"} onClick={deletePressedSkills}>
@@ -158,52 +151,6 @@ export const SkillsContent = ({
             </AlertDialog>
           )}
         </div>
-      </div>
-
-      {/* Панель кнопок (Добавить / Удалить) */}
-      <div className="flex justify-end gap-4 w-full border-t pt-4">
-        <SkillsForm userId={userId} cancelEditing={cancelEditing} selectedSkills={selectedSkills} />
-
-        {selectedSkills.length > 0 ? (
-          <Button variant="primary" onClick={deletePressedSkills}>
-            DELETE
-            <Badge
-              variant="primary"
-              className="bg-primary-foreground text-primary font-bold ml-2"
-            >
-              {selectedSkills.length}
-            </Badge>
-          </Button>
-        ) : (
-          <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-            <AlertDialogTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  className="text-primary hover:text-primary"
-                  disabled={!skills || skills.length <= 0}
-                >
-                  <Icon variant="delete" />
-                  {t("removeSkills")}
-                </Button>
-              }
-            />
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will clear list of skills.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={deleteAllSkills}>
-                  Continue
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
       </div>
     </>
   );
