@@ -47,7 +47,7 @@ const CvConstructor = () => {
   if (isCvLoading) return <Spinner />;
 
   return (
-    <div className="pl-6 pr-6.5">
+    <div className="px-12 xl:pl-6 xl:pr-6.5 py-4">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

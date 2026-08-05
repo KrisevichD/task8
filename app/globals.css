@@ -174,4 +174,8 @@
   h3 {
     @apply font-bold
   }
+
+  h4 {
+    @apply font-bold text-[16px]
+  }
 }

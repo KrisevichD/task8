@@ -4,6 +4,7 @@ import { IProfileSkill } from "./skills";
 export interface ICvProject {
   id: string;
   name: string;
+  project: IProjectData;
   description: string;
   domain: string;
   start_date: string;

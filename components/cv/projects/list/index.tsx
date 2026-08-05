@@ -28,7 +28,7 @@ import { validateProjectDate } from "@/utils/helpers";
 
 const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
   const { cvData, deleteCvProject } = useCvConstructor();
-  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState<string>();
   const [hoveredProjectId, setHoveredProjectId] = useState<string | null>(null);
 
   const handleDeleteProject = async (project: ICvProject) => {
@@ -119,7 +119,7 @@ const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
                     />
                     <DropdownMenuContent>
                       <DropdownMenuGroup>
-                        <DropdownMenuItem onClick={() => setIsEditing(true)}>
+                        <DropdownMenuItem onClick={() => setEditingId(project.id)}>
                           Edit
                         </DropdownMenuItem>
                       </DropdownMenuGroup>
@@ -135,9 +135,10 @@ const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                   <CvProjectsForm
-                    id={project.id}
-                    isEditing={isEditing}
-                    closeEditing={() => setIsEditing(false)}
+                    type="edit"
+                    id={project.project.id}
+                    editingId={editingId === project.id ? editingId : undefined}
+                    closeEditing={() => setEditingId(undefined)}
                     initialData={{
                       name: project.name,
                       domain: project.domain,

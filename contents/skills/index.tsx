@@ -25,6 +25,7 @@ import { useMe } from "@/hooks/auth/useMe";
 import useSkills from "@/hooks/skills/useSkills";
 
 import { getUserIdFromToken } from "@/utils/jwt";
+import { IProfileSkill } from "@/types/skills";
 
 const SkillsContent = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,27 +33,31 @@ const SkillsContent = () => {
   const { skillCategories, isCategoriesLoading, deleteProfileSkills } =
     useSkills();
   const { skills, isLoading, error } = useMe(userId);
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [selectedSkills, setSelectedSkills] = useState<IProfileSkill[]>([]);
 
-  const handleToggle = (isPressed: boolean, name: string) => {
+  const handleToggle = (isPressed: boolean, skill: IProfileSkill) => {
     if (isPressed) {
-      setSelectedSkills((prev) => [...prev, name]);
+      setSelectedSkills((prev) => [...prev, skill]);
     } else {
-      const selected = selectedSkills.filter((skill) => skill !== name);
+      const selected = selectedSkills.filter((e) => e.name !== skill.name);
       setSelectedSkills(selected);
     }
   };
 
   const deletePressedSkills = async () => {
-    await deleteProfileSkills(selectedSkills);
+    await deleteProfileSkills(selectedSkills.map(skill => skill.name));
     setSelectedSkills([]);
   };
 
   const deleteAllSkills = async () => {
     if (!skills) return;
-    await deleteProfileSkills(skills?.map((skill) => skill.name));
+    await deleteProfileSkills(skills?.map(skill => skill.name));
     setIsOpen(false);
   };
+
+  const cancelEditing = () => {
+    setSelectedSkills([]);
+  }
 
   if (error) return <>Error</>;
   if (!skills || isLoading || !skillCategories || isCategoriesLoading)
@@ -64,30 +69,30 @@ const SkillsContent = () => {
     )
     .map((category) => ({
       ...category,
-      skills: skills.filter((skill) => skill.categoryId === category.id),
+      skills: skills.filter(skill => skill.categoryId === category.id),
     }));
 
   return (
     <>
-      <div className="ml-6 mr-6.5 lg:ml-42.25 lg:mr-42.75">
+      <div className="ml-6 mr-6.5 xl:ml-42.25 xl:mr-42.75">
         <div className="pl-6 pt-8">
           {filteredList.map((category) => (
             <div key={`category-${category.id}`}>
-              <h2 className="font-normal">{category.name}</h2>
+              <h2 className="font-normal mt-8 mb-4">{category.name}</h2>
               <ul className="flex flex-wrap">
                 {category.skills.map((skill) => {
                   return (
                     <li key={`profile-skill-${skill.name}`}>
                       <Toggle
                         variant={"ghost"}
-                        pressed={selectedSkills.includes(skill.name)}
+                        pressed={selectedSkills.includes(skill)}
                         onPressedChange={(pressed) =>
-                          handleToggle(pressed, skill.name)
+                          handleToggle(pressed, skill)
                         }
                       >
                         <SkillBadge
                           variant={
-                            selectedSkills.includes(skill.name)
+                            selectedSkills.includes(skill)
                               ? "pressed"
                               : skill.mastery
                           }
@@ -102,8 +107,8 @@ const SkillsContent = () => {
           ))}
         </div>
 
-        <div className="flex justify-end gap-4 w-fill">
-          <SkillsForm />
+        <div className="flex justify-end gap-4 w-fill sticky bottom-1">
+          <SkillsForm selectedSkills={selectedSkills} cancelEditing={cancelEditing}/>
 
           {selectedSkills.length > 0 ? (
             <Button variant={"primary"} onClick={deletePressedSkills}>

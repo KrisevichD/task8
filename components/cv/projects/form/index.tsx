@@ -34,21 +34,24 @@ const INITIAL_FORM_DATA = {
 };
 
 const CvProjectsForm = ({
+  type = "add",
   id,
-  isEditing,
+  editingId,
   closeEditing,
   initialData,
 }: {
+  type?: "add" | "edit",
   id?: string;
-  isEditing?: boolean;
+  editingId?: string;
   closeEditing?: () => void;
   initialData?: ICreateCvProjectForm;
 }) => {
+  const isEditing = type === "edit" && editingId ? true : false;
   const [isOpen, setIsOpen] = useState(false);
   const { addCvProject, updateCvProject } = useCvConstructor();
   const { getAllSkills, skills } = useSkills();
 
-  const { register, reset, control, handleSubmit } =
+  const { register, reset, control, handleSubmit, formState: { isDirty } } =
     useForm<ICreateCvProjectForm>({
       defaultValues: initialData ?? INITIAL_FORM_DATA,
     });
@@ -83,10 +86,10 @@ const CvProjectsForm = ({
   return (
     <>
       <Dialog
-        open={isEditing !== undefined ? isEditing : isOpen}
-        onOpenChange={isEditing !== undefined ? closeEditing : setIsOpen}
+        open={isEditing ? isEditing : isOpen}
+        onOpenChange={isEditing ? closeEditing : setIsOpen}
       >
-        {isEditing === undefined && (
+        {type === 'add' && (
           <DialogTrigger
             render={
               <Button
@@ -102,7 +105,7 @@ const CvProjectsForm = ({
         )}
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add project</DialogTitle>
+            <DialogTitle>{isEditing ? "Upadate" : "Add"} project</DialogTitle>
           </DialogHeader>
           <form
             id="project-form"
@@ -185,7 +188,7 @@ const CvProjectsForm = ({
                 </Button>
               }
             />
-            <Button variant={"primary"} type="submit" form="project-form">
+            <Button variant={"primary"} type="submit" form="project-form" disabled={!isDirty}> 
               {isEditing ? "UPDATE" : "ADD"}
             </Button>
           </DialogFooter>

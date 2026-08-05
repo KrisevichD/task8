@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 import { useMe } from "@/hooks/auth/useMe";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
@@ -7,6 +8,7 @@ import useExportPdf from "@/hooks/cvs/useExportPdf";
 import useSkills from "@/hooks/skills/useSkills";
 import { validateProjectDate } from "@/utils/helpers";
 import { getUserIdFromToken } from "@/utils/jwt";
+import React from "react";
 
 const CvPreview = () => {
   const { cvData } = useCvConstructor();
@@ -31,7 +33,7 @@ const CvPreview = () => {
   return (
     <article
       ref={printRef}
-      className="px-12 xl:px-48.25 space-y-8 pt-8 text-[16px] font-normal"
+      className="px-0 xl:px-48.25 space-y-8 pt-8 text-[16px] font-normal"
     >
       <header className="flex justify-between">
         <div>
@@ -48,8 +50,8 @@ const CvPreview = () => {
         </Button>
       </header>
       <section className="flex">
-        <aside className="w-65 py-4 pr-4">
-          <section>
+        <aside>
+          <section className="w-65 py-4 pr-4">
             <h3>Education</h3>
             <p>{data.education}</p>
             <h3>Language proficiency</h3>
@@ -75,20 +77,20 @@ const CvPreview = () => {
           <p>{data.description}</p>
           {filteredSkills.map((category) => {
             return (
-              <>
+              <React.Fragment key={`category-skill-${category.id}`}>
                 <h3>{category.name}</h3>
                 <p>{category.skills.map((skill) => skill.name).join(", ")}</p>
-              </>
+              </React.Fragment>
             );
           })}
         </article>
       </section>
       <section>
-        <h2>Projects</h2>
+        <h2 className="text-[34px] font-normal tracking-wide my-7.5">Projects</h2>
         {data.projects.map((project) => {
           return (
             <article key={`project-${project.id}`} className="flex">
-              <header className="w-65 py-4 pr-4">
+              <header className="w-65 min-w-65 py-4 pr-4">
                 <h3 className="uppercase text-primary">{project.name}</h3>
                 <p>{project.description}</p>
               </header>
@@ -98,8 +100,11 @@ const CvPreview = () => {
                 <h4>Period</h4>
                 <p>{`${validateProjectDate(project.start_date, "preview")} - ${validateProjectDate(project.end_date, "preview")}`}</p>
                 <h4>Responsibilities</h4>
-                {/* TODO */}
-                {project.responsibilities}
+                <ul>
+                {project.responsibilities.map((responcibility, index) => (
+                  <li key={`responcibility-${index}`} className="list-disc list-inside">{responcibility}</li>
+                ))}
+                </ul>
                 <h4>Enviroment</h4>
                 {project.environment.join(", ") + "."}
               </div>
@@ -108,39 +113,39 @@ const CvPreview = () => {
         })}
       </section>
       <section>
-        <h2>Professional skills</h2>
-        {/* <Table>
+        <h2 className="text-[34px] font-normal tracking-wide my-7.5">Professional skills</h2>
+        <Table className="text-[14px]">
           <TableHeader>
-            <TableRow className="px-4 py-2.5 border-primary">
-              <TableHead className="align-top">SKILLS</TableHead>
+            <TableRow className=" border-primary font-medium">
+              <TableHead className="align-top px-4 py-2.5">SKILLS</TableHead>
               <TableHead></TableHead>
-              <TableHead className="align-top text-center w-28.5">
+              <TableHead className="align-top px-4 py-2.5 text-center w-28.5">
                 EXPERIENCE <br /> IN YEAR
               </TableHead>
-              <TableHead className="align-top text-center w-35">
+              <TableHead className="align-top px-4 py-2.5 text-center w-35">
                 LAST USED
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.skills.map((category) => {
+            {filteredSkills.map((category) => {
               return (
-                <TableRow key={`category-${category.name}`}>
-                  <TableCell className="text-primary">
+                <TableRow key={`category-${category.name}`} className="p-2.5">
+                  <TableCell className="align-top px-4 py-2.5 text-primary">
                     {category.name}
                   </TableCell>
-                  <TableCell>
-                    {category.list.map((skill) => (
-                      <div key={`skill-${skill.id}`}>{skill.name}</div>
+                  <TableCell className="space-y-5 pb-7 px-4 pt-2.5">
+                    {category.skills.map((skill) => (
+                      <p key={`skill-${skill.name}`}>{skill.name}</p>
                     ))}
                   </TableCell>
-                  <TableCell>2</TableCell>
-                  <TableCell>2025</TableCell>
+                  <TableCell className="align-top px-4 py-2.5 text-center">2</TableCell>
+                  <TableCell className="align-top px-4 py-2.5 text-center">2025</TableCell>
                 </TableRow>
               );
             })}
           </TableBody>
-        </Table> */}
+        </Table>
       </section>
     </article>
   );

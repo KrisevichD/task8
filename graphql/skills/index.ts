@@ -7,6 +7,7 @@ import {
   IProfileResponce,
   IProfileSkillVariables,
 } from "@/types/skills";
+import { ICvResponce } from "@/types/cv-constructor";
 
 export const GET_ALL_SKILLS: TypedDocumentNode<
   IGetAllSkillsResponce,
@@ -57,6 +58,39 @@ export const ADD_PROFILE_SKILL: TypedDocumentNode<
     }
   }
 `;
+
+export const UPDATE_PROFILE_SKILL: TypedDocumentNode<
+  IProfileResponce,
+  IProfileSkillVariables
+> = gql`
+  mutation UpdateProfileSkill($skill: UpdateProfileSkillInput!) {
+    updateProfileSkill(skill: $skill) {
+      id
+      skills {
+        name
+        categoryId
+        mastery
+      }
+    }
+  }
+`;
+
+export const UPDATE_CV_SKILL: TypedDocumentNode<
+  ICvResponce,
+  IProfileSkillVariables
+> = gql`
+  mutation UpdateCvSkill($skill: UpdateCvSkillInput!) {
+    updateCvSkill(skill: $skill) {
+      id
+      skills {
+        name
+        categoryId
+        mastery
+      }
+    }
+  }
+`;
+
 export const DELETE_PROFILE_SKILL: TypedDocumentNode<
   IProfileResponce,
   IDeleteProfileSkillVariables

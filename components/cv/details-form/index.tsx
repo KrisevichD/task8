@@ -10,11 +10,12 @@ import { Button } from "@/components/ui/button";
 import { FloatingTextarea } from "@/components/ui/floating-textarea";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import { ICvDetailsForm } from "@/types/cv-constructor";
+import { Spinner } from "@/components/ui/spinner";
 
 const CvDetailsForm = () => {
   const { cvData, updateCv } = useCvConstructor();
 
-  const { register, reset, handleSubmit } = useForm<ICvDetailsForm>({
+  const { register, reset, handleSubmit, formState: { isDirty } } = useForm<ICvDetailsForm>({
     defaultValues: {
       name: "",
       description: "",
@@ -48,6 +49,8 @@ const CvDetailsForm = () => {
     });
   };
 
+  if (!cvData) return <Spinner />
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -60,7 +63,7 @@ const CvDetailsForm = () => {
         className="min-h-46.25"
         label="Description"
       />
-      <Button type="submit" variant={"secondary"} size={"lg"}>
+      <Button type="submit" variant={"primary"} size={"lg"} disabled={!isDirty}>
         UPDATE
       </Button>
     </form>

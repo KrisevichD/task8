@@ -15,19 +15,31 @@ import { Icon } from "@/components/ui/icon";
 import { SelectItem } from "@/components/ui/select";
 import { useMe } from "@/hooks/auth/useMe";
 import useSkills from "@/hooks/skills/useSkills";
-import { ISkill, TSkillMastery } from "@/types/skills";
+import { IProfileSkill, ISkill, TSkillMastery } from "@/types/skills";
+import { toast } from "sonner";
+import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 
-const SkillsForm = () => {
+const SkillsForm = ({
+  selectedSkills,
+  cancelEditing
+} : {
+  selectedSkills: IProfileSkill[],
+  cancelEditing: () => void;
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [skill, setSkill] = useState<ISkill | null>(null);
   const [skillMastery, setSkillMastery] = useState<TSkillMastery>("Novice");
-  const { skills: selectedSkills } = useMe();
+  const { skills: profileSkills } = useMe();
+  const isEditing = selectedSkills.length === 1;
+  const action = isEditing ? 'Update' : 'Add';
   const {
     getAllSkills,
     skills,
     isSkillsLoading,
     addProfileSkill,
     isAddingLoading,
+    updateProfileSkill, 
+    isUpdatingLoading
   } = useSkills();
 
   useEffect(() => {
@@ -36,21 +48,43 @@ const SkillsForm = () => {
     }
   }, [isOpen, getAllSkills]);
 
+  useEffect(() => {
+    if (isEditing) {
+      setSkillMastery(selectedSkills[0].mastery)
+    }
+  }, [isEditing])
+
   const onSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!skill) return;
-    const categoryId = skill.category.id;
+    const submitSkill = !isEditing 
+      ? skill
+      : {
+        name: selectedSkills[0].name,
+        category: {
+          id: selectedSkills[0].categoryId
+        }
+      }
+    if (!submitSkill) {
+      toast.error("Choose skill", { position: "top-right" })
+      return;
+    }
+    const categoryId = submitSkill.category.id;
     const data = {
-      name: skill.name,
+      name: submitSkill.name,
       mastery: skillMastery,
       categoryId: categoryId,
     };
-    await addProfileSkill(data);
+    if (isEditing) {
+      await updateProfileSkill(data);
+    } else {
+      await addProfileSkill(data);
+    }
     setIsOpen(false);
+    cancelEditing();
   };
 
   const filteredSkills = skills?.skills.filter(
-    (skill) => !selectedSkills?.some((e) => e.name === skill.name),
+    (skill) => !profileSkills?.some((e) => e.name === skill.name),
   );
 
   return (
@@ -58,24 +92,24 @@ const SkillsForm = () => {
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger
           render={
-            <Button variant={"ghost"}>
+            <Button variant={"ghost"} className={'uppercase'}>
               <Icon variant="add" />
-              ADD SKILL
+              {action} SKILL
             </Button>
           }
         />
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add skill</DialogTitle>
+            <DialogTitle>{action} skill</DialogTitle>
           </DialogHeader>
           <form id="cv-skill-form" className="space-y-8" onSubmit={onSubmit}>
             <FloatingSelect
               label="Skill"
-              value={skill?.name ?? ""}
+              value={isEditing ? selectedSkills[0].name : (skill?.name ?? "")}
               onValueChange={(value) =>
                 setSkill(skills?.skills.find((e) => e.name === value) ?? null)
               }
-              disabled={isSkillsLoading || isAddingLoading}
+              disabled={isSkillsLoading || isAddingLoading || isEditing}
             >
               {filteredSkills?.map((skill) => {
                 return (
@@ -107,10 +141,11 @@ const SkillsForm = () => {
             <Button
               variant={"primary"}
               type="submit"
-              disabled={isSkillsLoading || isAddingLoading}
+              className={'uppercase'}
+              disabled={isSkillsLoading || isAddingLoading || isUpdatingLoading || (isEditing && skillMastery === selectedSkills[0].mastery)}
               form="cv-skill-form"
             >
-              ADD
+              {action} 
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -8,6 +8,7 @@ import {
   CREATE_PROJECT_MUTATION,
   DELETE_CV_PROJECT,
   DELETE_CV_SKILL,
+  DELETE_PROJECT,
   GET_CV,
   UPDATE_CV,
   UPDATE_CV_PROJECT,
@@ -19,15 +20,16 @@ import {
   IUpdateCvInput,
 } from "@/types/cv-constructor";
 import { validateDateString } from "@/utils/helpers";
+import { IProfileSkill, IProfileSkillInput } from "@/types/skills";
+import { toast } from "sonner";
+import { UPDATE_CV_SKILL } from "@/graphql/skills";
 
 export default function useCvConstructor() {
   const cvId = useParams().id as string;
   const [createProject] = useMutation(CREATE_PROJECT_MUTATION);
-  // const [deleteProject, {}] = useMutation(DELETE_PROJECT, {
-  //   refetchQueries: ["GetCv"],
-  // });
-  // const [getProject, {}] = useLazyQuery(GET_PROJECT);
-  // const [getAllProjects, { data: projects }] = useLazyQuery(GET_ALL_PROJECTS);
+  const [deleteProject, {}] = useMutation(DELETE_PROJECT, {
+    refetchQueries: ["GetCv"],
+  });
   const [
     executeAddCvProject,
     { loading: isCvProjectLoading, error: cvProjecterror },
@@ -36,6 +38,8 @@ export default function useCvConstructor() {
   const [executeDeleteCvProject] = useMutation(DELETE_CV_PROJECT);
   const [executeUpdateCv] = useMutation(UPDATE_CV);
   const [executeAddCvSkill] = useMutation(ADD_CV_SKILL);
+  const [executeUpdateCvSkill, { loading: isCvUpdatingLoading }] =
+    useMutation(UPDATE_CV_SKILL);
   const [executeDeleteCvSkill] = useMutation(DELETE_CV_SKILL);
   const {
     data: cvData,
@@ -65,13 +69,19 @@ export default function useCvConstructor() {
           ? responsibilities.trim().split("\n")
           : [],
     };
-    executeAddCvProject({ variables: { project: addProjectData } });
+    const promise = executeAddCvProject({ variables: { project: addProjectData } });
+    toast.promise(promise, {
+      loading: "Adding project",
+      success: "Successfully added",
+      error: (err) => err.message,
+      position: "top-right",
+    })
   };
 
   const updateCvProject = async (id: string, input: ICreateCvProjectForm) => {
     const { responsibilities, start_date, end_date } = input;
     console.log(start_date, end_date, responsibilities);
-    executeUpdateCvProject({
+    const promise = executeUpdateCvProject({
       variables: {
         project: {
           cvId: cvId,
@@ -81,43 +91,52 @@ export default function useCvConstructor() {
           roles: [],
           responsibilities:
             responsibilities.trim().length > 0
-              ? responsibilities.trim().split("\n")
+              ? responsibilities.trim().split("\n").filter(e => e.trim().length !== 0)
               : [],
         },
       },
     });
+    toast.promise(promise, {
+      loading: "Updating project",
+      success: "Successfully updated",
+      error: (err) => err.message,
+      position: "top-right",
+    })
   };
 
   const deleteCvProject = async (input: {
     cvId: string;
     project: ICvProject;
   }) => {
-    // console.log(input)
-    // const response = await getAllProjects();
-    // console.log(response)
-    // const idToDelete = response.data?.projects.find(project => {
-    //   const matchesName = project.name === input.project.name;
-    //   const matchesDomain = project.domain === input.project.domain;
-    //   const matchesDescription = project.description === input.project.description;
-    //   const matchesStartDate = project.start_date === input.project.start_date;
-    //   const matchesEndDate = project.end_date === input.project.end_date;
-
-    //   return matchesName && matchesDomain && matchesDescription && matchesStartDate && matchesEndDate;
-    // })?.id;
-    // console.log("!",idToDelete)
-    // if(!idToDelete) return;
-    // deleteProject({ variables: { project: { projectId: idToDelete }}});
-    executeDeleteCvProject({
-      variables: { project: { cvId: input.cvId, projectId: input.project.id } },
+    const promise = deleteProject({
+      variables: { project: { projectId: input.project.project.id } },
     });
+    toast.promise(promise, {
+      loading: "Deleting project",
+      success: "Successfully deleted",
+      error: (err) => err.message,
+      position: "top-right",
+    })
   };
 
-  const addCvSkill = (input: IAddCvSkillInput) => {
-    executeAddCvSkill({ variables: { skill: input } });
+  const addCvSkill = (input: IProfileSkill) => {
+    const data = {
+      cvId: cvId,
+      ...input,
+    }
+    const promise = executeAddCvSkill({ variables: { skill: data } });
+    toast.promise(promise, {
+      loading: "Adding skill",
+      success: "Successfully added",
+      error: (err) => err.message,
+      position: "top-right",
+    })
   };
+  
+    
 
   const deleteCvSkill = (input: string[]) => {
-    executeDeleteCvSkill({
+    const promise = executeDeleteCvSkill({
       variables: {
         skill: {
           cvId: cvId,
@@ -125,10 +144,24 @@ export default function useCvConstructor() {
         },
       },
     });
+    
+    toast.promise(promise, {
+      loading: "Deleting skill",
+      success: "Successfully deleted",
+      error: (err) => err.message,
+      position: "top-right",
+    })
   };
 
   const updateCv = (input: IUpdateCvInput) => {
-    return executeUpdateCv({ variables: { cv: input } });
+    const promise = executeUpdateCv({ variables: { cv: input } });
+    toast.promise(promise, {
+      loading: "Updating CV",
+      success: "Successfully updated",
+      error: (err) => err.message,
+      position: "top-right",
+    })
+    return promise;
   };
 
   return {

@@ -22,25 +22,27 @@ import { Spinner } from "@/components/ui/spinner";
 import { Toggle } from "@/components/ui/toggle";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import useSkills from "@/hooks/skills/useSkills";
+import { IProfileSkill } from "@/types/skills";
+import SkillsForm from "@/components/skills-form";
 
 const CvSkills = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { skillCategories } = useSkills();
   const { cvData, deleteCvSkill } = useCvConstructor();
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [selectedSkills, setSelectedSkills] = useState<IProfileSkill[]>([]);
   const skills = cvData?.cv.skills;
 
-  const handleToggle = (isPressed: boolean, name: string) => {
+  const handleToggle = (isPressed: boolean, skill: IProfileSkill) => {
     if (isPressed) {
-      setSelectedSkills((prev) => [...prev, name]);
+      setSelectedSkills((prev) => [...prev, skill]);
     } else {
-      const selected = selectedSkills.filter((skill) => skill !== name);
+      const selected = selectedSkills.filter((e) => e.name !== skill.name);
       setSelectedSkills(selected);
     }
   };
 
   const deletePressedSkills = async () => {
-    await deleteCvSkill(selectedSkills);
+    await deleteCvSkill(selectedSkills.map(e => e.name));
     setSelectedSkills([]);
   };
 
@@ -62,7 +64,7 @@ const CvSkills = () => {
     }));
 
   return (
-    <div className="pl-6 pt-8 ml-42.25 mr-42.75">
+    <div className="pl-0 xl:pl-6 pt-8 xl:ml-42.25 xl:mr-42.75">
       {filteredList.map((category) => (
         <div key={`category-${category.id}`}>
           <h2 className="font-normal">{category.name}</h2>
@@ -72,14 +74,14 @@ const CvSkills = () => {
                 <li key={`profile-skill-${skill.name}`}>
                   <Toggle
                     variant={"ghost"}
-                    pressed={selectedSkills.includes(skill.name)}
+                    pressed={selectedSkills.includes(skill)}
                     onPressedChange={(pressed) =>
-                      handleToggle(pressed, skill.name)
+                      handleToggle(pressed, skill)
                     }
                   >
                     <SkillBadge
                       variant={
-                        selectedSkills.includes(skill.name)
+                        selectedSkills.includes(skill)
                           ? "pressed"
                           : skill.mastery
                       }
@@ -94,7 +96,12 @@ const CvSkills = () => {
       ))}
 
       <div className="flex justify-end w-fill gap-4">
+        {selectedSkills.length === 1
+        ?
+        <SkillsForm selectedSkills={selectedSkills} cancelEditing={() => setSelectedSkills([])}/>
+        :
         <CvSkillsForm />
+        }
 
         {selectedSkills.length > 0 ? (
           <Button variant={"primary"} onClick={deletePressedSkills}>

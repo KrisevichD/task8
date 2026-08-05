@@ -18,6 +18,7 @@ import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 
 import { IAddCvSkillInput } from "@/types/cv-constructor";
 import { getUserIdFromToken } from "@/utils/jwt";
+import { IProfileSkill } from "@/types/skills";
 
 const CvSkillsForm = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -34,15 +35,13 @@ const CvSkillsForm = () => {
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!cvData || !skills) return;
-    const newSkill = skills.find((e) => e.name === skill);
+    const newSkill = skills?.find((e) => e.name === skill);
     if (!newSkill) return;
     const data = {
-      cvId: cvData.cv.id,
       name: newSkill.name,
       mastery: newSkill.mastery,
       categoryId: newSkill.categoryId,
-    } as IAddCvSkillInput;
+    } as IProfileSkill;
 
     await addCvSkill(data);
     setIsOpen(false);

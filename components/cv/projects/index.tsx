@@ -24,7 +24,7 @@ const CvProjects = () => {
             <Icon variant="search" className="text-muted-foreground" />
           </InputGroupAddon>
         </InputGroup>
-        <CvProjectsForm />
+        <CvProjectsForm/>
       </div>
       <CvProjectsList searchQuery={searchQuery} />
     </>

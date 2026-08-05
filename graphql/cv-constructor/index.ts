@@ -24,6 +24,9 @@ export const GET_CV: TypedDocumentNode<{ cv: ICvResponce }, ICvVariables> = gql`
       projects {
         id
         name
+        project {
+          id
+        }
         domain
         description
         start_date
@@ -137,6 +140,12 @@ export const UPDATE_CV_PROJECT: TypedDocumentNode<
       projects {
         id
         name
+        project {
+          id
+        }
+        start_date
+        end_date
+        responsibilities
       }
     }
   }
