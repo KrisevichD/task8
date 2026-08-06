@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSyncExternalStore } from "react";
 
+import { Button } from "../ui/button";
 import { UserSkeleton } from "../ui/user-skeleton";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,7 +15,6 @@ import { useLogout } from "@/hooks/auth/useLogout";
 import { useMe } from "@/hooks/auth/useMe";
 import { getUserIdFromToken } from "@/utils/jwt";
 import { cn } from "@/utils/shadcn";
-import { Button } from "../ui/button";
 
 interface INavItem {
   key: TranslationKeys;
@@ -51,59 +51,59 @@ export const Sidebar = () => {
 
   return (
     <>
-    <aside className="w-50 h-screen flex flex-col pt-11 pb-6 mr-6 shrink-0 bg-background max-lg:w-full max-lg:h-15 fixed bottom-0 max-lg:z-50 max-lg:flex-row max-lg:items-center max-lg:justify-between max-lg:py-2 max-lg:px-4 max-lg:mr-0 max-lg:border-t max-lg:border-border">
-      <nav className="space-y-1 w-full max-lg:flex max-lg:space-y-0 max-lg:gap-1 max-lg:w-auto">
-        {NAV_ITEMS.map((item) => {
-          const isActive = pathname.startsWith(item.href);
-          return (
+      <aside className="w-50 h-screen flex flex-col pt-11 pb-6 mr-6 shrink-0 bg-background max-lg:w-full max-lg:h-15 fixed bottom-0 max-lg:z-50 max-lg:flex-row max-lg:items-center max-lg:justify-between max-lg:py-2 max-lg:px-4 max-lg:mr-0 max-lg:border-t max-lg:border-border">
+        <nav className="space-y-1 w-full max-lg:flex max-lg:space-y-0 max-lg:gap-1 max-lg:w-auto">
+          {NAV_ITEMS.map((item) => {
+            const isActive = pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-3.5 pl-4 pr-4 py-4 w-full text-sm font-medium transition-colors rounded-r-[20px] max-lg:rounded-full max-lg:px-3 max-lg:py-1.5 max-lg:text-xs",
+                  isActive
+                    ? "bg-secondary text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50",
+                )}
+              >
+                <Icon variant={item.icon} size="md" />
+                <span>{t(item.key)}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="pl-4 pr-3 mt-auto space-y-4 max-lg:pl-0  max-lg:pr-0 max-lg:mt-0 max-lg:space-y-0 max-lg:flex max-lg:items-center max-lg:gap-3">
+          {isProfileLoading ? (
+            <UserSkeleton />
+          ) : (
             <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3.5 pl-4 pr-4 py-4 w-full text-sm font-medium transition-colors rounded-r-[20px] max-lg:rounded-full max-lg:px-3 max-lg:py-1.5 max-lg:text-xs",
-                isActive
-                  ? "bg-secondary text-foreground font-semibold"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/50",
-              )}
+              href="/settings"
+              className="flex items-center gap-3 overflow-hidden p-1.5 -ml-1.5 rounded-lg transition-all duration-200 hover:bg-secondary/50 group cursor-pointer"
             >
-              <Icon variant={item.icon} size="md" />
-              <span>{t(item.key)}</span>
+              <Avatar size="lg" className="max-lg:size-7 shrink-0">
+                <AvatarImage src={avatarUrl} alt={fullName} />
+                <AvatarFallback className="bg-muted text-muted-foreground font-semibold">
+                  {initials || "U"}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-sm font-medium text-foreground group-hover:text-primary truncate max-lg:text-xs transition-colors">
+                {fullName}
+              </span>
             </Link>
-          );
-        })}
-      </nav>
+          )}
 
-      <div className="pl-4 pr-3 mt-auto space-y-4 max-lg:pl-0  max-lg:pr-0 max-lg:mt-0 max-lg:space-y-0 max-lg:flex max-lg:items-center max-lg:gap-3">
-        {isProfileLoading ? (
-          <UserSkeleton />
-        ) : (
-          <Link
-            href="/settings"
-            className="flex items-center gap-3 overflow-hidden p-1.5 -ml-1.5 rounded-lg transition-all duration-200 hover:bg-secondary/50 group cursor-pointer"
+          <Button
+            type="button"
+            onClick={logout}
+            variant={"ghost"}
+            size={"icon"}
+            // className="p-1 text-muted-foreground hover:text-foreground transition-colors max-lg:hidden cursor-pointer"
           >
-            <Avatar size="lg" className="max-lg:size-7 shrink-0">
-              <AvatarImage src={avatarUrl} alt={fullName} />
-              <AvatarFallback className="bg-muted text-muted-foreground font-semibold">
-                {initials || "U"}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-sm font-medium text-foreground group-hover:text-primary truncate max-lg:text-xs transition-colors">
-              {fullName}
-            </span>
-          </Link>
-        )}
-
-        <Button
-          type="button"
-          onClick={logout}
-          variant={"ghost"}
-          size={"icon"}
-          // className="p-1 text-muted-foreground hover:text-foreground transition-colors max-lg:hidden cursor-pointer"
-        >
-          <Icon variant="arrow-back" label="Log out" />
-        </Button>
-      </div>
-    </aside>
+            <Icon variant="arrow-back" label="Log out" />
+          </Button>
+        </div>
+      </aside>
     </>
   );
 };

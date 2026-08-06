@@ -1,11 +1,11 @@
 import { useMutation, useQuery } from "@apollo/client/react";
-import { useParams } from "next/navigation";
+
+import { toast } from "sonner";
 
 import {
   ADD_CV_PROJECT_MUTATION,
   ADD_CV_SKILL,
   CREATE_PROJECT_MUTATION,
-  DELETE_CV_PROJECT,
   DELETE_CV_SKILL,
   DELETE_PROJECT,
   GET_CV,
@@ -15,14 +15,12 @@ import {
 } from "@/graphql/cv-constructor";
 import {
   IAddCvProjectInput,
-  IAddCvSkillInput,
   ICreateCvProjectForm,
   ICvProject,
   IUpdateCvInput,
 } from "@/types/cv-constructor";
+import { IProfileSkill } from "@/types/skills";
 import { validateDateString } from "@/utils/helpers";
-import { IProfileSkill, IProfileSkillInput } from "@/types/skills";
-import { toast } from "sonner";
 
 export default function useCvConstructor(cvId: string) {
   const [createProject] = useMutation(CREATE_PROJECT_MUTATION);
@@ -37,8 +35,7 @@ export default function useCvConstructor(cvId: string) {
   const [executeUpdateCvProject] = useMutation(UPDATE_CV_PROJECT);
   const [executeUpdateCv] = useMutation(UPDATE_CV);
   const [executeAddCvSkill] = useMutation(ADD_CV_SKILL);
-  const [executeUpdateCvSkill] =
-    useMutation(UPDATE_CV_SKILL);
+  const [executeUpdateCvSkill] = useMutation(UPDATE_CV_SKILL);
   const [executeDeleteCvSkill] = useMutation(DELETE_CV_SKILL);
   const {
     data,
@@ -69,18 +66,19 @@ export default function useCvConstructor(cvId: string) {
           ? responsibilities.trim().split("\n")
           : [],
     };
-    const promise = executeAddCvProject({ variables: { project: addProjectData } });
+    const promise = executeAddCvProject({
+      variables: { project: addProjectData },
+    });
     toast.promise(promise, {
       loading: "Adding project",
       success: "Successfully added",
       error: (err) => err.message,
       position: "top-right",
-    })
+    });
   };
 
   const updateCvProject = async (id: string, input: ICreateCvProjectForm) => {
     const { responsibilities, start_date, end_date } = input;
-    console.log(start_date, end_date, responsibilities);
     const promise = executeUpdateCvProject({
       variables: {
         project: {
@@ -91,7 +89,10 @@ export default function useCvConstructor(cvId: string) {
           roles: [],
           responsibilities:
             responsibilities.trim().length > 0
-              ? responsibilities.trim().split("\n").filter(e => e.trim().length !== 0)
+              ? responsibilities
+                  .trim()
+                  .split("\n")
+                  .filter((e) => e.trim().length !== 0)
               : [],
         },
       },
@@ -101,7 +102,7 @@ export default function useCvConstructor(cvId: string) {
       success: "Successfully updated",
       error: (err) => err.message,
       position: "top-right",
-    })
+    });
   };
 
   const deleteCvProject = async (input: {
@@ -116,35 +117,35 @@ export default function useCvConstructor(cvId: string) {
       success: "Successfully deleted",
       error: (err) => err.message,
       position: "top-right",
-    })
+    });
   };
 
   const addCvSkill = (input: IProfileSkill) => {
     const data = {
       cvId: cvId,
       ...input,
-    }
+    };
     const promise = executeAddCvSkill({ variables: { skill: data } });
     toast.promise(promise, {
       loading: "Adding skill",
       success: "Successfully added",
       error: (err) => err.message,
       position: "top-right",
-    })
+    });
   };
-  
+
   const updateCvSkill = (input: IProfileSkill) => {
     const data = {
       cvId: cvId,
       ...input,
-    }
+    };
     const promise = executeUpdateCvSkill({ variables: { skill: data } });
     toast.promise(promise, {
       loading: "Updating skill",
       success: "Successfully updated",
       error: (err) => err.message,
       position: "top-right",
-    })
+    });
   };
 
   const deleteCvSkill = (input: string[]) => {
@@ -156,13 +157,13 @@ export default function useCvConstructor(cvId: string) {
         },
       },
     });
-    
+
     toast.promise(promise, {
       loading: "Deleting skill",
       success: "Successfully deleted",
       error: (err) => err.message,
       position: "top-right",
-    })
+    });
   };
 
   const updateCv = (input: IUpdateCvInput) => {
@@ -172,7 +173,7 @@ export default function useCvConstructor(cvId: string) {
       success: "Successfully updated",
       error: (err) => err.message,
       position: "top-right",
-    })
+    });
   };
 
   return {

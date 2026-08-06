@@ -22,8 +22,9 @@ import { Toggle } from "@/components/ui/toggle";
 import { useLanguage } from "@/context/language";
 import { useMe } from "@/hooks/auth/useMe";
 import useLanguages from "@/hooks/languages/useLanguages";
-import { getUserIdFromToken } from "@/utils/jwt";
 import { IProfileLanguage } from "@/types/languages";
+import { getUserIdFromToken } from "@/utils/jwt";
+import { cn } from "@/utils/shadcn";
 
 interface ILanguagesContentProps {
   userId?: string;
@@ -39,18 +40,22 @@ export const LanguagesContent = ({
 
   const { deleteProfileLanguages } = useLanguages(userId);
   const { languages, isLoading, error } = useMe(userId);
-  const [selectedLanguages, setSelectedLanguages] = useState<IProfileLanguage[]>([]);
+  const [selectedLanguages, setSelectedLanguages] = useState<
+    IProfileLanguage[]
+  >([]);
 
   const handleToggle = (isPressed: boolean, language: IProfileLanguage) => {
     if (isPressed) {
       setSelectedLanguages((prev) => [...prev, language]);
     } else {
-      setSelectedLanguages((prev) => prev.filter((lang) => lang.name !== language.name));
+      setSelectedLanguages((prev) =>
+        prev.filter((lang) => lang.name !== language.name),
+      );
     }
   };
 
   const deletePressedLanguages = async () => {
-    await deleteProfileLanguages(selectedLanguages.map(lang => lang.name));
+    await deleteProfileLanguages(selectedLanguages.map((lang) => lang.name));
     setSelectedLanguages([]);
   };
 
@@ -65,7 +70,7 @@ export const LanguagesContent = ({
   if (!languages || isLoading) return <Spinner />;
 
   return (
-    <div className="w-full space-y-6 pt-4">
+    <div className="w-full space-y-6 pt-4 my-4">
       <div className="flex flex-wrap gap-2">
         {languages.map((language) => {
           const isSelected = selectedLanguages.includes(language);
@@ -73,17 +78,19 @@ export const LanguagesContent = ({
             <Toggle
               key={`profile-language-${language.name}`}
               variant="ghost"
+              className={"group"}
               pressed={isSelected}
-              onPressedChange={(pressed) =>
-                handleToggle(pressed, language)
-              }
+              onPressedChange={(pressed) => handleToggle(pressed, language)}
             >
               <span
-                className={
-                  language.proficiency
-                    ? "text-successful font-bold mr-1"
-                    : "text-primary mr-1"
-                }
+                className={cn(
+                  "font-bold transition-colors",
+                  isSelected
+                    ? "text-foreground"
+                    : language.proficiency === "Native"
+                      ? "text-primary"
+                      : "text-successful",
+                )}
               >
                 {language.proficiency}
               </span>
@@ -94,10 +101,10 @@ export const LanguagesContent = ({
       </div>
 
       <div className="flex justify-end gap-4 w-full pt-4">
-        <LanguagesForm 
-        userId={userId} 
-        selectedLanguages={selectedLanguages} 
-        cancelEditing={() => setSelectedLanguages([])} 
+        <LanguagesForm
+          userId={userId}
+          selectedLanguages={selectedLanguages}
+          cancelEditing={() => setSelectedLanguages([])}
         />
 
         {selectedLanguages.length > 0 ? (

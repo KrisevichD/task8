@@ -239,8 +239,8 @@ interface IPdfVariables {
       bottom: string;
       left: string;
       right: string;
-    }
-  }
+    };
+  };
 }
 
 export const EXPORT_PDF: TypedDocumentNode<
@@ -248,6 +248,6 @@ export const EXPORT_PDF: TypedDocumentNode<
   IPdfVariables
 > = gql`
   mutation ExportPdf($pdf: ExportPdfInput!) {
-    exportPdf(pdf: $pdf) 
+    exportPdf(pdf: $pdf)
   }
 `;

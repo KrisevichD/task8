@@ -7,7 +7,6 @@ import {
   IProfileResponce,
   IProfileSkillVariables,
 } from "@/types/skills";
-import { ICvResponce } from "@/types/cv-constructor";
 
 export const GET_ALL_SKILLS: TypedDocumentNode<
   IGetAllSkillsResponce,

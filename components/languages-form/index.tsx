@@ -13,26 +13,27 @@ import {
 import { FloatingSelect } from "@/components/ui/floating-select";
 import { Icon } from "@/components/ui/icon";
 import { SelectItem } from "@/components/ui/select";
+import { useMe } from "@/hooks/auth/useMe";
 import useLanguages from "@/hooks/languages/useLanguages";
 import { IProfileLanguage, TLanguageProficiency } from "@/types/languages";
-import { useMe } from "@/hooks/auth/useMe";
-import { Spinner } from "../ui/spinner";
 
-const LanguagesForm = ({ 
+const LanguagesForm = ({
   userId,
   selectedLanguages,
   cancelEditing,
-}: { 
-  userId: string,
-  selectedLanguages: IProfileLanguage[],
-  cancelEditing: () => void,
+}: {
+  userId: string;
+  selectedLanguages: IProfileLanguage[];
+  cancelEditing: () => void;
 }) => {
   const isEditing = selectedLanguages.length === 1;
   const action = isEditing ? "Update" : "Add";
   const [isOpen, setIsOpen] = useState(false);
   const [language, setLanguage] = useState<string>("");
   const [languageProficiency, setLanguageProficiency] =
-    useState<TLanguageProficiency>("A1");
+    useState<TLanguageProficiency>(
+      isEditing ? selectedLanguages[0].proficiency : "A1",
+    );
   const { languages: profileLanguages } = useMe(userId);
   const {
     getAllLanguages,
@@ -49,18 +50,10 @@ const LanguagesForm = ({
     }
   }, [isOpen, getAllLanguages]);
 
-  useEffect(() => {
-    if (isEditing) {
-      setLanguage(selectedLanguages[0].name);
-      setLanguageProficiency(selectedLanguages[0].proficiency);
-    }
-  }, [isEditing])
-
   const onSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!language) return;
     const data = {
-      name: language,
+      name: isEditing ? selectedLanguages[0].name : language,
       proficiency: languageProficiency,
     };
     if (isEditing) {
@@ -72,16 +65,22 @@ const LanguagesForm = ({
     cancelEditing();
   };
 
-  console.log(profileLanguages, languages?.languages)
-  const filteredLanguages = languages?.languages
-    .filter((lang) => !profileLanguages?.some(profileLang => profileLang.name === lang.name))
+  const handleOpen = (open: boolean) => {
+    setIsOpen(open);
+    if (isEditing) setLanguageProficiency(selectedLanguages[0].proficiency);
+  };
+
+  const filteredLanguages = languages?.languages.filter(
+    (lang) =>
+      !profileLanguages?.some((profileLang) => profileLang.name === lang.name),
+  );
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog open={isOpen} onOpenChange={handleOpen}>
         <DialogTrigger
           render={
-            <Button variant={"ghost"} className={'uppercase'}>
+            <Button variant={"ghost"} className={"uppercase"}>
               <Icon variant="add" />
               {action} LANGUAGE
             </Button>
@@ -94,7 +93,7 @@ const LanguagesForm = ({
           <form id="language-form" className="space-y-8" onSubmit={onSubmit}>
             <FloatingSelect
               label="Language"
-              value={language}
+              value={isEditing ? selectedLanguages[0].name : language}
               onValueChange={(value) => setLanguage(value as string)}
               disabled={isLanguagesLoading || isAddingLoading || isEditing}
             >
@@ -134,7 +133,7 @@ const LanguagesForm = ({
               type="submit"
               disabled={isLanguagesLoading || isAddingLoading}
               form="language-form"
-              className={'uppercase'}
+              className={"uppercase"}
             >
               {action}
             </Button>

@@ -1,3 +1,4 @@
+import { useParams } from "next/navigation";
 import React, { useState } from "react";
 
 import CvProjectsForm from "../form";
@@ -25,14 +26,13 @@ import {
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import { ICvProject } from "@/types/cv-constructor";
 import { validateProjectDate } from "@/utils/helpers";
-import { useParams } from "next/navigation";
 
 const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
   const cvId = useParams().id as string;
   const { cvData, deleteCvProject } = useCvConstructor(cvId);
   const [editingId, setEditingId] = useState<string>();
   const [hoveredProjectId, setHoveredProjectId] = useState<string | null>(null);
-  
+
   if (!cvData) return <Spinner />;
 
   const handleDeleteProject = async (project: ICvProject) => {
@@ -41,8 +41,6 @@ const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
       project: project,
     });
   };
-
-
 
   const projects = cvData.projects;
   const filteredList = !searchQuery
@@ -123,7 +121,9 @@ const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
                     />
                     <DropdownMenuContent>
                       <DropdownMenuGroup>
-                        <DropdownMenuItem onClick={() => setEditingId(project.id)}>
+                        <DropdownMenuItem
+                          onClick={() => setEditingId(project.id)}
+                        >
                           Edit
                         </DropdownMenuItem>
                       </DropdownMenuGroup>

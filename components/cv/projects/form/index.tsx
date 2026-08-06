@@ -1,3 +1,4 @@
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Controller, useForm } from "react-hook-form";
@@ -21,8 +22,7 @@ import { Icon } from "@/components/ui/icon";
 import { SelectItem } from "@/components/ui/select";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import useSkills from "@/hooks/skills/useSkills";
-import { ICreateCvProjectForm, ICvResponce } from "@/types/cv-constructor";
-import { useParams } from "next/navigation";
+import { ICreateCvProjectForm } from "@/types/cv-constructor";
 
 const INITIAL_FORM_DATA = {
   name: "",
@@ -41,7 +41,7 @@ const CvProjectsForm = ({
   closeEditing,
   initialData,
 }: {
-  type?: "add" | "edit",
+  type?: "add" | "edit";
   id?: string;
   editingId?: string;
   closeEditing?: () => void;
@@ -53,10 +53,15 @@ const CvProjectsForm = ({
   const { addCvProject, updateCvProject } = useCvConstructor(cvId);
   const { getAllSkills, skills } = useSkills();
 
-  const { register, reset, control, handleSubmit, formState: { isDirty } } =
-    useForm<ICreateCvProjectForm>({
-      defaultValues: initialData ?? INITIAL_FORM_DATA,
-    });
+  const {
+    register,
+    reset,
+    control,
+    handleSubmit,
+    formState: { isDirty },
+  } = useForm<ICreateCvProjectForm>({
+    defaultValues: initialData ?? INITIAL_FORM_DATA,
+  });
 
   useEffect(() => {
     if (isOpen) {
@@ -89,13 +94,15 @@ const CvProjectsForm = ({
         open={isEditing ? isEditing : isOpen}
         onOpenChange={isEditing ? closeEditing : setIsOpen}
       >
-        {type === 'add' && (
+        {type === "add" && (
           <DialogTrigger
             render={
               <Button
                 variant={"ghost"}
                 type="button"
-                className={"text-primary hover:text-primary max-lg:bg-primary/4 max-lg:size-10"}
+                className={
+                  "text-primary hover:text-primary max-lg:bg-primary/4 max-lg:size-10"
+                }
               >
                 <Icon variant="add" />
                 <span className="max-lg:sr-only">Add project</span>
@@ -188,7 +195,12 @@ const CvProjectsForm = ({
                 </Button>
               }
             />
-            <Button variant={"primary"} type="submit" form="project-form" disabled={!isDirty}> 
+            <Button
+              variant={"primary"}
+              type="submit"
+              form="project-form"
+              disabled={!isDirty}
+            >
               {isEditing ? "UPDATE" : "ADD"}
             </Button>
           </DialogFooter>

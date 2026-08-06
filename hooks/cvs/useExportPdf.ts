@@ -1,8 +1,9 @@
+import { useMutation } from "@apollo/client/react";
+import { useRef } from "react";
 
-import { useRef, useState } from "react";
-import { EXPORT_PDF } from "@/graphql/cv-constructor";
 import { toast } from "sonner";
-import { useLazyQuery, useMutation } from "@apollo/client/react";
+
+import { EXPORT_PDF } from "@/graphql/cv-constructor";
 
 export default function useExportPdf() {
   const printRef = useRef<HTMLDivElement>(null);
@@ -16,7 +17,9 @@ export default function useExportPdf() {
     try {
       const htmlContent = element.innerHTML;
 
-      const styleElements = document.querySelectorAll('style, link[rel="stylesheet"]');
+      const styleElements = document.querySelectorAll(
+        'style, link[rel="stylesheet"]',
+      );
       let injectedStyles = "";
 
       styleElements.forEach((style) => {
@@ -26,7 +29,9 @@ export default function useExportPdf() {
           try {
             const sheet = (style as HTMLLinkElement).sheet;
             if (sheet) {
-              const rules = Array.from(sheet.cssRules).map(rule => rule.cssText).join("\n");
+              const rules = Array.from(sheet.cssRules)
+                .map((rule) => rule.cssText)
+                .join("\n");
               injectedStyles += rules;
             }
           } catch (e) {
@@ -34,7 +39,7 @@ export default function useExportPdf() {
           }
         }
       });
-      
+
       const fullHtmlPayload = `
         <!DOCTYPE html>
         <html>
@@ -74,17 +79,16 @@ export default function useExportPdf() {
 
       const { data } = await getExportedPdf({
         variables: {
-          pdf:
-          {
+          pdf: {
             html: fullHtmlPayload,
             margin: {
               top: "15mm",
               bottom: "15mm",
               left: "15mm",
-              right: "15mm"
-            }
-          }
-        }
+              right: "15mm",
+            },
+          },
+        },
       });
 
       if (data?.exportPdf) {
@@ -107,7 +111,10 @@ export default function useExportPdf() {
 }
 
 function downloadPdfFromBase64(base64String: string, fileName: string) {
-  const cleanBase64 = base64String.replace(/^data:application\/pdf;base64,/, "");
+  const cleanBase64 = base64String.replace(
+    /^data:application\/pdf;base64,/,
+    "",
+  );
 
   const byteCharacters = atob(cleanBase64);
   const byteNumbers = new Array(byteCharacters.length);

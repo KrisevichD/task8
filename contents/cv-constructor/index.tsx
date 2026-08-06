@@ -29,7 +29,6 @@ const CvConstructor = ({ cvId }: { cvId: string }) => {
   const tab = searchParams.get("tab") ?? "";
   const activeTab = VALID_TABS.includes(tab as TTab) ? tab : DEFAULT_TAB;
   const { cvData } = useCvConstructor(cvId);
-  
 
   const handleTabChange = (nextTab: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -53,13 +52,13 @@ const CvConstructor = ({ cvId }: { cvId: string }) => {
             <BreadcrumbLink render={<Link href="/cvs" />}>CVs</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>
-                {cvData.name || "CV"}
-              </BreadcrumbPage>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            {activeTab !== "details" && <BreadcrumbItem className="capitalize">{activeTab}</BreadcrumbItem>}
+          <BreadcrumbItem>
+            <BreadcrumbPage>{cvData.name || "CV"}</BreadcrumbPage>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          {activeTab !== "details" && (
+            <BreadcrumbItem className="capitalize">{activeTab}</BreadcrumbItem>
+          )}
         </BreadcrumbList>
       </Breadcrumb>
 
@@ -76,16 +75,16 @@ const CvConstructor = ({ cvId }: { cvId: string }) => {
         </TabsList>
 
         <TabsContent value="details">
-          <CvDetailsForm cvData={cvData}/>
+          <CvDetailsForm cvData={cvData} />
         </TabsContent>
         <TabsContent value="projects">
           <CvProjects />
         </TabsContent>
         <TabsContent value="skills">
-          <CvSkills cvData={cvData}/>
+          <CvSkills cvData={cvData} />
         </TabsContent>
         <TabsContent value="preview">
-          <CvPreview cvData={cvData}/>
+          <CvPreview cvData={cvData} />
         </TabsContent>
       </Tabs>
     </div>

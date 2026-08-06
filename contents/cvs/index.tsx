@@ -11,12 +11,12 @@ import {
   BreadcrumbList,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
 import { SearchInput } from "@/components/ui/search-input";
 import { useLanguage } from "@/context/language";
 import { CREATE_CV_MUTATION } from "@/graphql/cvs";
 import { GET_CVS } from "@/graphql/cvs/queries";
 import useCreateCv from "@/hooks/cvs/useCreateCv";
-import { Icon } from "@/components/ui/icon";
 
 const CvsContent = () => {
   const [search, setSearch] = useState("");
@@ -75,7 +75,7 @@ const CvsContent = () => {
             disabled={isCreating}
             className="text-primary hover:text-primary/80 font-semibold gap-1.5 uppercase tracking-wide cursor-pointer"
           >
-            <Icon variant="add"/>
+            <Icon variant="add" />
             {t("createCv")}
           </Button>
         </div>

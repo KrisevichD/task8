@@ -24,16 +24,14 @@ import { Toggle } from "@/components/ui/toggle";
 import { useMe } from "@/hooks/auth/useMe";
 import useSkills from "@/hooks/skills/useSkills";
 
-import { getUserIdFromToken } from "@/utils/jwt";
 import { IProfileSkill } from "@/types/skills";
 
-const SkillsContent = ({ userId }: { userId?: string}) => {
+const SkillsContent = ({ userId }: { userId?: string }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { skillCategories, isCategoriesLoading, deleteProfileSkills } = useSkills(userId);
+  const { skillCategories, isCategoriesLoading, deleteProfileSkills } =
+    useSkills(userId);
   const { skills, isLoading, error } = useMe(userId);
   const [selectedSkills, setSelectedSkills] = useState<IProfileSkill[]>([]);
-
-  console.log(skills, skillCategories)
 
   const handleToggle = (isPressed: boolean, skill: IProfileSkill) => {
     if (isPressed) {
@@ -45,22 +43,23 @@ const SkillsContent = ({ userId }: { userId?: string}) => {
   };
 
   const deletePressedSkills = async () => {
-    await deleteProfileSkills(selectedSkills.map(skill => skill.name));
+    await deleteProfileSkills(selectedSkills.map((skill) => skill.name));
     setSelectedSkills([]);
   };
 
   const deleteAllSkills = async () => {
     if (!skills) return;
-    await deleteProfileSkills(skills?.map(skill => skill.name));
+    await deleteProfileSkills(skills?.map((skill) => skill.name));
     setIsOpen(false);
   };
 
   const cancelEditing = () => {
     setSelectedSkills([]);
-  }
+  };
 
   if (error) return <>Error</>;
-  if (!skills || isLoading || !skillCategories || isCategoriesLoading) return <Spinner />;
+  if (!skills || isLoading || !skillCategories || isCategoriesLoading)
+    return <Spinner />;
 
   const filteredList = skillCategories
     .filter((category) =>
@@ -68,10 +67,8 @@ const SkillsContent = ({ userId }: { userId?: string}) => {
     )
     .map((category) => ({
       ...category,
-      skills: skills.filter(skill => skill.categoryId === category.id),
+      skills: skills.filter((skill) => skill.categoryId === category.id),
     }));
-
-  console.log(">>>", filteredList)
 
   return (
     <>
@@ -109,7 +106,11 @@ const SkillsContent = ({ userId }: { userId?: string}) => {
         </div>
 
         <div className="flex justify-end gap-4 w-fill sticky bottom-1">
-          <SkillsForm userId={userId} selectedSkills={selectedSkills} cancelEditing={cancelEditing}/>
+          <SkillsForm
+            userId={userId}
+            selectedSkills={selectedSkills}
+            cancelEditing={cancelEditing}
+          />
 
           {selectedSkills.length > 0 ? (
             <Button variant={"primary"} onClick={deletePressedSkills}>

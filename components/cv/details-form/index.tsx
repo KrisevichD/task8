@@ -2,20 +2,23 @@ import React, { useEffect } from "react";
 
 import { useForm } from "react-hook-form";
 
-import { toast } from "sonner";
-
 import { FloatingInput } from "../../ui/floating-input";
 
 import { Button } from "@/components/ui/button";
 import { FloatingTextarea } from "@/components/ui/floating-textarea";
+import { Spinner } from "@/components/ui/spinner";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import { ICvDetailsForm, ICvResponce } from "@/types/cv-constructor";
-import { Spinner } from "@/components/ui/spinner";
 
 const CvDetailsForm = ({ cvData }: { cvData: ICvResponce }) => {
   const { updateCv } = useCvConstructor(cvData.id);
 
-  const { register, reset, handleSubmit, formState: { isDirty } } = useForm<ICvDetailsForm>({
+  const {
+    register,
+    reset,
+    handleSubmit,
+    formState: { isDirty },
+  } = useForm<ICvDetailsForm>({
     defaultValues: {
       name: "",
       description: "",
@@ -41,7 +44,7 @@ const CvDetailsForm = ({ cvData }: { cvData: ICvResponce }) => {
     updateCv(data);
   };
 
-  if (!cvData) return <Spinner />
+  if (!cvData) return <Spinner />;
 
   return (
     <form

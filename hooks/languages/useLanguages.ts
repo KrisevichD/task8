@@ -1,5 +1,7 @@
 import { useLazyQuery, useMutation } from "@apollo/client/react";
 
+import { toast } from "sonner";
+
 import {
   ADD_PROFILE_LANGUAGE,
   DELETE_PROFILE_LANGUAGE,
@@ -8,7 +10,6 @@ import {
 } from "@/graphql/languages";
 import { IProfileLanguage } from "@/types/languages";
 import { getUserIdFromToken } from "@/utils/jwt";
-import { toast } from "sonner";
 
 export default function useLanguages(customUserId: string) {
   const userId = customUserId || getUserIdFromToken() || "";
@@ -34,7 +35,7 @@ export default function useLanguages(customUserId: string) {
       success: "Successfully added",
       error: (err) => err.message,
       position: "top-right",
-    })
+    });
   };
 
   const updateProfileLanguage = (input: IProfileLanguage) => {
@@ -51,7 +52,7 @@ export default function useLanguages(customUserId: string) {
       success: "Successfully updated",
       error: (err) => err.message,
       position: "top-right",
-    })
+    });
   };
 
   const deleteProfileLanguages = (input: string[]) => {
@@ -68,7 +69,7 @@ export default function useLanguages(customUserId: string) {
       success: "Successfully deleted",
       error: (err) => err.message,
       position: "top-right",
-    })
+    });
   };
 
   return {

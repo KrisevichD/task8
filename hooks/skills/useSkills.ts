@@ -1,5 +1,8 @@
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
 
+import { toast } from "sonner";
+
+import { UPDATE_CV_SKILL } from "@/graphql/cv-constructor";
 import {
   ADD_PROFILE_SKILL,
   DELETE_PROFILE_SKILL,
@@ -10,9 +13,6 @@ import {
 import { GET_USER } from "@/graphql/user/queries";
 import { IProfileSkillInput } from "@/types/skills";
 import { getUserIdFromToken } from "@/utils/jwt";
-import { toast } from "sonner";
-import { useParams } from "next/navigation";
-import { UPDATE_CV_SKILL } from "@/graphql/cv-constructor";
 
 export default function useSkills(customUserId?: string, cvId?: string) {
   const userId = customUserId || getUserIdFromToken();
@@ -26,8 +26,7 @@ export default function useSkills(customUserId?: string, cvId?: string) {
     useMutation(ADD_PROFILE_SKILL);
   const [executeUpdateProfileSkill, { loading: isUpdatingLoading }] =
     useMutation(UPDATE_PROFILE_SKILL);
-  const [executeUpdateCvSkill, { loading: isCvUpdatingLoading }] =
-    useMutation(UPDATE_CV_SKILL);
+  const [executeUpdateCvSkill] = useMutation(UPDATE_CV_SKILL);
   const [executeDeleteProfileSkills, { loading: isDeletingLoading }] =
     useMutation(DELETE_PROFILE_SKILL);
 
@@ -48,39 +47,39 @@ export default function useSkills(customUserId?: string, cvId?: string) {
       success: "Successfully added",
       error: (err) => err.message,
       position: "top-right",
-    })
+    });
   };
 
   const updateProfileSkill = async (input: IProfileSkillInput) => {
-    console.log("!!!", input, userId)
     if (!userId) return;
     if (!cvId) {
       const dataProfile = {
         userId: userId,
         ...input,
       };
-      const promise = executeUpdateProfileSkill({ variables: { skill: dataProfile } });
-      toast.promise((promise), {
+      const promise = executeUpdateProfileSkill({
+        variables: { skill: dataProfile },
+      });
+      toast.promise(promise, {
         loading: "Updating skill mastery",
         success: "Skill is updated",
         error: (err) => err.message,
         position: "top-right",
-      })
+      });
       return;
     }
     const dataCv = {
       cvId: cvId,
-      ...input
-    }
+      ...input,
+    };
     const promise2 = executeUpdateCvSkill({ variables: { skill: dataCv } });
-    toast.promise((promise2), {
+    toast.promise(promise2, {
       loading: "Updating skill mastery",
       success: "Skill is updated",
       error: (err) => err.message,
       position: "top-right",
-    })
-  }
-
+    });
+  };
 
   const deleteProfileSkills = (input: string[]) => {
     if (!userId) return;
@@ -88,13 +87,15 @@ export default function useSkills(customUserId?: string, cvId?: string) {
       userId: userId,
       name: input,
     };
-    const promise = executeDeleteProfileSkills({ variables: { skill: profileSkillInput } });
+    const promise = executeDeleteProfileSkills({
+      variables: { skill: profileSkillInput },
+    });
     toast.promise(promise, {
       loading: "Deleting skills",
       success: "Successfully deleted",
       error: (err) => err.message,
       position: "top-right",
-    })
+    });
   };
 
   return {

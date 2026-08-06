@@ -1,6 +1,7 @@
-import { IUserData } from "@/graphql/user/queries";
 import { IProfileLanguage } from "./languages";
 import { IProfileSkill } from "./skills";
+
+import { IUserData } from "@/graphql/user/queries";
 
 export interface ICvProject {
   id: string;

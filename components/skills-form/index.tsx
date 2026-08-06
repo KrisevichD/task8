@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,38 +15,37 @@ import {
 import { FloatingSelect } from "@/components/ui/floating-select";
 import { Icon } from "@/components/ui/icon";
 import { SelectItem } from "@/components/ui/select";
+import { useLanguage } from "@/context/language";
 import { useMe } from "@/hooks/auth/useMe";
 import useSkills from "@/hooks/skills/useSkills";
 import { IProfileSkill, ISkill, TSkillMastery } from "@/types/skills";
-import { toast } from "sonner";
-import useCvConstructor from "@/hooks/cvs/useCvConstructor";
-import { useLanguage } from "@/context/language";
-import { ICvResponce } from "@/types/cv-constructor";
 
 const SkillsForm = ({
   selectedSkills,
   cancelEditing,
   userId,
-} : {
-  selectedSkills: IProfileSkill[],
-  cancelEditing: () => void,
-  userId?: string,
+}: {
+  selectedSkills: IProfileSkill[];
+  cancelEditing: () => void;
+  userId?: string;
 }) => {
   const { t } = useLanguage();
+  const isEditing = selectedSkills.length === 1;
+  const action = isEditing ? "Update" : "Add";
   const [isOpen, setIsOpen] = useState(false);
   const [skill, setSkill] = useState<ISkill | null>(null);
-  const [skillMastery, setSkillMastery] = useState<TSkillMastery>("Novice");
+  const [skillMastery, setSkillMastery] = useState<TSkillMastery>(
+    isEditing ? selectedSkills[0].mastery : "Novice",
+  );
   const { skills: profileSkills } = useMe(userId);
-  const isEditing = selectedSkills.length === 1;
-  const action = isEditing ? 'Update' : 'Add';
   const {
     getAllSkills,
     skills,
     isSkillsLoading,
     addProfileSkill,
     isAddingLoading,
-    updateProfileSkill, 
-    isUpdatingLoading
+    updateProfileSkill,
+    isUpdatingLoading,
   } = useSkills(userId);
 
   useEffect(() => {
@@ -53,25 +54,18 @@ const SkillsForm = ({
     }
   }, [isOpen, getAllSkills]);
 
-  useEffect(() => {
-    if (isEditing) {
-      setSkillMastery(selectedSkills[0].mastery)
-    }
-  }, [isEditing])
-
   const onSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(selectedSkills[0])
-    const submitSkill = !isEditing 
+    const submitSkill = !isEditing
       ? skill
       : {
-        name: selectedSkills[0].name,
-        category: {
-          id: selectedSkills[0].categoryId
-        }
-      }
+          name: selectedSkills[0].name,
+          category: {
+            id: selectedSkills[0].categoryId,
+          },
+        };
     if (!submitSkill) {
-      toast.error("Choose skill", { position: "top-right" })
+      toast.error("Choose skill", { position: "top-right" });
       return;
     }
     const categoryId = submitSkill.category.id;
@@ -98,7 +92,7 @@ const SkillsForm = ({
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger
           render={
-            <Button variant={"ghost"} className={'uppercase'}>
+            <Button variant={"ghost"} className={"uppercase"}>
               <Icon variant="add" />
               {action} SKILL
             </Button>
@@ -147,11 +141,16 @@ const SkillsForm = ({
             <Button
               variant={"primary"}
               type="submit"
-              className={'uppercase'}
-              disabled={isSkillsLoading || isAddingLoading || isUpdatingLoading || (isEditing && skillMastery === selectedSkills[0].mastery)}
+              className={"uppercase"}
+              disabled={
+                isSkillsLoading ||
+                isAddingLoading ||
+                isUpdatingLoading ||
+                (isEditing && skillMastery === selectedSkills[0].mastery)
+              }
               form="cv-skill-form"
             >
-              {action} 
+              {action}
             </Button>
           </DialogFooter>
         </DialogContent>

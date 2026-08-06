@@ -1,15 +1,21 @@
+import React from "react";
+
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 import { useMe } from "@/hooks/auth/useMe";
-import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import useExportPdf from "@/hooks/cvs/useExportPdf";
 import useSkills from "@/hooks/skills/useSkills";
 import { ICvResponce } from "@/types/cv-constructor";
 import { validateProjectDate } from "@/utils/helpers";
-import { getUserIdFromToken } from "@/utils/jwt";
-import React from "react";
 
 const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
   const userId = cvData.user.id;
@@ -86,7 +92,9 @@ const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
         </article>
       </section>
       <section>
-        <h2 className="text-[34px] font-normal tracking-wide my-7.5">Projects</h2>
+        <h2 className="text-[34px] font-normal tracking-wide my-7.5">
+          Projects
+        </h2>
         {cvData.projects.map((project) => {
           return (
             <article key={`project-${project.id}`} className="flex">
@@ -101,9 +109,14 @@ const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
                 <p>{`${validateProjectDate(project.start_date, "preview")} - ${validateProjectDate(project.end_date, "preview")}`}</p>
                 <h4>Responsibilities</h4>
                 <ul>
-                {project.responsibilities.map((responcibility, index) => (
-                  <li key={`responcibility-${index}`} className="list-disc list-inside">{responcibility}</li>
-                ))}
+                  {project.responsibilities.map((responcibility, index) => (
+                    <li
+                      key={`responcibility-${index}`}
+                      className="list-disc list-inside"
+                    >
+                      {responcibility}
+                    </li>
+                  ))}
                 </ul>
                 <h4>Enviroment</h4>
                 {project.environment.join(", ") + "."}
@@ -113,7 +126,9 @@ const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
         })}
       </section>
       <section>
-        <h2 className="text-[34px] font-normal tracking-wide my-7.5">Professional skills</h2>
+        <h2 className="text-[34px] font-normal tracking-wide my-7.5">
+          Professional skills
+        </h2>
         <Table className="text-[14px]">
           <TableHeader>
             <TableRow className=" border-primary font-medium">
@@ -139,8 +154,12 @@ const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
                       <p key={`skill-${skill.name}`}>{skill.name}</p>
                     ))}
                   </TableCell>
-                  <TableCell className="align-top px-4 py-2.5 text-center">2</TableCell>
-                  <TableCell className="align-top px-4 py-2.5 text-center">2025</TableCell>
+                  <TableCell className="align-top px-4 py-2.5 text-center">
+                    2
+                  </TableCell>
+                  <TableCell className="align-top px-4 py-2.5 text-center">
+                    2025
+                  </TableCell>
                 </TableRow>
               );
             })}

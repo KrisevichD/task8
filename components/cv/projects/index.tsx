@@ -9,7 +9,6 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { ICvResponce } from "@/types/cv-constructor";
 
 const CvProjects = () => {
   const [searchQuery, setSearchQuery] = useState("");

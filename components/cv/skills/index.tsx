@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+import CvSkillsForm from "./form";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,10 +22,8 @@ import { Spinner } from "@/components/ui/spinner";
 import { Toggle } from "@/components/ui/toggle";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import useSkills from "@/hooks/skills/useSkills";
-import { IProfileSkill } from "@/types/skills";
-import SkillsForm from "@/components/skills-form";
 import { ICvResponce } from "@/types/cv-constructor";
-import CvSkillsForm from "./form";
+import { IProfileSkill } from "@/types/skills";
 
 const CvSkills = ({ cvData }: { cvData: ICvResponce }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,7 +42,7 @@ const CvSkills = ({ cvData }: { cvData: ICvResponce }) => {
   };
 
   const deletePressedSkills = async () => {
-    await deleteCvSkill(selectedSkills.map(e => e.name));
+    await deleteCvSkill(selectedSkills.map((e) => e.name));
     setSelectedSkills([]);
   };
 
@@ -75,9 +75,7 @@ const CvSkills = ({ cvData }: { cvData: ICvResponce }) => {
                   <Toggle
                     variant={"ghost"}
                     pressed={selectedSkills.includes(skill)}
-                    onPressedChange={(pressed) =>
-                      handleToggle(pressed, skill)
-                    }
+                    onPressedChange={(pressed) => handleToggle(pressed, skill)}
                   >
                     <SkillBadge
                       variant={
@@ -96,11 +94,11 @@ const CvSkills = ({ cvData }: { cvData: ICvResponce }) => {
       ))}
 
       <div className="flex justify-end w-fill gap-4 sticky bottom-1">
-        <CvSkillsForm 
-        userId={cvData.user.id} 
-        cvData={cvData} 
-        selectedSkills={selectedSkills} 
-        cancelEditing={() => setSelectedSkills([])}
+        <CvSkillsForm
+          userId={cvData.user.id}
+          cvData={cvData}
+          selectedSkills={selectedSkills}
+          cancelEditing={() => setSelectedSkills([])}
         />
 
         {selectedSkills.length > 0 ? (
