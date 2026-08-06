@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -15,28 +13,21 @@ import {
 import { FloatingSelect } from "@/components/ui/floating-select";
 import { Icon } from "@/components/ui/icon";
 import { SelectItem } from "@/components/ui/select";
-import { useLanguage } from "@/context/language";
 import useLanguages from "@/hooks/languages/useLanguages";
 import { TLanguageProficiency } from "@/types/languages";
 
-interface ILanguagesFormProps {
-  userId: string;
-}
-
-const LanguagesForm = ({ userId }: ILanguagesFormProps) => {
-  const { t } = useLanguage();
+const LanguagesForm = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [language, setLanguage] = useState<string>("");
   const [languageProficiency, setLanguageProficiency] =
     useState<TLanguageProficiency>("A1");
-
   const {
     getAllLanguages,
     languages,
     isLanguagesLoading,
     addProfileLanguage,
     isAddingLoading,
-  } = useLanguages(userId);
+  } = useLanguages();
 
   useEffect(() => {
     if (isOpen) {
@@ -44,7 +35,7 @@ const LanguagesForm = ({ userId }: ILanguagesFormProps) => {
     }
   }, [isOpen, getAllLanguages]);
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!language) return;
     const data = {
@@ -56,67 +47,70 @@ const LanguagesForm = ({ userId }: ILanguagesFormProps) => {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger
-        render={
-          <Button variant="ghost">
-            <Icon variant="add" />
-            {t("addLanguage")}
-          </Button>
-        }
-      />
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{t("addLanguage")}</DialogTitle>
-        </DialogHeader>
-        <form id="language-form" className="space-y-8" onSubmit={onSubmit}>
-          <FloatingSelect
-            label="Language"
-            value={language}
-            onValueChange={(value) => setLanguage(value as string)}
-            disabled={isLanguagesLoading || isAddingLoading}
-          >
-            {languages?.languages.map((item) => (
-              <SelectItem
-                key={`select-language-${item.name}`}
-                value={item.name}
-              >
-                {item.name}
-              </SelectItem>
-            ))}
-          </FloatingSelect>
+    <>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger
+          render={
+            <Button variant={"ghost"}>
+              <Icon variant="add" />
+              ADD LANGUAGE
+            </Button>
+          }
+        />
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add language</DialogTitle>
+          </DialogHeader>
+          <form id="language-form" className="space-y-8" onSubmit={onSubmit}>
+            <FloatingSelect
+              label="Language"
+              value={language}
+              onValueChange={(value) => setLanguage(value as string)}
+              disabled={isLanguagesLoading || isAddingLoading}
+            >
+              {languages?.languages.map((language) => {
+                return (
+                  <SelectItem
+                    key={`select-language-${language.name}`}
+                    value={language.name}
+                  >
+                    {language.name}
+                  </SelectItem>
+                );
+              })}
+            </FloatingSelect>
 
-          <FloatingSelect
-            label="Language proficiency"
-            value={languageProficiency}
-            onValueChange={(value) =>
-              setLanguageProficiency(value as TLanguageProficiency)
-            }
-            disabled={isLanguagesLoading || isAddingLoading}
-          >
-            <SelectItem value="A1">A1</SelectItem>
-            <SelectItem value="A2">A2</SelectItem>
-            <SelectItem value="B1">B1</SelectItem>
-            <SelectItem value="B2">B2</SelectItem>
-            <SelectItem value="B2">B2</SelectItem>
-            <SelectItem value="C1">C1</SelectItem>
-            <SelectItem value="C2">C2</SelectItem>
-            <SelectItem value="Native">Native</SelectItem>
-          </FloatingSelect>
-        </form>
-        <DialogFooter>
-          <DialogClose render={<Button variant="outline">CANCEL</Button>} />
-          <Button
-            variant="primary"
-            type="submit"
-            disabled={isLanguagesLoading || isAddingLoading}
-            form="language-form"
-          >
-            ADD
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            <FloatingSelect
+              label="Language proficiency"
+              value={languageProficiency}
+              onValueChange={(value) =>
+                setLanguageProficiency(value as TLanguageProficiency)
+              }
+              disabled={isLanguagesLoading || isAddingLoading}
+            >
+              <SelectItem value={"A1"}>A1</SelectItem>
+              <SelectItem value={"A2"}>A2</SelectItem>
+              <SelectItem value={"B1"}>B1</SelectItem>
+              <SelectItem value={"B2"}>B2</SelectItem>
+              <SelectItem value={"C1"}>C1</SelectItem>
+              <SelectItem value={"C2"}>C2</SelectItem>
+              <SelectItem value={"Native"}>Native</SelectItem>
+            </FloatingSelect>
+          </form>
+          <DialogFooter>
+            <DialogClose render={<Button variant={"outline"}>CANCEL</Button>} />
+            <Button
+              variant={"primary"}
+              type="submit"
+              disabled={isLanguagesLoading || isAddingLoading}
+              form="language-form"
+            >
+              ADD
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
