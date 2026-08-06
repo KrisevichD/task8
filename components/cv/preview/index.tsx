@@ -6,21 +6,20 @@ import { useMe } from "@/hooks/auth/useMe";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import useExportPdf from "@/hooks/cvs/useExportPdf";
 import useSkills from "@/hooks/skills/useSkills";
+import { ICvResponce } from "@/types/cv-constructor";
 import { validateProjectDate } from "@/utils/helpers";
 import { getUserIdFromToken } from "@/utils/jwt";
 import React from "react";
 
-const CvPreview = () => {
-  const { cvData } = useCvConstructor();
-  const userId = getUserIdFromToken();
+const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
+  const userId = cvData.user.id;
   const { skillCategories } = useSkills();
   const { fullName, positionName, languages } = useMe(userId);
   const { printRef, handleDownloadPdf } = useExportPdf();
 
   if (!cvData || !skillCategories) return <Spinner />;
 
-  const data = cvData.cv;
-  const skills = data.skills;
+  const skills = cvData.skills;
   const filteredSkills = skillCategories
     .filter((category) =>
       skills.some((skill) => skill.categoryId === category.id),
@@ -41,6 +40,7 @@ const CvPreview = () => {
           <p className="uppercase leading-6">{positionName}</p>
         </div>
         <Button
+          id="export-pdf-btn"
           variant={"outlinePrimary"}
           size={"sm"}
           onClick={() => handleDownloadPdf()}
@@ -53,7 +53,7 @@ const CvPreview = () => {
         <aside>
           <section className="w-65 py-4 pr-4">
             <h3>Education</h3>
-            <p>{data.education}</p>
+            <p>{cvData.education}</p>
             <h3>Language proficiency</h3>
             <ul>
               {languages?.map((language) => {
@@ -66,15 +66,15 @@ const CvPreview = () => {
             </ul>
             <h3>Domains</h3>
             <ul>
-              {data.projects.map((project) => (
+              {cvData.projects.map((project) => (
                 <li key={`domain-${project.id}`}>{project.domain}</li>
               ))}
             </ul>
           </section>
         </aside>
         <article className="py-4 pl-6.25 pr-3 border-l border-primary">
-          <h2>{data.name}</h2>
-          <p>{data.description}</p>
+          <h2>{cvData.name}</h2>
+          <p>{cvData.description}</p>
           {filteredSkills.map((category) => {
             return (
               <React.Fragment key={`category-skill-${category.id}`}>
@@ -87,7 +87,7 @@ const CvPreview = () => {
       </section>
       <section>
         <h2 className="text-[34px] font-normal tracking-wide my-7.5">Projects</h2>
-        {data.projects.map((project) => {
+        {cvData.projects.map((project) => {
           return (
             <article key={`project-${project.id}`} className="flex">
               <header className="w-65 min-w-65 py-4 pr-4">

@@ -25,22 +25,26 @@ import {
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import { ICvProject } from "@/types/cv-constructor";
 import { validateProjectDate } from "@/utils/helpers";
+import { useParams } from "next/navigation";
 
 const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
-  const { cvData, deleteCvProject } = useCvConstructor();
+  const cvId = useParams().id as string;
+  const { cvData, deleteCvProject } = useCvConstructor(cvId);
   const [editingId, setEditingId] = useState<string>();
   const [hoveredProjectId, setHoveredProjectId] = useState<string | null>(null);
+  
+  if (!cvData) return <Spinner />;
 
   const handleDeleteProject = async (project: ICvProject) => {
     deleteCvProject({
-      cvId: cvData!.cv.id,
+      cvId: cvData.id,
       project: project,
     });
   };
 
-  if (!cvData) return <Spinner />;
 
-  const projects = cvData.cv.projects;
+
+  const projects = cvData.projects;
   const filteredList = !searchQuery
     ? projects
     : projects.filter((project) => {

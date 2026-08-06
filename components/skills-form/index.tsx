@@ -19,17 +19,16 @@ import { IProfileSkill, ISkill, TSkillMastery } from "@/types/skills";
 import { toast } from "sonner";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import { useLanguage } from "@/context/language";
+import { ICvResponce } from "@/types/cv-constructor";
 
 const SkillsForm = ({
   selectedSkills,
   cancelEditing,
   userId,
-  cvId
 } : {
   selectedSkills: IProfileSkill[],
   cancelEditing: () => void,
   userId?: string,
-  cvId?:string
 }) => {
   const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
@@ -46,7 +45,7 @@ const SkillsForm = ({
     isAddingLoading,
     updateProfileSkill, 
     isUpdatingLoading
-  } = useSkills(userId, cvId);
+  } = useSkills(userId);
 
   useEffect(() => {
     if (isOpen) {

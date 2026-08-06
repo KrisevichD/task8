@@ -1,54 +1,101 @@
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
+
 import { useRef, useState } from "react";
+import { EXPORT_PDF } from "@/graphql/cv-constructor";
+import { toast } from "sonner";
+import { useLazyQuery, useMutation } from "@apollo/client/react";
 
 export default function useExportPdf() {
   const printRef = useRef<HTMLDivElement>(null);
-  const [isExporting, setIsExporting] = useState(false);
+
+  const [getExportedPdf, { loading: isExporting }] = useMutation(EXPORT_PDF);
 
   const handleDownloadPdf = async (): Promise<void> => {
     const element = printRef.current;
     if (!element) return;
 
-    await document.fonts.ready;
-
     try {
-      setIsExporting(true);
-      const canvas = await html2canvas(element, {
-        scale: 2, 
-        useCORS: true, 
-        logging: false,
+      const htmlContent = element.innerHTML;
+
+      const styleElements = document.querySelectorAll('style, link[rel="stylesheet"]');
+      let injectedStyles = "";
+
+      styleElements.forEach((style) => {
+        if (style.tagName === "STYLE") {
+          injectedStyles += style.innerHTML;
+        } else if (style.tagName === "LINK") {
+          try {
+            const sheet = (style as HTMLLinkElement).sheet;
+            if (sheet) {
+              const rules = Array.from(sheet.cssRules).map(rule => rule.cssText).join("\n");
+              injectedStyles += rules;
+            }
+          } catch (e) {
+            console.warn("Не удалось прочитать внешние стили:", e);
+          }
+        }
+      });
+      
+      const fullHtmlPayload = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <style>
+             @import url('https://googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+            
+            * {
+              font-family: 'Roboto', -apple-system, sans-serif !important;
+            }
+
+            body { 
+              font-family: 'Roboto', -apple-system, sans-serif !important;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+              color-adjust: exact !important;
+            }
+
+            #export-pdf-btn { 
+              display: none !important; 
+              opacity: 0 !important;
+              visibility: hidden !important;
+              height: 0 !important;
+              padding: 0 !important;
+              margin: 0 !important;
+            }
+              ${injectedStyles}
+            </style>
+            <script src="https://tailwindcss.com"></script>
+          </head>
+          <body class="">
+            <div class="p-6">${htmlContent}</div>
+          </body>
+        </html>
+      `;
+
+      const { data } = await getExportedPdf({
+        variables: {
+          pdf:
+          {
+            html: fullHtmlPayload,
+            margin: {
+              top: "15mm",
+              bottom: "15mm",
+              left: "15mm",
+              right: "15mm"
+            }
+          }
+        }
       });
 
-      const imgData = canvas.toDataURL("image/png");
-
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      });
-
-      const imgWidth = 210; 
-      const pageHeight = 295; 
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+      if (data?.exportPdf) {
+        downloadPdfFromBase64(data?.exportPdf, "resume.pdf");
+        toast.success("PDF successfully downloaded!");
+      } else {
+        toast.error("Failed to generate PDF");
       }
-
-      pdf.save("resume-or-report.pdf");
     } catch (error) {
       console.error("Ошибка при генерации PDF:", error);
-    } finally {
-      setIsExporting(false);
+      toast.error("An error occurred during export");
     }
   };
 
@@ -57,4 +104,27 @@ export default function useExportPdf() {
     isExporting,
     handleDownloadPdf,
   };
+}
+
+function downloadPdfFromBase64(base64String: string, fileName: string) {
+  const cleanBase64 = base64String.replace(/^data:application\/pdf;base64,/, "");
+
+  const byteCharacters = atob(cleanBase64);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+
+  const blob = new Blob([byteArray], { type: "application/pdf" });
+  const blobUrl = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = blobUrl;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+
+  document.body.removeChild(link);
+  URL.revokeObjectURL(blobUrl);
 }

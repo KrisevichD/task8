@@ -23,6 +23,7 @@ import { useLanguage } from "@/context/language";
 import { useMe } from "@/hooks/auth/useMe";
 import useLanguages from "@/hooks/languages/useLanguages";
 import { getUserIdFromToken } from "@/utils/jwt";
+import { IProfileLanguage } from "@/types/languages";
 
 interface ILanguagesContentProps {
   userId?: string;
@@ -38,18 +39,18 @@ export const LanguagesContent = ({
 
   const { deleteProfileLanguages } = useLanguages(userId);
   const { languages, isLoading, error } = useMe(userId);
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [selectedLanguages, setSelectedLanguages] = useState<IProfileLanguage[]>([]);
 
-  const handleToggle = (isPressed: boolean, name: string) => {
+  const handleToggle = (isPressed: boolean, language: IProfileLanguage) => {
     if (isPressed) {
-      setSelectedLanguages((prev) => [...prev, name]);
+      setSelectedLanguages((prev) => [...prev, language]);
     } else {
-      setSelectedLanguages((prev) => prev.filter((lang) => lang !== name));
+      setSelectedLanguages((prev) => prev.filter((lang) => lang.name !== language.name));
     }
   };
 
   const deletePressedLanguages = async () => {
-    await deleteProfileLanguages(selectedLanguages);
+    await deleteProfileLanguages(selectedLanguages.map(lang => lang.name));
     setSelectedLanguages([]);
   };
 
@@ -67,14 +68,14 @@ export const LanguagesContent = ({
     <div className="w-full space-y-6 pt-4">
       <div className="flex flex-wrap gap-2">
         {languages.map((language) => {
-          const isSelected = selectedLanguages.includes(language.name);
+          const isSelected = selectedLanguages.includes(language);
           return (
             <Toggle
               key={`profile-language-${language.name}`}
               variant="ghost"
               pressed={isSelected}
               onPressedChange={(pressed) =>
-                handleToggle(pressed, language.name)
+                handleToggle(pressed, language)
               }
             >
               <span
@@ -93,7 +94,11 @@ export const LanguagesContent = ({
       </div>
 
       <div className="flex justify-end gap-4 w-full pt-4">
-        <LanguagesForm userId={userId} />
+        <LanguagesForm 
+        userId={userId} 
+        selectedLanguages={selectedLanguages} 
+        cancelEditing={() => setSelectedLanguages([])} 
+        />
 
         {selectedLanguages.length > 0 ? (
           <Button variant="primary" onClick={deletePressedLanguages}>

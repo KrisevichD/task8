@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 
-import CvSkillsForm from "./form";
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,13 +22,15 @@ import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import useSkills from "@/hooks/skills/useSkills";
 import { IProfileSkill } from "@/types/skills";
 import SkillsForm from "@/components/skills-form";
+import { ICvResponce } from "@/types/cv-constructor";
+import CvSkillsForm from "./form";
 
-const CvSkills = () => {
+const CvSkills = ({ cvData }: { cvData: ICvResponce }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { skillCategories } = useSkills();
-  const { cvData, deleteCvSkill } = useCvConstructor();
+  const { deleteCvSkill } = useCvConstructor(cvData.id);
   const [selectedSkills, setSelectedSkills] = useState<IProfileSkill[]>([]);
-  const skills = cvData?.cv.skills;
+  const skills = cvData?.skills;
 
   const handleToggle = (isPressed: boolean, skill: IProfileSkill) => {
     if (isPressed) {
@@ -95,13 +95,13 @@ const CvSkills = () => {
         </div>
       ))}
 
-      <div className="flex justify-end w-fill gap-4">
-        {selectedSkills.length === 1
-        ?
-        <SkillsForm cvId={cvData.cv.id} selectedSkills={selectedSkills} cancelEditing={() => setSelectedSkills([])}/>
-        :
-        <CvSkillsForm />
-        }
+      <div className="flex justify-end w-fill gap-4 sticky bottom-1">
+        <CvSkillsForm 
+        userId={cvData.user.id} 
+        cvData={cvData} 
+        selectedSkills={selectedSkills} 
+        cancelEditing={() => setSelectedSkills([])}
+        />
 
         {selectedSkills.length > 0 ? (
           <Button variant={"primary"} onClick={deletePressedSkills}>

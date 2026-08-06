@@ -9,9 +9,11 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { ICvResponce } from "@/types/cv-constructor";
 
 const CvProjects = () => {
   const [searchQuery, setSearchQuery] = useState("");
+
   return (
     <>
       <div className="flex justify-between px-5 py-2">
@@ -24,7 +26,7 @@ const CvProjects = () => {
             <Icon variant="search" className="text-muted-foreground" />
           </InputGroupAddon>
         </InputGroup>
-        <CvProjectsForm/>
+        <CvProjectsForm />
       </div>
       <CvProjectsList searchQuery={searchQuery} />
     </>

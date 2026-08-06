@@ -21,7 +21,8 @@ import { Icon } from "@/components/ui/icon";
 import { SelectItem } from "@/components/ui/select";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import useSkills from "@/hooks/skills/useSkills";
-import { ICreateCvProjectForm } from "@/types/cv-constructor";
+import { ICreateCvProjectForm, ICvResponce } from "@/types/cv-constructor";
+import { useParams } from "next/navigation";
 
 const INITIAL_FORM_DATA = {
   name: "",
@@ -46,9 +47,10 @@ const CvProjectsForm = ({
   closeEditing?: () => void;
   initialData?: ICreateCvProjectForm;
 }) => {
+  const cvId = useParams().id as string;
   const isEditing = type === "edit" && editingId ? true : false;
   const [isOpen, setIsOpen] = useState(false);
-  const { addCvProject, updateCvProject } = useCvConstructor();
+  const { addCvProject, updateCvProject } = useCvConstructor(cvId);
   const { getAllSkills, skills } = useSkills();
 
   const { register, reset, control, handleSubmit, formState: { isDirty } } =
@@ -75,11 +77,9 @@ const CvProjectsForm = ({
       if (!id || !closeEditing) return;
       await updateCvProject(id, formData);
       closeEditing();
-      toast.success("Project updated", { position: "top-right" });
     } else {
       await addCvProject(formData);
       setIsOpen(false);
-      toast.success("Project added", { position: "top-right" });
     }
   };
 
@@ -95,10 +95,10 @@ const CvProjectsForm = ({
               <Button
                 variant={"ghost"}
                 type="button"
-                className={"text-primary hover:text-primary"}
+                className={"text-primary hover:text-primary max-lg:bg-primary/4 max-lg:size-10"}
               >
                 <Icon variant="add" />
-                Add project
+                <span className="max-lg:sr-only">Add project</span>
               </Button>
             }
           />

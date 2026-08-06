@@ -34,6 +34,22 @@ export const ADD_PROFILE_LANGUAGE: TypedDocumentNode<
     }
   }
 `;
+
+export const UPDATE_PROFILE_LANGUAGE: TypedDocumentNode<
+  IProfileResponce,
+  IAddProfileLanguageVariables
+> = gql`
+  mutation UpdateProfileLanguage($language: UpdateProfileLanguageInput!) {
+    updateProfileLanguage(language: $language) {
+      id
+      languages {
+        name
+        proficiency
+      }
+    }
+  }
+`;
+
 export const DELETE_PROFILE_LANGUAGE: TypedDocumentNode<
   IProfileResponce,
   IDeleteProfileLanguageVariables

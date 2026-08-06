@@ -11,6 +11,7 @@ import {
   GET_CV,
   UPDATE_CV,
   UPDATE_CV_PROJECT,
+  UPDATE_CV_SKILL,
 } from "@/graphql/cv-constructor";
 import {
   IAddCvProjectInput,
@@ -22,10 +23,8 @@ import {
 import { validateDateString } from "@/utils/helpers";
 import { IProfileSkill, IProfileSkillInput } from "@/types/skills";
 import { toast } from "sonner";
-import { UPDATE_CV_SKILL } from "@/graphql/skills";
 
-export default function useCvConstructor() {
-  const cvId = useParams().id as string;
+export default function useCvConstructor(cvId: string) {
   const [createProject] = useMutation(CREATE_PROJECT_MUTATION);
   const [deleteProject, {}] = useMutation(DELETE_PROJECT, {
     refetchQueries: ["GetCv"],
@@ -36,20 +35,20 @@ export default function useCvConstructor() {
   ] = useMutation(ADD_CV_PROJECT_MUTATION);
 
   const [executeUpdateCvProject] = useMutation(UPDATE_CV_PROJECT);
-  const [executeDeleteCvProject] = useMutation(DELETE_CV_PROJECT);
   const [executeUpdateCv] = useMutation(UPDATE_CV);
   const [executeAddCvSkill] = useMutation(ADD_CV_SKILL);
-  const [executeUpdateCvSkill, { loading: isCvUpdatingLoading }] =
+  const [executeUpdateCvSkill] =
     useMutation(UPDATE_CV_SKILL);
   const [executeDeleteCvSkill] = useMutation(DELETE_CV_SKILL);
   const {
-    data: cvData,
+    data,
     loading: isCvLoading,
     error: cvError,
   } = useQuery(GET_CV, {
     variables: { cvId: cvId },
     skip: !cvId,
   });
+  const cvData = data?.cv;
 
   const addCvProject = async (input: ICreateCvProjectForm) => {
     const { responsibilities, ...createProjectData } = input;
@@ -134,7 +133,19 @@ export default function useCvConstructor() {
     })
   };
   
-    
+  const updateCvSkill = (input: IProfileSkill) => {
+    const data = {
+      cvId: cvId,
+      ...input,
+    }
+    const promise = executeUpdateCvSkill({ variables: { skill: data } });
+    toast.promise(promise, {
+      loading: "Updating skill",
+      success: "Successfully updated",
+      error: (err) => err.message,
+      position: "top-right",
+    })
+  };
 
   const deleteCvSkill = (input: string[]) => {
     const promise = executeDeleteCvSkill({
@@ -162,7 +173,6 @@ export default function useCvConstructor() {
       error: (err) => err.message,
       position: "top-right",
     })
-    return promise;
   };
 
   return {
@@ -175,6 +185,7 @@ export default function useCvConstructor() {
     cvProjectError,
     deleteCvProject,
     addCvSkill,
+    updateCvSkill,
     deleteCvSkill,
     updateCv,
   };

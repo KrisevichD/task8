@@ -23,12 +23,13 @@ const VALID_TABS = ["details", "projects", "skills", "preview"] as const;
 const DEFAULT_TAB = "details";
 type TTab = (typeof VALID_TABS)[number];
 
-const CvConstructor = ({ cvId }: { cvId?: string }) => {
+const CvConstructor = ({ cvId }: { cvId: string }) => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const tab = searchParams.get("tab") ?? "";
   const activeTab = VALID_TABS.includes(tab as TTab) ? tab : DEFAULT_TAB;
-  const { cvData, isCvLoading } = useCvConstructor();
+  const { cvData } = useCvConstructor(cvId);
+  
 
   const handleTabChange = (nextTab: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -42,7 +43,7 @@ const CvConstructor = ({ cvId }: { cvId?: string }) => {
     window.history.replaceState(null, "", newUrl);
   };
 
-  if (isCvLoading) return <Spinner />;
+  if (!cvData) return <Spinner />;
 
   return (
     <div className="px-12 xl:pl-6 xl:pr-6.5 py-4">
@@ -51,32 +52,14 @@ const CvConstructor = ({ cvId }: { cvId?: string }) => {
           <BreadcrumbItem>
             <BreadcrumbLink render={<Link href="/cvs" />}>CVs</BreadcrumbLink>
           </BreadcrumbItem>
-
           <BreadcrumbSeparator />
-
-          {activeTab === "details" ? (
             <BreadcrumbItem>
               <BreadcrumbPage>
-                {cvData?.cv.name || "CV Constructor"}
+                {cvData.name || "CV"}
               </BreadcrumbPage>
             </BreadcrumbItem>
-          ) : (
-            <>
-              <BreadcrumbItem>
-                <BreadcrumbLink render={<Link href={pathname} />}>
-                  {cvData?.cv.name || "CV"}
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-
-              <BreadcrumbSeparator />
-
-              <BreadcrumbItem>
-                <BreadcrumbPage className="capitalize">
-                  {activeTab}
-                </BreadcrumbPage>
-              </BreadcrumbItem>
-            </>
-          )}
+            <BreadcrumbSeparator />
+            {activeTab !== "details" && <BreadcrumbItem className="capitalize">{activeTab}</BreadcrumbItem>}
         </BreadcrumbList>
       </Breadcrumb>
 
@@ -93,16 +76,16 @@ const CvConstructor = ({ cvId }: { cvId?: string }) => {
         </TabsList>
 
         <TabsContent value="details">
-          <CvDetailsForm />
+          <CvDetailsForm cvData={cvData}/>
         </TabsContent>
         <TabsContent value="projects">
           <CvProjects />
         </TabsContent>
         <TabsContent value="skills">
-          <CvSkills />
+          <CvSkills cvData={cvData}/>
         </TabsContent>
         <TabsContent value="preview">
-          <CvPreview />
+          <CvPreview cvData={cvData}/>
         </TabsContent>
       </Tabs>
     </div>

@@ -38,7 +38,7 @@ export default async function RootLayout({
       suppressHydrationWarning
       className={cn("h-full", "antialiased", roboto.variable)}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-screen">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

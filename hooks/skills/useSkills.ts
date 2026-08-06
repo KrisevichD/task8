@@ -5,7 +5,6 @@ import {
   DELETE_PROFILE_SKILL,
   GET_ALL_SKILLS,
   GET_SKILLS_CATEGORIES,
-  UPDATE_CV_SKILL,
   UPDATE_PROFILE_SKILL,
 } from "@/graphql/skills";
 import { GET_USER } from "@/graphql/user/queries";
@@ -13,6 +12,7 @@ import { IProfileSkillInput } from "@/types/skills";
 import { getUserIdFromToken } from "@/utils/jwt";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
+import { UPDATE_CV_SKILL } from "@/graphql/cv-constructor";
 
 export default function useSkills(customUserId?: string, cvId?: string) {
   const userId = customUserId || getUserIdFromToken();

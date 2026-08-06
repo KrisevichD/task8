@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import SkillsContent from "@/contents/skills";
 
-export default async function CvsPage() {
+export default async function SkillsPage() {
   return (
     <>
       <Breadcrumb className="ml-11 mt-4">

@@ -14,6 +14,7 @@ import { useLogout } from "@/hooks/auth/useLogout";
 import { useMe } from "@/hooks/auth/useMe";
 import { getUserIdFromToken } from "@/utils/jwt";
 import { cn } from "@/utils/shadcn";
+import { Button } from "../ui/button";
 
 interface INavItem {
   key: TranslationKeys;
@@ -50,7 +51,7 @@ export const Sidebar = () => {
 
   return (
     <>
-    <aside className="w-50 h-screen flex flex-col pt-11 pb-1 mr-6 shrink-0 bg-background max-lg:w-full max-lg:h-15 fixed bottom-0 max-lg:z-50 max-lg:flex-row max-lg:items-center max-lg:justify-between max-lg:p-3 max-lg:mr-0 max-lg:border-t max-lg:border-border">
+    <aside className="w-50 h-screen flex flex-col pt-11 pb-6 mr-6 shrink-0 bg-background max-lg:w-full max-lg:h-15 fixed bottom-0 max-lg:z-50 max-lg:flex-row max-lg:items-center max-lg:justify-between max-lg:py-2 max-lg:px-4 max-lg:mr-0 max-lg:border-t max-lg:border-border">
       <nav className="space-y-1 w-full max-lg:flex max-lg:space-y-0 max-lg:gap-1 max-lg:w-auto">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname.startsWith(item.href);
@@ -72,7 +73,7 @@ export const Sidebar = () => {
         })}
       </nav>
 
-      <div className="pl-4 pr-3 mt-auto space-y-4 max-lg:pl-0 max-lg:pr-0 max-lg:mt-0 max-lg:space-y-0 max-lg:flex max-lg:items-center max-lg:gap-3">
+      <div className="pl-4 pr-3 mt-auto space-y-4 max-lg:pl-0  max-lg:pr-0 max-lg:mt-0 max-lg:space-y-0 max-lg:flex max-lg:items-center max-lg:gap-3">
         {isProfileLoading ? (
           <UserSkeleton />
         ) : (
@@ -92,14 +93,15 @@ export const Sidebar = () => {
           </Link>
         )}
 
-        <button
+        <Button
           type="button"
           onClick={logout}
-          className="p-1 text-muted-foreground hover:text-foreground transition-colors max-lg:hidden cursor-pointer"
-          aria-label="Logout"
+          variant={"ghost"}
+          size={"icon"}
+          // className="p-1 text-muted-foreground hover:text-foreground transition-colors max-lg:hidden cursor-pointer"
         >
-          <Icon variant="arrow-back" size="sm" />
-        </button>
+          <Icon variant="arrow-back" label="Log out" />
+        </Button>
       </div>
     </aside>
     </>

@@ -13,12 +13,31 @@ import {
   IProjectVariables,
   IUpdateCvVariables,
 } from "@/types/cv-constructor";
+import { IProfileSkillVariables } from "@/types/skills";
 
 export const GET_CV: TypedDocumentNode<{ cv: ICvResponce }, ICvVariables> = gql`
   query GetCv($cvId: ID!) {
     cv(cvId: $cvId) {
       id
       name
+      user {
+        id
+        position_name
+        profile {
+          id
+          first_name
+          last_name
+          skills {
+            name
+            categoryId
+            mastery
+          }
+          languages {
+            name
+            proficiency
+          }
+        }
+      }
       description
       education
       projects {
@@ -181,6 +200,22 @@ export const ADD_CV_SKILL: TypedDocumentNode<
   }
 `;
 
+export const UPDATE_CV_SKILL: TypedDocumentNode<
+  ICvResponce,
+  IProfileSkillVariables
+> = gql`
+  mutation UpdateCvSkill($skill: UpdateCvSkillInput!) {
+    updateCvSkill(skill: $skill) {
+      id
+      skills {
+        name
+        categoryId
+        mastery
+      }
+    }
+  }
+`;
+
 export const DELETE_CV_SKILL: TypedDocumentNode<
   ICvResponce,
   IDeleteCvSkillVariables
@@ -193,5 +228,26 @@ export const DELETE_CV_SKILL: TypedDocumentNode<
         mastery
       }
     }
+  }
+`;
+
+interface IPdfVariables {
+  pdf: {
+    html: string;
+    margin: {
+      top: string;
+      bottom: string;
+      left: string;
+      right: string;
+    }
+  }
+}
+
+export const EXPORT_PDF: TypedDocumentNode<
+  { exportPdf: string },
+  IPdfVariables
+> = gql`
+  mutation ExportPdf($pdf: ExportPdfInput!) {
+    exportPdf(pdf: $pdf) 
   }
 `;

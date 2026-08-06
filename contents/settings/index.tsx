@@ -41,16 +41,15 @@ export const SettingsContent = () => {
       <FloatingSelect
         label={t("appearance")}
         value={currentTheme}
-        displayValue={themeDisplayNames[currentTheme]}
-        onValueChange={(val) => setTheme(val)}
+        onValueChange={(val) => setTheme(val as string)}
       >
-        <SelectItem value="system" className="text-base py-3">
+        <SelectItem value="system">
           {t("deviceSettings")}
         </SelectItem>
-        <SelectItem value="light" className="text-base py-3">
+        <SelectItem value="light">
           {t("light")}
         </SelectItem>
-        <SelectItem value="dark" className="text-base py-3">
+        <SelectItem value="dark">
           {t("dark")}
         </SelectItem>
       </FloatingSelect>
@@ -58,13 +57,12 @@ export const SettingsContent = () => {
       <FloatingSelect
         label={t("language")}
         value={language}
-        displayValue={languageDisplayNames[language]}
         onValueChange={(val) => setLanguage(val as Language)}
       >
-        <SelectItem value="en" className="text-base py-3">
+        <SelectItem value="en">
           {t("english")}
         </SelectItem>
-        <SelectItem value="ru" className="text-base py-3">
+        <SelectItem value="ru">
           {t("russian")}
         </SelectItem>
       </FloatingSelect>

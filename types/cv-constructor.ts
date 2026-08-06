@@ -1,3 +1,4 @@
+import { IUserData } from "@/graphql/user/queries";
 import { IProfileLanguage } from "./languages";
 import { IProfileSkill } from "./skills";
 
@@ -16,6 +17,7 @@ export interface ICvProject {
 export interface ICvResponce {
   id: string;
   name: string;
+  user: IUserData;
   education: string;
   description: string;
   projects: ICvProject[];

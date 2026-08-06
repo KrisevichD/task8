@@ -27,7 +27,7 @@ import useSkills from "@/hooks/skills/useSkills";
 import { getUserIdFromToken } from "@/utils/jwt";
 import { IProfileSkill } from "@/types/skills";
 
-const SkillsContent = ({userId}: { userId: string}) => {
+const SkillsContent = ({ userId }: { userId?: string}) => {
   const [isOpen, setIsOpen] = useState(false);
   const { skillCategories, isCategoriesLoading, deleteProfileSkills } = useSkills(userId);
   const { skills, isLoading, error } = useMe(userId);

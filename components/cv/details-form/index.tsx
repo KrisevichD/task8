@@ -9,11 +9,11 @@ import { FloatingInput } from "../../ui/floating-input";
 import { Button } from "@/components/ui/button";
 import { FloatingTextarea } from "@/components/ui/floating-textarea";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
-import { ICvDetailsForm } from "@/types/cv-constructor";
+import { ICvDetailsForm, ICvResponce } from "@/types/cv-constructor";
 import { Spinner } from "@/components/ui/spinner";
 
-const CvDetailsForm = () => {
-  const { cvData, updateCv } = useCvConstructor();
+const CvDetailsForm = ({ cvData }: { cvData: ICvResponce }) => {
+  const { updateCv } = useCvConstructor(cvData.id);
 
   const { register, reset, handleSubmit, formState: { isDirty } } = useForm<ICvDetailsForm>({
     defaultValues: {
@@ -26,27 +26,19 @@ const CvDetailsForm = () => {
   useEffect(() => {
     if (cvData)
       reset({
-        name: cvData.cv.name,
-        description: cvData.cv.description,
-        education: cvData.cv.education,
+        name: cvData.name,
+        description: cvData.description,
+        education: cvData.education,
       });
   }, [cvData, reset]);
 
   const onSubmit = (formData: ICvDetailsForm) => {
     if (!cvData) return;
     const data = {
-      cvId: cvData.cv.id,
+      cvId: cvData.id,
       ...formData,
     };
-    const status = updateCv(data);
-    toast.promise(status, {
-      loading: "Updating data",
-      success: "CV successfully updated",
-      error: (error) => {
-        return error.message;
-      },
-      position: "top-right",
-    });
+    updateCv(data);
   };
 
   if (!cvData) return <Spinner />
