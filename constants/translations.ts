@@ -41,6 +41,8 @@ export const translations = {
     removeSkills: "REMOVE SKILLS",
     addLanguage: "ADD LANGUAGE",
     removeLanguages: "REMOVE LANGUAGES",
+    edit: "Edit",
+    delete: "Delete",
   },
   ru: {
     // Navigation / Sidebar
@@ -84,6 +86,8 @@ export const translations = {
     removeSkills: "УДАЛИТЬ НАВЫКИ",
     addLanguage: "ДОБАВИТЬ ЯЗЫК",
     removeLanguages: "УДАЛИТЬ ЯЗЫКИ",
+    edit: "Редактировать",
+    delete: "Удалить",
   },
 } as const;
 
