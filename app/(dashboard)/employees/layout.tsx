@@ -6,7 +6,7 @@ interface IEmployeesLayoutProps {
 
 export default function EmployeesLayout({ children }: IEmployeesLayoutProps) {
   return (
-    <div className="flex flex-col h-screen overflow-hidden p-4">
+    <div className="flex flex-col h-screen overflow-hidden pl-3 p-4">
       <div className="flex-1 min-h-0 overflow-y-auto">{children}</div>
     </div>
   );
