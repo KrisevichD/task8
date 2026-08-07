@@ -10,6 +10,11 @@ import { useLanguage } from "@/context/language";
 
 const emptySubscribe = () => () => {};
 
+const LANGUAGE_OPTIONS: Record<Language, string> = {
+  en: "English",
+  ru: "Русский",
+};
+
 export const SettingsContent = () => {
   const { theme, setTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
@@ -22,20 +27,6 @@ export const SettingsContent = () => {
 
   if (!isClient) return null;
 
-  // 🔑 Карты перевода для отображения выбранных значений
-  const themeDisplayNames: Record<string, string> = {
-    system: t("deviceSettings"),
-    light: t("light"),
-    dark: t("dark"),
-  };
-
-  const languageDisplayNames: Record<Language, string> = {
-    en: t("english"),
-    ru: t("russian"),
-  };
-
-  console.log(themeDisplayNames, languageDisplayNames);
-
   const currentTheme = theme || "system";
 
   return (
@@ -43,11 +34,17 @@ export const SettingsContent = () => {
       <FloatingSelect
         label={t("appearance")}
         value={currentTheme}
-        onValueChange={(val) => setTheme(val as string)}
+        onValueChange={(val) => setTheme(String(val))}
       >
-        <SelectItem value="system">{t("deviceSettings")}</SelectItem>
-        <SelectItem value="light">{t("light")}</SelectItem>
-        <SelectItem value="dark">{t("dark")}</SelectItem>
+        <SelectItem value="system" className="capitalize">
+          {t("deviceSettings")}
+        </SelectItem>
+        <SelectItem value="light" className="capitalize">
+          {t("light")}
+        </SelectItem>
+        <SelectItem value="dark" className="capitalize">
+          {t("dark")}
+        </SelectItem>
       </FloatingSelect>
 
       <FloatingSelect
@@ -55,8 +52,11 @@ export const SettingsContent = () => {
         value={language}
         onValueChange={(val) => setLanguage(val as Language)}
       >
-        <SelectItem value="en">{t("english")}</SelectItem>
-        <SelectItem value="ru">{t("russian")}</SelectItem>
+        {Object.entries(LANGUAGE_OPTIONS).map(([code, name]) => (
+          <SelectItem key={code} value={code}>
+            {name}
+          </SelectItem>
+        ))}
       </FloatingSelect>
     </div>
   );

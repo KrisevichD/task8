@@ -30,7 +30,6 @@ export const EmployeeDetailsContent = ({
 
   const {
     form,
-    isOwner,
     departments,
     positions,
     avatarPreview,
@@ -39,14 +38,6 @@ export const EmployeeDetailsContent = ({
     handleAvatarChange,
     onSubmit,
   } = useEmployeeDetailsForm(userId, user);
-
-  if (isUserLoading) {
-    return (
-      <div className="p-8 text-center text-muted-foreground">
-        {t("search")}...
-      </div>
-    );
-  }
 
   if (!user) {
     return (
@@ -69,7 +60,7 @@ export const EmployeeDetailsContent = ({
         avatarPreview={avatarPreview}
         firstName={user.profile?.first_name}
         initials={initials}
-        isOwner={isOwner}
+        isOwner={true}
         onAvatarChange={handleAvatarChange}
       />
 
@@ -91,13 +82,11 @@ export const EmployeeDetailsContent = ({
           <FloatingInput
             id="firstName"
             label={t("firstName")}
-            disabled={!isOwner}
             {...form.register("firstName", { required: true })}
           />
           <FloatingInput
             id="lastName"
             label={t("lastName")}
-            disabled={!isOwner}
             {...form.register("lastName", { required: true })}
           />
         </div>
@@ -112,7 +101,6 @@ export const EmployeeDetailsContent = ({
                 label={t("department")}
                 value={field.value || ""}
                 onValueChange={field.onChange}
-                disabled={!isOwner}
               >
                 {departments.map((dept) => (
                   <SelectItem key={dept.id} value={dept.name}>
@@ -132,7 +120,6 @@ export const EmployeeDetailsContent = ({
                 label={t("position")}
                 value={field.value || ""}
                 onValueChange={field.onChange}
-                disabled={!isOwner}
               >
                 {positions.map((pos) => (
                   <SelectItem key={pos.id} value={pos.name}>
@@ -144,22 +131,20 @@ export const EmployeeDetailsContent = ({
           />
         </div>
 
-        {isOwner && (
-          <div className="pt-4 flex justify-end">
-            <Button
-              type="submit"
-              disabled={!canSubmit || isUpdating}
-              className={cn(
-                "w-full max-w-90 h-12 rounded-full font-semibold text-sm tracking-wider uppercase transition-colors",
-                canSubmit
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
-                  : "bg-muted text-muted-foreground cursor-not-allowed opacity-60",
-              )}
-            >
-              {isUpdating ? `${t("update")}...` : t("update")}
-            </Button>
-          </div>
-        )}
+        <div className="pt-4 flex justify-end">
+          <Button
+            type="submit"
+            disabled={!canSubmit || isUpdating}
+            className={cn(
+              "w-full max-w-90 h-12 rounded-full font-semibold text-sm tracking-wider uppercase transition-colors",
+              canSubmit
+                ? "bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
+                : "bg-muted text-muted-foreground cursor-not-allowed opacity-60",
+            )}
+          >
+            {isUpdating ? `${t("update")}...` : t("update")}
+          </Button>
+        </div>
       </form>
     </div>
   );

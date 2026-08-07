@@ -5,6 +5,7 @@ import { useState } from "react";
 import { EmployeeTable } from "./table";
 
 import { SearchInput } from "@/components/ui/search-input";
+import { Spinner } from "@/components/ui/spinner";
 import { useLanguage } from "@/context/language";
 import { useEmployees } from "@/hooks/employees/useEmployees";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -15,6 +16,13 @@ export const EmployeesContent = () => {
   const { employees, isLoading, error } = useEmployees();
   const { t } = useLanguage();
 
+  if (error) {
+    return (
+      <div className=" text-center flex justify-center items-center text-destructive">
+        Error loading employees: {error.message}
+      </div>
+    );
+  }
   const filteredEmployees = employees.filter((emp) => {
     const q = debouncedSearch.toLowerCase();
     return (
@@ -25,26 +33,18 @@ export const EmployeesContent = () => {
     );
   });
 
-  if (error) {
-    return (
-      <div className="p-8 text-center text-destructive">{error.message}</div>
-    );
-  }
-
   return (
     <div className="flex flex-col h-full">
-      <div className="shrink-0 pl-11 pr-8 space-y-3 pb-3">
+      <div className="shrink-0 pl-8 space-y-3 pb-3">
         <h1 className="text-base font-normal text-muted-foreground">
-          {t("employees")}
+          {t("employee")}
         </h1>
         <SearchInput value={search} onChange={setSearch} />
       </div>
 
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0 flex justify-center items-center">
         {isLoading ? (
-          <div className="p-8 text-center text-muted-foreground">
-            {t("search")}...
-          </div>
+          <Spinner />
         ) : (
           <EmployeeTable employees={filteredEmployees} />
         )}
