@@ -2,6 +2,8 @@ import { useLazyQuery, useMutation } from "@apollo/client/react";
 
 import { toast } from "sonner";
 
+import { useMe } from "../auth/useMe";
+
 import {
   ADD_PROFILE_LANGUAGE,
   DELETE_PROFILE_LANGUAGE,
@@ -21,6 +23,9 @@ export default function useLanguages(customUserId: string) {
   const [executeDeleteProfileLanguages, { loading: isUpdatingLoading }] =
     useMutation(DELETE_PROFILE_LANGUAGE);
 
+  const { languages: profileLanguages } = useMe(userId);
+  const currentLanguages = profileLanguages ?? [];
+
   const addProfileLanguage = (input: IProfileLanguage) => {
     if (!userId) return;
     const profileLanguageInput = {
@@ -29,6 +34,20 @@ export default function useLanguages(customUserId: string) {
     };
     const promise = executeAddProfileLanguage({
       variables: { language: profileLanguageInput },
+      optimisticResponse: {
+        addProfileLanguage: {
+          __typename: "Profile",
+          id: userId,
+          languages: [
+            ...currentLanguages,
+            {
+              __typename: "LanguageProficiency",
+              name: input.name,
+              proficiency: input.proficiency,
+            },
+          ],
+        },
+      },
     });
     toast.promise(promise, {
       loading: "Adding language",
@@ -46,6 +65,21 @@ export default function useLanguages(customUserId: string) {
     };
     const promise = executeUpdateProfileLanguage({
       variables: { language: profileLanguageInput },
+      optimisticResponse: {
+        updateProfileLanguage: {
+          __typename: "Profile",
+          id: userId,
+          languages: currentLanguages.map((lang) =>
+            lang.name === input.name
+              ? {
+                  __typename: "LanguageProficiency",
+                  name: input.name,
+                  proficiency: input.proficiency,
+                }
+              : lang,
+          ),
+        },
+      },
     });
     toast.promise(promise, {
       loading: "Updating language",
@@ -63,6 +97,15 @@ export default function useLanguages(customUserId: string) {
     };
     const promise = executeDeleteProfileLanguages({
       variables: { language: profileLanguageInput },
+      optimisticResponse: {
+        deleteProfileLanguage: {
+          __typename: "Profile",
+          id: userId,
+          languages: currentLanguages.filter(
+            (lang) => !input.some((e) => e === lang.name),
+          ),
+        },
+      },
     });
     toast.promise(promise, {
       loading: "Deleting language",
@@ -72,9 +115,15 @@ export default function useLanguages(customUserId: string) {
     });
   };
 
+  const filteredLanguages = languages?.languages.filter(
+    (lang) =>
+      !profileLanguages?.some((profileLang) => profileLang.name === lang.name),
+  );
+
   return {
     getAllLanguages,
     languages,
+    filteredLanguages,
     isLanguagesLoading,
     addProfileLanguage,
     updateProfileLanguage,

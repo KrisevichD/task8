@@ -13,6 +13,7 @@ export interface ICvProject {
   end_date: string;
   environment: string[];
   responsibilities: string[];
+  __typename?: "CvProject";
 }
 
 export interface ICvResponce {
@@ -24,6 +25,7 @@ export interface ICvResponce {
   projects: ICvProject[];
   skills: IProfileSkill[];
   languages: IProfileLanguage[];
+  __typename?: "Cv";
 }
 
 export interface ICvVariables {

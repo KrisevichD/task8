@@ -1,10 +1,11 @@
 import { gql, TypedDocumentNode } from "@apollo/client";
 
+import { IUserProfile } from "../user/queries";
+
 import {
   IDeleteProfileSkillVariables,
   IGetAllSkillsResponce,
   IGetSkillsCategoriesResponce,
-  IProfileResponce,
   IProfileSkillVariables,
 } from "@/types/skills";
 
@@ -43,7 +44,7 @@ export const GET_SKILLS_CATEGORIES: TypedDocumentNode<
 `;
 
 export const ADD_PROFILE_SKILL: TypedDocumentNode<
-  IProfileResponce,
+  { addProfileSkill: IUserProfile },
   IProfileSkillVariables
 > = gql`
   mutation AddProfileSkill($skill: AddProfileSkillInput!) {
@@ -59,7 +60,7 @@ export const ADD_PROFILE_SKILL: TypedDocumentNode<
 `;
 
 export const UPDATE_PROFILE_SKILL: TypedDocumentNode<
-  IProfileResponce,
+  { updateProfileSkill: IUserProfile },
   IProfileSkillVariables
 > = gql`
   mutation UpdateProfileSkill($skill: UpdateProfileSkillInput!) {
@@ -75,7 +76,7 @@ export const UPDATE_PROFILE_SKILL: TypedDocumentNode<
 `;
 
 export const DELETE_PROFILE_SKILL: TypedDocumentNode<
-  IProfileResponce,
+  { deleteProfileSkill: IUserProfile },
   IDeleteProfileSkillVariables
 > = gql`
   mutation DeleteProfileSkill($skill: DeleteProfileSkillInput!) {

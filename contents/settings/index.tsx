@@ -34,6 +34,8 @@ export const SettingsContent = () => {
     ru: t("russian"),
   };
 
+  console.log(themeDisplayNames, languageDisplayNames);
+
   const currentTheme = theme || "system";
 
   return (

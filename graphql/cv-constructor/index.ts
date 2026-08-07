@@ -135,7 +135,7 @@ export const GET_PROJECT: TypedDocumentNode<IProjectData, IProjectVariables> =
   `;
 
 export const ADD_CV_PROJECT_MUTATION: TypedDocumentNode<
-  ICvResponce,
+  { addCvProject: ICvResponce },
   IAddCvProjectVariables
 > = gql`
   mutation AddCvProject($project: AddCvProjectInput!) {
@@ -150,7 +150,7 @@ export const ADD_CV_PROJECT_MUTATION: TypedDocumentNode<
 `;
 
 export const UPDATE_CV_PROJECT: TypedDocumentNode<
-  ICvResponce,
+  { updateCvProject: ICvResponce },
   IAddCvProjectVariables
 > = gql`
   mutation UpdateCvProject($project: UpdateCvProjectInput!) {
@@ -171,7 +171,7 @@ export const UPDATE_CV_PROJECT: TypedDocumentNode<
 `;
 
 export const DELETE_CV_PROJECT: TypedDocumentNode<
-  ICvResponce,
+  { removeCvProject: ICvResponce },
   IDeleteCvProjectVariables
 > = gql`
   mutation RemoveCvProject($project: RemoveCvProjectInput!) {
@@ -186,7 +186,7 @@ export const DELETE_CV_PROJECT: TypedDocumentNode<
 `;
 
 export const ADD_CV_SKILL: TypedDocumentNode<
-  ICvResponce,
+  { addCvSkill: ICvResponce },
   IAddCvSkillVariables
 > = gql`
   mutation AddCvSkill($skill: AddCvSkillInput!) {
@@ -194,6 +194,7 @@ export const ADD_CV_SKILL: TypedDocumentNode<
       id
       skills {
         name
+        categoryId
         mastery
       }
     }
@@ -201,7 +202,7 @@ export const ADD_CV_SKILL: TypedDocumentNode<
 `;
 
 export const UPDATE_CV_SKILL: TypedDocumentNode<
-  ICvResponce,
+  { updateCvSkill: ICvResponce },
   IProfileSkillVariables
 > = gql`
   mutation UpdateCvSkill($skill: UpdateCvSkillInput!) {
@@ -217,7 +218,7 @@ export const UPDATE_CV_SKILL: TypedDocumentNode<
 `;
 
 export const DELETE_CV_SKILL: TypedDocumentNode<
-  ICvResponce,
+  { deleteCvSkill: ICvResponce },
   IDeleteCvSkillVariables
 > = gql`
   mutation DeleteCvSkill($skill: DeleteCvSkillInput!) {
@@ -225,6 +226,7 @@ export const DELETE_CV_SKILL: TypedDocumentNode<
       id
       skills {
         name
+        categoryId
         mastery
       }
     }

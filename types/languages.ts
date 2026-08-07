@@ -12,6 +12,7 @@ export interface ILanguage {
 export interface IProfileLanguage {
   name: string;
   proficiency: TLanguageProficiency;
+  __typename?: "LanguageProficiency";
 }
 
 export interface IAddProfileLanguageVariables extends OperationVariables {

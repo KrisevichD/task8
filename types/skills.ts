@@ -7,6 +7,7 @@ export interface IProfileSkill {
   name: string;
   categoryId: string;
   mastery: TSkillMastery;
+  __typename?: "SkillMastery";
 }
 
 export interface ISkill {
@@ -34,14 +35,8 @@ export interface IProfileResponce {
   profile: IUserProfile;
 }
 
-export interface IProfileSkillInput {
-  name: string;
-  categoryId: string;
-  mastery: TSkillMastery;
-}
-
 export interface IProfileSkillVariables {
-  skill: IProfileSkillInput;
+  skill: IProfileSkill;
 }
 
 export interface IDeleteProfileSkillVariables {

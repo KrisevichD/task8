@@ -45,7 +45,7 @@ const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
   const projects = cvData.projects;
   const filteredList = !searchQuery
     ? projects
-    : projects.filter((project) => {
+    : projects?.filter((project) => {
         const lowerQuery = searchQuery.trim().toLowerCase();
         const isMatchesName = project.name.toLowerCase().includes(lowerQuery);
         const isMatchesDomain = project.domain
@@ -67,7 +67,7 @@ const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
         );
       });
 
-  if (filteredList.length === 0 && !!searchQuery)
+  if (filteredList?.length === 0 && !!searchQuery)
     return (
       <div className="w-full text-xl text-primary text-center">
         No matches found
@@ -86,7 +86,7 @@ const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {filteredList.map((project) => {
+        {filteredList?.map((project) => {
           const isCurrentHovered = project.id === hoveredProjectId;
           return (
             <React.Fragment key={`cv-projects-${project.id}`}>

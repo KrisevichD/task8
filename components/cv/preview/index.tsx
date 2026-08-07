@@ -18,7 +18,7 @@ import { ICvResponce } from "@/types/cv-constructor";
 import { validateProjectDate } from "@/utils/helpers";
 
 const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
-  const userId = cvData.user.id;
+  const userId = cvData.user?.id;
   const { skillCategories } = useSkills();
   const { fullName, positionName, languages } = useMe(userId);
   const { printRef, handleDownloadPdf } = useExportPdf();
@@ -28,11 +28,11 @@ const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
   const skills = cvData.skills;
   const filteredSkills = skillCategories
     .filter((category) =>
-      skills.some((skill) => skill.categoryId === category.id),
+      skills?.some((skill) => skill.categoryId === category.id),
     )
     .map((category) => ({
       ...category,
-      skills: skills.filter((skill) => skill.categoryId === category.id),
+      skills: skills?.filter((skill) => skill.categoryId === category.id),
     }));
 
   return (
@@ -72,7 +72,7 @@ const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
             </ul>
             <h3>Domains</h3>
             <ul>
-              {cvData.projects.map((project) => (
+              {cvData.projects?.map((project) => (
                 <li key={`domain-${project.id}`}>{project.domain}</li>
               ))}
             </ul>
@@ -85,7 +85,7 @@ const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
             return (
               <React.Fragment key={`category-skill-${category.id}`}>
                 <h3>{category.name}</h3>
-                <p>{category.skills.map((skill) => skill.name).join(", ")}</p>
+                <p>{category.skills?.map((skill) => skill.name).join(", ")}</p>
               </React.Fragment>
             );
           })}
@@ -95,9 +95,9 @@ const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
         <h2 className="text-[34px] font-normal tracking-wide my-7.5">
           Projects
         </h2>
-        {cvData.projects.map((project) => {
+        {cvData.projects?.map((project) => {
           return (
-            <article key={`project-${project.id}`} className="flex">
+            <article key={`project-${project.id}`} className="flex mb-15">
               <header className="w-65 min-w-65 py-4 pr-4">
                 <h3 className="uppercase text-primary">{project.name}</h3>
                 <p>{project.description}</p>
@@ -150,7 +150,7 @@ const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
                     {category.name}
                   </TableCell>
                   <TableCell className="space-y-5 pb-7 px-4 pt-2.5">
-                    {category.skills.map((skill) => (
+                    {category.skills?.map((skill) => (
                       <p key={`skill-${skill.name}`}>{skill.name}</p>
                     ))}
                   </TableCell>

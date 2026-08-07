@@ -1,11 +1,12 @@
 import { gql, TypedDocumentNode } from "@apollo/client";
 
+import { IUserProfile } from "../user/queries";
+
 import {
   IAddProfileLanguageVariables,
   IDeleteProfileLanguageVariables,
   ILanguage,
 } from "@/types/languages";
-import { IProfileResponce } from "@/types/skills";
 
 export const GET_ALL_LANGUAGES: TypedDocumentNode<
   { languages: ILanguage[] },
@@ -21,7 +22,7 @@ export const GET_ALL_LANGUAGES: TypedDocumentNode<
 `;
 
 export const ADD_PROFILE_LANGUAGE: TypedDocumentNode<
-  IProfileResponce,
+  { addProfileLanguage: IUserProfile },
   IAddProfileLanguageVariables
 > = gql`
   mutation AddProfileLanguage($language: AddProfileLanguageInput!) {
@@ -36,7 +37,7 @@ export const ADD_PROFILE_LANGUAGE: TypedDocumentNode<
 `;
 
 export const UPDATE_PROFILE_LANGUAGE: TypedDocumentNode<
-  IProfileResponce,
+  { updateProfileLanguage: IUserProfile },
   IAddProfileLanguageVariables
 > = gql`
   mutation UpdateProfileLanguage($language: UpdateProfileLanguageInput!) {
@@ -51,7 +52,7 @@ export const UPDATE_PROFILE_LANGUAGE: TypedDocumentNode<
 `;
 
 export const DELETE_PROFILE_LANGUAGE: TypedDocumentNode<
-  IProfileResponce,
+  { deleteProfileLanguage: IUserProfile },
   IDeleteProfileLanguageVariables
 > = gql`
   mutation DeleteProfileLanguage($language: DeleteProfileLanguageInput!) {

@@ -106,11 +106,17 @@ const SkillsContent = ({ userId }: { userId?: string }) => {
         </div>
 
         <div className="flex justify-end gap-4 w-fill sticky bottom-1">
-          <SkillsForm
-            userId={userId}
-            selectedSkills={selectedSkills}
-            cancelEditing={cancelEditing}
-          />
+          {selectedSkills.length > 1 ? (
+            <Button variant={"outline"} onClick={() => setSelectedSkills([])}>
+              CANCEL
+            </Button>
+          ) : (
+            <SkillsForm
+              userId={userId}
+              selectedSkills={selectedSkills}
+              cancelEditing={cancelEditing}
+            />
+          )}
 
           {selectedSkills.length > 0 ? (
             <Button variant={"primary"} onClick={deletePressedSkills}>

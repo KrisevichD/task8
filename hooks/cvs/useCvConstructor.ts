@@ -24,7 +24,7 @@ import { validateDateString } from "@/utils/helpers";
 
 export default function useCvConstructor(cvId: string) {
   const [createProject] = useMutation(CREATE_PROJECT_MUTATION);
-  const [deleteProject, {}] = useMutation(DELETE_PROJECT, {
+  const [deleteProject] = useMutation(DELETE_PROJECT, {
     refetchQueries: ["GetCv"],
   });
   const [
@@ -45,7 +45,15 @@ export default function useCvConstructor(cvId: string) {
     variables: { cvId: cvId },
     skip: !cvId,
   });
+
   const cvData = data?.cv;
+  const currentSkills: IProfileSkill[] =
+    cvData?.skills?.map((skill) => ({
+      __typename: "SkillMastery",
+      name: skill.name,
+      categoryId: skill.categoryId,
+      mastery: skill.mastery,
+    })) || [];
 
   const addCvProject = async (input: ICreateCvProjectForm) => {
     const { responsibilities, ...createProjectData } = input;
@@ -121,11 +129,29 @@ export default function useCvConstructor(cvId: string) {
   };
 
   const addCvSkill = (input: IProfileSkill) => {
+    if (!cvData) return;
     const data = {
       cvId: cvId,
       ...input,
     };
-    const promise = executeAddCvSkill({ variables: { skill: data } });
+    const promise = executeAddCvSkill({
+      variables: { skill: data },
+      optimisticResponse: {
+        addCvSkill: {
+          ...cvData,
+          __typename: "Cv",
+          skills: [
+            ...currentSkills,
+            {
+              __typename: "SkillMastery",
+              name: input.name,
+              categoryId: input.categoryId,
+              mastery: input.mastery,
+            },
+          ],
+        },
+      },
+    });
     toast.promise(promise, {
       loading: "Adding skill",
       success: "Successfully added",
@@ -135,11 +161,30 @@ export default function useCvConstructor(cvId: string) {
   };
 
   const updateCvSkill = (input: IProfileSkill) => {
+    if (!cvData) return;
     const data = {
       cvId: cvId,
       ...input,
     };
-    const promise = executeUpdateCvSkill({ variables: { skill: data } });
+    const promise = executeUpdateCvSkill({
+      variables: { skill: data },
+      optimisticResponse: {
+        updateCvSkill: {
+          ...cvData,
+          __typename: "Cv",
+          skills: currentSkills.map((skill) =>
+            skill.name === input.name
+              ? {
+                  __typename: "SkillMastery",
+                  name: input.name,
+                  categoryId: input.categoryId,
+                  mastery: input.mastery,
+                }
+              : skill,
+          ),
+        },
+      },
+    });
     toast.promise(promise, {
       loading: "Updating skill",
       success: "Successfully updated",
@@ -149,11 +194,21 @@ export default function useCvConstructor(cvId: string) {
   };
 
   const deleteCvSkill = (input: string[]) => {
+    if (!cvData) return;
     const promise = executeDeleteCvSkill({
       variables: {
         skill: {
           cvId: cvId,
           name: input,
+        },
+      },
+      optimisticResponse: {
+        deleteCvSkill: {
+          ...cvData,
+          __typename: "Cv",
+          skills: currentSkills.filter(
+            (skill) => !input.some((e) => e === skill.name),
+          ),
         },
       },
     });

@@ -10,6 +10,7 @@ export interface IUserProfile {
   avatar?: string;
   skills?: IProfileSkill[];
   languages?: IProfileLanguage[];
+  __typename?: "Profile";
 }
 
 export interface IUserData {

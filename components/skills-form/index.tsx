@@ -15,8 +15,6 @@ import {
 import { FloatingSelect } from "@/components/ui/floating-select";
 import { Icon } from "@/components/ui/icon";
 import { SelectItem } from "@/components/ui/select";
-import { useLanguage } from "@/context/language";
-import { useMe } from "@/hooks/auth/useMe";
 import useSkills from "@/hooks/skills/useSkills";
 import { IProfileSkill, ISkill, TSkillMastery } from "@/types/skills";
 
@@ -29,24 +27,28 @@ const SkillsForm = ({
   cancelEditing: () => void;
   userId?: string;
 }) => {
-  const { t } = useLanguage();
   const isEditing = selectedSkills.length === 1;
   const action = isEditing ? "Update" : "Add";
   const [isOpen, setIsOpen] = useState(false);
   const [skill, setSkill] = useState<ISkill | null>(null);
-  const [skillMastery, setSkillMastery] = useState<TSkillMastery>(
-    isEditing ? selectedSkills[0].mastery : "Novice",
-  );
-  const { skills: profileSkills } = useMe(userId);
+  const [skillMastery, setSkillMastery] = useState<TSkillMastery>("Novice");
   const {
     getAllSkills,
-    skills,
+    filteredSkills,
     isSkillsLoading,
     addProfileSkill,
-    isAddingLoading,
     updateProfileSkill,
     isUpdatingLoading,
   } = useSkills(userId);
+
+  const [prevSelectedSkill, setPrevSelectedSkill] = useState<string | null>(
+    null,
+  );
+  const currentSelectedSkill = isEditing ? selectedSkills[0].name : null;
+  if (currentSelectedSkill !== prevSelectedSkill) {
+    setPrevSelectedSkill(currentSelectedSkill);
+    setSkillMastery(isEditing ? selectedSkills[0].mastery : "Novice");
+  }
 
   useEffect(() => {
     if (isOpen) {
@@ -68,6 +70,8 @@ const SkillsForm = ({
       toast.error("Choose skill", { position: "top-right" });
       return;
     }
+
+    setIsOpen(false);
     const categoryId = submitSkill.category.id;
     const data = {
       name: submitSkill.name,
@@ -79,13 +83,8 @@ const SkillsForm = ({
     } else {
       await addProfileSkill(data);
     }
-    setIsOpen(false);
     cancelEditing();
   };
-
-  const filteredSkills = skills?.skills.filter(
-    (skill) => !profileSkills?.some((e) => e.name === skill.name),
-  );
 
   return (
     <>
@@ -93,7 +92,7 @@ const SkillsForm = ({
         <DialogTrigger
           render={
             <Button variant={"ghost"} className={"uppercase"}>
-              <Icon variant="add" />
+              {!isEditing && <Icon variant="add" />}
               {action} SKILL
             </Button>
           }
@@ -107,9 +106,9 @@ const SkillsForm = ({
               label="Skill"
               value={isEditing ? selectedSkills[0].name : (skill?.name ?? "")}
               onValueChange={(value) =>
-                setSkill(skills?.skills.find((e) => e.name === value) ?? null)
+                setSkill(filteredSkills?.find((e) => e.name === value) ?? null)
               }
-              disabled={isSkillsLoading || isAddingLoading || isEditing}
+              disabled={isSkillsLoading || isEditing}
             >
               {filteredSkills?.map((skill) => {
                 return (
@@ -127,7 +126,7 @@ const SkillsForm = ({
               label="Skill mastery"
               value={skillMastery}
               onValueChange={(value) => setSkillMastery(value as TSkillMastery)}
-              disabled={isSkillsLoading || isAddingLoading}
+              disabled={isSkillsLoading}
             >
               <SelectItem value={"Novice"}>Novice</SelectItem>
               <SelectItem value={"Advanced"}>Advanced</SelectItem>
@@ -144,7 +143,6 @@ const SkillsForm = ({
               className={"uppercase"}
               disabled={
                 isSkillsLoading ||
-                isAddingLoading ||
                 isUpdatingLoading ||
                 (isEditing && skillMastery === selectedSkills[0].mastery)
               }

@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client/react";
 
-import { Employee } from "@/contents/employees/index";
+import { Employee } from "@/contents/employees/table";
 import { GET_EMPLOYEES } from "@/graphql/employees/queries";
 
 export const useEmployees = () => {

@@ -94,12 +94,18 @@ const CvSkills = ({ cvData }: { cvData: ICvResponce }) => {
       ))}
 
       <div className="flex justify-end w-fill gap-4 sticky bottom-1">
-        <CvSkillsForm
-          userId={cvData.user.id}
-          cvData={cvData}
-          selectedSkills={selectedSkills}
-          cancelEditing={() => setSelectedSkills([])}
-        />
+        {selectedSkills.length > 1 ? (
+          <Button variant={"outline"} onClick={() => setSelectedSkills([])}>
+            CANCEL
+          </Button>
+        ) : (
+          <CvSkillsForm
+            userId={cvData.user?.id}
+            cvData={cvData}
+            selectedSkills={selectedSkills}
+            cancelEditing={() => setSelectedSkills([])}
+          />
+        )}
 
         {selectedSkills.length > 0 ? (
           <Button variant={"primary"} onClick={deletePressedSkills}>

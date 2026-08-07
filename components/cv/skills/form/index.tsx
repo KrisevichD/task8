@@ -15,7 +15,6 @@ import {
 import { FloatingSelect } from "@/components/ui/floating-select";
 import { Icon } from "@/components/ui/icon";
 import { SelectItem } from "@/components/ui/select";
-import { useLanguage } from "@/context/language";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import useSkills from "@/hooks/skills/useSkills";
 import { ICvResponce } from "@/types/cv-constructor";
@@ -29,17 +28,14 @@ const CvSkillsForm = ({
 }: {
   selectedSkills: IProfileSkill[];
   cancelEditing: () => void;
-  userId: string;
+  userId?: string;
   cvData: ICvResponce;
 }) => {
-  const { t } = useLanguage();
   const isEditing = selectedSkills.length === 1;
   const action = isEditing ? "Update" : "Add";
   const [isOpen, setIsOpen] = useState(false);
   const [skill, setSkill] = useState<ISkill | null>(null);
-  const [skillMastery, setSkillMastery] = useState<TSkillMastery>(
-    isEditing ? selectedSkills[0].mastery : "Novice",
-  );
+  const [skillMastery, setSkillMastery] = useState<TSkillMastery>("Novice");
   const { addCvSkill, updateCvSkill } = useCvConstructor(cvData.id);
   const {
     getAllSkills,
@@ -47,7 +43,16 @@ const CvSkillsForm = ({
     isSkillsLoading,
     isAddingLoading,
     isUpdatingLoading,
-  } = useSkills(userId, cvData?.id);
+  } = useSkills(userId);
+
+  const [prevSelectedSkill, setPrevSelectedSkill] = useState<string | null>(
+    null,
+  );
+  const currentSelectedSkill = isEditing ? selectedSkills[0].name : null;
+  if (currentSelectedSkill !== prevSelectedSkill) {
+    setPrevSelectedSkill(currentSelectedSkill);
+    setSkillMastery(isEditing ? selectedSkills[0].mastery : "Novice");
+  }
 
   useEffect(() => {
     if (isOpen) {
@@ -69,6 +74,7 @@ const CvSkillsForm = ({
       toast.error("Choose skill", { position: "top-right" });
       return;
     }
+    setIsOpen(false);
     const categoryId = submitSkill.category.id;
     const data = {
       name: submitSkill.name,
@@ -80,7 +86,6 @@ const CvSkillsForm = ({
     } else {
       await addCvSkill(data);
     }
-    setIsOpen(false);
     cancelEditing();
   };
 
@@ -94,7 +99,7 @@ const CvSkillsForm = ({
         <DialogTrigger
           render={
             <Button variant={"ghost"} className={"uppercase"}>
-              <Icon variant="add" />
+              {!isEditing && <Icon variant="add" />}
               {action} SKILL
             </Button>
           }
@@ -108,7 +113,7 @@ const CvSkillsForm = ({
               label="Skill"
               value={isEditing ? selectedSkills[0].name : (skill?.name ?? "")}
               onValueChange={(value) =>
-                setSkill(skills?.skills.find((e) => e.name === value) ?? null)
+                setSkill(filteredSkills?.find((e) => e.name === value) ?? null)
               }
               disabled={isSkillsLoading || isAddingLoading || isEditing}
             >

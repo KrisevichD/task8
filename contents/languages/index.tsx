@@ -70,7 +70,7 @@ export const LanguagesContent = ({
   if (!languages || isLoading) return <Spinner />;
 
   return (
-    <div className="w-full space-y-6 pt-4 my-4">
+    <div className="space-y-6 mt-4 ml-6 mr-6.5 xl:ml-42.25 xl:mr-42.75">
       <div className="flex flex-wrap gap-2">
         {languages.map((language) => {
           const isSelected = selectedLanguages.includes(language);
@@ -101,12 +101,17 @@ export const LanguagesContent = ({
       </div>
 
       <div className="flex justify-end gap-4 w-full pt-4">
-        <LanguagesForm
-          userId={userId}
-          selectedLanguages={selectedLanguages}
-          cancelEditing={() => setSelectedLanguages([])}
-        />
-
+        {selectedLanguages.length > 1 ? (
+          <Button variant={"outline"} onClick={() => setSelectedLanguages([])}>
+            CANCEL
+          </Button>
+        ) : (
+          <LanguagesForm
+            userId={userId}
+            selectedLanguages={selectedLanguages}
+            cancelEditing={() => setSelectedLanguages([])}
+          />
+        )}
         {selectedLanguages.length > 0 ? (
           <Button variant="primary" onClick={deletePressedLanguages}>
             DELETE
