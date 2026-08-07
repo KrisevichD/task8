@@ -78,8 +78,8 @@ export const Sidebar = () => {
             <UserSkeleton />
           ) : (
             <Link
-              href="/settings"
-              className="flex items-center gap-3 overflow-hidden p-1.5 -ml-1.5 rounded-lg transition-all duration-200 hover:bg-secondary/50 group cursor-pointer"
+              href={`/employees/${userId}`}
+              className="flex items-center gap-3 overflow-hidden  rounded-lg transition-all duration-200 hover:bg-secondary/50 group cursor-pointer"
             >
               <Avatar size="lg" className="max-lg:size-7 shrink-0">
                 <AvatarImage src={avatarUrl} alt={fullName} />
@@ -98,7 +98,6 @@ export const Sidebar = () => {
             onClick={logout}
             variant={"ghost"}
             size={"icon"}
-            // className="p-1 text-muted-foreground hover:text-foreground transition-colors max-lg:hidden cursor-pointer"
           >
             <Icon variant="arrow-back" label="Log out" />
           </Button>

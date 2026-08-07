@@ -67,7 +67,7 @@ export const LanguagesContent = ({
 
   if (error)
     return <div className="p-4 text-destructive">Error loading languages</div>;
-  if (!languages || isLoading) return <Spinner />;
+  if (!languages || isLoading) return null;
 
   return (
     <div className="space-y-6 mt-4 ml-6 mr-6.5 xl:ml-42.25 xl:mr-42.75">

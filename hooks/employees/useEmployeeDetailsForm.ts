@@ -64,11 +64,9 @@ export const useEmployeeDetailsForm = (userId: string, user?: IUserData) => {
         positionId: user.position_name || "",
       });
     }
-  }, [user, reset]);
+  }, [user?.id, reset]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!isOwner) return;
-
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 0.5 * 1024 * 1024) {
@@ -89,8 +87,6 @@ export const useEmployeeDetailsForm = (userId: string, user?: IUserData) => {
   };
 
   const onSubmit = async (values: IProfileFormValues) => {
-    if (!isOwner) return;
-
     const selectedDeptObj = departments.find(
       (d) => d.name === values.departmentId || d.id === values.departmentId,
     );
@@ -114,7 +110,7 @@ export const useEmployeeDetailsForm = (userId: string, user?: IUserData) => {
   };
 
   const isAvatarChanged = Boolean(avatarFile);
-  const canSubmit = isOwner && (isDirty || isAvatarChanged) && isValid;
+  const canSubmit = (isDirty || isAvatarChanged) && isValid;
 
   return {
     form,

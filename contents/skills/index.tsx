@@ -19,7 +19,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import SkillBadge from "@/components/ui/skill-badge";
-import { Spinner } from "@/components/ui/spinner";
 import { Toggle } from "@/components/ui/toggle";
 import { useMe } from "@/hooks/auth/useMe";
 import useSkills from "@/hooks/skills/useSkills";
@@ -57,9 +56,10 @@ const SkillsContent = ({ userId }: { userId?: string }) => {
     setSelectedSkills([]);
   };
 
-  if (error) return <>Error</>;
+  if (error)
+    return <div className="p-4 text-destructive">Error loading skills</div>;
   if (!skills || isLoading || !skillCategories || isCategoriesLoading)
-    return <Spinner />;
+    return null;
 
   const filteredList = skillCategories
     .filter((category) =>
