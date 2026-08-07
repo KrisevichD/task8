@@ -79,7 +79,7 @@ export const Sidebar = () => {
           ) : (
             <Link
               href={`/employees/${userId}`}
-              className="flex items-center gap-3 overflow-hidden  rounded-lg transition-all duration-200 hover:bg-secondary/50 group cursor-pointer"
+              className="flex items-center gap-3 overflow-hidden  p-2 -ml-2  rounded-lg transition-all duration-200 hover:bg-secondary/50 group cursor-pointer"
             >
               <Avatar size="lg" className="max-lg:size-7 shrink-0">
                 <AvatarImage src={avatarUrl} alt={fullName} />

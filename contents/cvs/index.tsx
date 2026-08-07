@@ -13,13 +13,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { SearchInput } from "@/components/ui/search-input";
+import { Spinner } from "@/components/ui/spinner";
 import { useLanguage } from "@/context/language";
 import { CREATE_CV_MUTATION } from "@/graphql/cvs";
-import { GET_CVS } from "@/graphql/cvs/queries";
+import { GET_CVS, ICv } from "@/graphql/cvs/queries";
 import useCreateCv from "@/hooks/cvs/useCreateCv";
+import { useDeleteCv } from "@/hooks/cvs/useDeleteCv";
 
 const CvsContent = () => {
   const [search, setSearch] = useState("");
+  const { deleteCv } = useDeleteCv();
+  const handleDeleteCv = async (cv: ICv) => {
+    deleteCv(cv.id);
+  };
   const { data, loading: isLoadingCvs, error } = useQuery(GET_CVS);
   const { createCv, isLoading: isCreating } = useCreateCv(CREATE_CV_MUTATION);
   const { t } = useLanguage();
@@ -53,10 +59,9 @@ const CvsContent = () => {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden w-full pt-4">
-      {/* Зафиксированная шапка: Хлебные крошки и поиск с кнопкой */}
+    <div className="flex flex-col h-full w-full pt-4 relative">
       <div className="shrink-0 space-y-3 pb-3">
-        <div className="pl-11 pr-8">
+        <div className="pl-11">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="text-muted-foreground font-normal">
@@ -66,7 +71,7 @@ const CvsContent = () => {
           </Breadcrumb>
         </div>
 
-        <div className="flex items-center justify-between pl-5 pr-8">
+        <div className="flex items-center justify-between pl-5">
           <SearchInput value={search} onChange={setSearch} />
 
           <Button
@@ -81,13 +86,13 @@ const CvsContent = () => {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 pr-8">
+      <div className="flex-1 min-h-0">
         {isLoadingCvs ? (
-          <div className="p-8 text-center text-muted-foreground">
-            {t("search")}...
+          <div className="fixed inset-0 left-0 lg:left-50 flex items-center justify-center pointer-events-none">
+            <Spinner />
           </div>
         ) : (
-          <CvTable items={filteredCvs} />
+          <CvTable items={filteredCvs} onDelete={handleDeleteCv} />
         )}
       </div>
     </div>
