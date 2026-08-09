@@ -37,7 +37,6 @@ export const LanguageProvider = ({
   children: React.ReactNode;
   initialLanguage?: Language;
 }) => {
-  // 🔑 Инициализация сразу берёт нужный язык (без useEffect и без перезаписи)
   const [language, setLanguageState] = useState<Language>(
     () => initialLanguage || getLanguageFromCookie(),
   );
