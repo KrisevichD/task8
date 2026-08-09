@@ -39,20 +39,20 @@ export default async function RootLayout({
       className={cn("h-full", "antialiased", roboto.variable)}
     >
       <body className="min-h-screen">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Providers>
-            <LanguageProvider initialLanguage={initialLanguage}>
+        <LanguageProvider initialLanguage={initialLanguage}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Providers>
               {children}
-            </LanguageProvider>
-          </Providers>
-        </ThemeProvider>
+            </Providers>
+          </ThemeProvider>
 
-        <Toaster />
+          <Toaster />
+        </LanguageProvider>
       </body>
     </html>
   );
