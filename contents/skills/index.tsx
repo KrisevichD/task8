@@ -16,16 +16,24 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import SkillBadge from "@/components/ui/skill-badge";
+import { Spinner } from "@/components/ui/spinner";
 import { Toggle } from "@/components/ui/toggle";
+import { useLanguage } from "@/context/language";
 import { useMe } from "@/hooks/auth/useMe";
 import useSkills from "@/hooks/skills/useSkills";
 
 import { IProfileSkill } from "@/types/skills";
 
 const SkillsContent = ({ userId }: { userId?: string }) => {
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const { skillCategories, isCategoriesLoading, deleteProfileSkills } =
     useSkills(userId);
@@ -59,7 +67,7 @@ const SkillsContent = ({ userId }: { userId?: string }) => {
   if (error)
     return <div className="p-4 text-destructive">Error loading skills</div>;
   if (!skills || isLoading || !skillCategories || isCategoriesLoading)
-    return null;
+    return <Spinner />;
 
   const filteredList = skillCategories
     .filter((category) =>
@@ -72,12 +80,17 @@ const SkillsContent = ({ userId }: { userId?: string }) => {
 
   return (
     <>
+      <Breadcrumb className="ml-11 mt-4">
+        <BreadcrumbList>
+          <BreadcrumbItem>{t("skills")}</BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <div className="ml-6 mr-6.5 xl:ml-42.25 xl:mr-42.75">
         <div className="pl-6 pt-8">
           {filteredList.map((category) => (
             <div key={`category-${category.id}`}>
-              <h2 className="font-normal mt-8 mb-4">{category.name}</h2>
-              <ul className="flex flex-wrap">
+              <h2 className="font-normal mb-4">{category.name}</h2>
+              <ul className="flex flex-wrap mb-8">
                 {category.skills.map((skill) => {
                   return (
                     <li key={`profile-skill-${skill.name}`}>
@@ -107,8 +120,12 @@ const SkillsContent = ({ userId }: { userId?: string }) => {
 
         <div className="flex justify-end gap-4 w-fill sticky bottom-1">
           {selectedSkills.length > 1 ? (
-            <Button variant={"outline"} onClick={() => setSelectedSkills([])}>
-              CANCEL
+            <Button
+              variant={"outline"}
+              className={"uppercase"}
+              onClick={() => setSelectedSkills([])}
+            >
+              {t("cancel")}
             </Button>
           ) : (
             <SkillsForm
@@ -119,8 +136,12 @@ const SkillsContent = ({ userId }: { userId?: string }) => {
           )}
 
           {selectedSkills.length > 0 ? (
-            <Button variant={"primary"} onClick={deletePressedSkills}>
-              DELETE
+            <Button
+              variant={"primary"}
+              className={"uppercase"}
+              onClick={deletePressedSkills}
+            >
+              {t("delete")}
               <Badge
                 variant={"primary"}
                 className="bg-primary-foreground text-primary font-bold"
@@ -134,25 +155,30 @@ const SkillsContent = ({ userId }: { userId?: string }) => {
                 render={
                   <Button
                     variant={"ghost"}
-                    className={"text-primary hover:text-primary"}
+                    className={"text-primary hover:text-primary uppercase"}
                     disabled={!skills || skills.length <= 0}
                   >
                     <Icon variant="delete" />
-                    REMOVE SKILLS
+                    {t("remove") + " " + t("skills")}
                   </Button>
                 }
               />
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogTitle>{t("alertWarning")}</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will clear list of skills.
+                    {t("alertSkills")}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={deleteAllSkills}>
-                    Continue
+                  <AlertDialogCancel className={"uppercase"}>
+                    {t("cancel")}
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    className={"uppercase"}
+                    onClick={deleteAllSkills}
+                  >
+                    {t("continue")}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

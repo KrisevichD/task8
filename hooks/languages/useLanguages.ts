@@ -4,6 +4,7 @@ import { toast } from "sonner";
 
 import { useMe } from "../auth/useMe";
 
+import { useLanguage } from "@/context/language";
 import {
   ADD_PROFILE_LANGUAGE,
   DELETE_PROFILE_LANGUAGE,
@@ -14,6 +15,7 @@ import { IProfileLanguage } from "@/types/languages";
 import { getUserIdFromToken } from "@/utils/jwt";
 
 export default function useLanguages(customUserId: string) {
+  const { t } = useLanguage();
   const userId = customUserId || getUserIdFromToken() || "";
   const [getAllLanguages, { data: languages, loading: isLanguagesLoading }] =
     useLazyQuery(GET_ALL_LANGUAGES);
@@ -50,9 +52,9 @@ export default function useLanguages(customUserId: string) {
       },
     });
     toast.promise(promise, {
-      loading: "Adding language",
-      success: "Successfully added",
-      error: (err) => err.message,
+      loading: `${t("adding")} ${t("language").toLowerCase()}...`,
+      success: `${t("language")} ${t("successfully")} ${t("added")}!`,
+      error: (err) => `${t("errorMessage")} ${err.message}`,
       position: "top-right",
     });
   };
@@ -82,9 +84,9 @@ export default function useLanguages(customUserId: string) {
       },
     });
     toast.promise(promise, {
-      loading: "Updating language",
-      success: "Successfully updated",
-      error: (err) => err.message,
+      loading: `${t("updating")} ${t("language").toLowerCase()}...`,
+      success: `${t("language")} ${t("successfully")} ${t("updated")}!`,
+      error: (err) => `${t("errorMessage")} ${err.message}`,
       position: "top-right",
     });
   };
@@ -108,9 +110,9 @@ export default function useLanguages(customUserId: string) {
       },
     });
     toast.promise(promise, {
-      loading: "Deleting language",
-      success: "Successfully deleted",
-      error: (err) => err.message,
+      loading: `${t("deleting")} ${t("language").toLowerCase()}...`,
+      success: `${t("language")} ${t("successfully")} ${t("deleted")}!`,
+      error: (err) => `${t("errorMessage")} ${err.message}`,
       position: "top-right",
     });
   };

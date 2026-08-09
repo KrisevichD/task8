@@ -4,6 +4,7 @@ import { toast } from "sonner";
 
 import { useMe } from "../auth/useMe";
 
+import { useLanguage } from "@/context/language";
 import {
   ADD_PROFILE_SKILL,
   DELETE_PROFILE_SKILL,
@@ -15,6 +16,7 @@ import { IProfileSkill } from "@/types/skills";
 import { getUserIdFromToken } from "@/utils/jwt";
 
 export default function useSkills(customUserId?: string) {
+  const { t } = useLanguage();
   const userId = customUserId || getUserIdFromToken();
 
   const { data: skillCategoriesData, loading: isCategoriesLoading } = useQuery(
@@ -61,9 +63,9 @@ export default function useSkills(customUserId?: string) {
     });
 
     toast.promise(promise, {
-      loading: "Adding skill",
-      success: "Successfully added",
-      error: (err) => err.message,
+      loading: `${t("adding")} ${t("skill").toLowerCase()}...`,
+      success: `${t("skill")} ${t("successfully")} ${t("added")}!`,
+      error: (err) => `${t("errorMessage")} ${err.message}`,
       position: "top-right",
     });
   };
@@ -94,9 +96,9 @@ export default function useSkills(customUserId?: string) {
       },
     });
     toast.promise(promise, {
-      loading: "Updating skill mastery",
-      success: "Skill is updated",
-      error: (err) => err.message,
+      loading: `${t("updating")} ${t("skill").toLowerCase()}...`,
+      success: `${t("skill")} ${t("successfully")} ${t("updated")}!`,
+      error: (err) => `${t("errorMessage")} ${err.message}`,
       position: "top-right",
     });
   };
@@ -120,9 +122,9 @@ export default function useSkills(customUserId?: string) {
       },
     });
     toast.promise(promise, {
-      loading: "Deleting skills",
-      success: "Successfully deleted",
-      error: (err) => err.message,
+      loading: `${t("deleting")} ${t("skill").toLowerCase()}...`,
+      success: `${t("skill")} ${t("successfully")} ${t("deleted")}!`,
+      error: (err) => `${t("errorMessage")} ${err.message}`,
       position: "top-right",
     });
   };

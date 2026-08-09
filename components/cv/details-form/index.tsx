@@ -7,10 +7,12 @@ import { FloatingInput } from "../../ui/floating-input";
 import { Button } from "@/components/ui/button";
 import { FloatingTextarea } from "@/components/ui/floating-textarea";
 import { Spinner } from "@/components/ui/spinner";
+import { useLanguage } from "@/context/language";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import { ICvDetailsForm, ICvResponce } from "@/types/cv-constructor";
 
 const CvDetailsForm = ({ cvData }: { cvData: ICvResponce }) => {
+  const { t } = useLanguage();
   const { updateCv } = useCvConstructor(cvData.id);
 
   const {
@@ -51,15 +53,21 @@ const CvDetailsForm = ({ cvData }: { cvData: ICvResponce }) => {
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col items-end gap-9 mt-8 lg:ml-48.25 lg:mr-48.75"
     >
-      <FloatingInput {...register("name")} label="Name" />
-      <FloatingInput {...register("education")} label="Education" />
+      <FloatingInput {...register("name")} label={t("name")} />
+      <FloatingInput {...register("education")} label={t("education")} />
       <FloatingTextarea
         {...register("description")}
         className="min-h-46.25"
-        label="Description"
+        label={t("description")}
       />
-      <Button type="submit" variant={"primary"} size={"lg"} disabled={!isDirty}>
-        UPDATE
+      <Button
+        type="submit"
+        className={"uppercase"}
+        variant={"primary"}
+        size={"lg"}
+        disabled={!isDirty}
+      >
+        {t("update")}
       </Button>
     </form>
   );

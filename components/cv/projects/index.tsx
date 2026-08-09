@@ -9,8 +9,10 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { useLanguage } from "@/context/language";
 
 const CvProjects = () => {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
@@ -19,6 +21,7 @@ const CvProjects = () => {
         <InputGroup variant={"search"} className="w-80">
           <InputGroupInput
             value={searchQuery}
+            placeholder={t("search")}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           <InputGroupAddon align={"inline-start"}>

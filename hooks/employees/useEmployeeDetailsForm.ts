@@ -64,7 +64,7 @@ export const useEmployeeDetailsForm = (userId: string, user?: IUserData) => {
         positionId: user.position_name || "",
       });
     }
-  }, [user?.id, reset]);
+  }, [user?.id, user, reset]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@apollo/client/react";
 
 import { toast } from "sonner";
 
+import { useLanguage } from "@/context/language";
 import {
   ADD_CV_PROJECT_MUTATION,
   ADD_CV_SKILL,
@@ -23,6 +24,7 @@ import { IProfileSkill } from "@/types/skills";
 import { validateDateString } from "@/utils/helpers";
 
 export default function useCvConstructor(cvId: string) {
+  const { t } = useLanguage();
   const [createProject] = useMutation(CREATE_PROJECT_MUTATION);
   const [deleteProject] = useMutation(DELETE_PROJECT, {
     refetchQueries: ["GetCv"],
@@ -78,9 +80,9 @@ export default function useCvConstructor(cvId: string) {
       variables: { project: addProjectData },
     });
     toast.promise(promise, {
-      loading: "Adding project",
-      success: "Successfully added",
-      error: (err) => err.message,
+      loading: `${t("adding")} ${t("project").toLowerCase()}...`,
+      success: `${t("project")} ${t("successfully")} ${t("added")}!`,
+      error: (err) => `${t("errorMessage")} ${err.message}`,
       position: "top-right",
     });
   };
@@ -106,9 +108,9 @@ export default function useCvConstructor(cvId: string) {
       },
     });
     toast.promise(promise, {
-      loading: "Updating project",
-      success: "Successfully updated",
-      error: (err) => err.message,
+      loading: `${t("updating")} ${t("project").toLowerCase()}...`,
+      success: `${t("project")} ${t("successfully")} ${t("updated")}!`,
+      error: (err) => `${t("errorMessage")} ${err.message}`,
       position: "top-right",
     });
   };
@@ -121,9 +123,9 @@ export default function useCvConstructor(cvId: string) {
       variables: { project: { projectId: input.project.project.id } },
     });
     toast.promise(promise, {
-      loading: "Deleting project",
-      success: "Successfully deleted",
-      error: (err) => err.message,
+      loading: `${t("deleting")} ${t("project").toLowerCase()}...`,
+      success: `${t("project")} ${t("successfully")} ${t("deleted")}!`,
+      error: (err) => `${t("errorMessage")} ${err.message}`,
       position: "top-right",
     });
   };
@@ -153,9 +155,9 @@ export default function useCvConstructor(cvId: string) {
       },
     });
     toast.promise(promise, {
-      loading: "Adding skill",
-      success: "Successfully added",
-      error: (err) => err.message,
+      loading: `${t("adding")} ${t("skill").toLowerCase()}...`,
+      success: `${t("skill")} ${t("successfully")} ${t("added")}!`,
+      error: (err) => `${t("errorMessage")} ${err.message}`,
       position: "top-right",
     });
   };
@@ -186,9 +188,9 @@ export default function useCvConstructor(cvId: string) {
       },
     });
     toast.promise(promise, {
-      loading: "Updating skill",
-      success: "Successfully updated",
-      error: (err) => err.message,
+      loading: `${t("updating")} ${t("skill").toLowerCase()}...`,
+      success: `${t("skill")} ${t("successfully")} ${t("updated")}!`,
+      error: (err) => `${t("errorMessage")} ${err.message}`,
       position: "top-right",
     });
   };
@@ -214,9 +216,9 @@ export default function useCvConstructor(cvId: string) {
     });
 
     toast.promise(promise, {
-      loading: "Deleting skill",
-      success: "Successfully deleted",
-      error: (err) => err.message,
+      loading: `${t("deleting")} ${t("skill").toLowerCase()}...`,
+      success: `${t("skill")} ${t("successfully")} ${t("deleted")}!`,
+      error: (err) => `${t("errorMessage")} ${err.message}`,
       position: "top-right",
     });
   };
@@ -224,9 +226,9 @@ export default function useCvConstructor(cvId: string) {
   const updateCv = (input: IUpdateCvInput) => {
     const promise = executeUpdateCv({ variables: { cv: input } });
     toast.promise(promise, {
-      loading: "Updating CV",
-      success: "Successfully updated",
-      error: (err) => err.message,
+      loading: `${t("updating")} ${t("cv")}...`,
+      success: `CV ${t("successfully")} ${t("updated")}!`,
+      error: (err) => `${t("errorMessage")} ${err.message}`,
       position: "top-right",
     });
   };

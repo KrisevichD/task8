@@ -20,6 +20,7 @@ import { FloatingSelect } from "@/components/ui/floating-select";
 import { FloatingTextarea } from "@/components/ui/floating-textarea";
 import { Icon } from "@/components/ui/icon";
 import { SelectItem } from "@/components/ui/select";
+import { useLanguage } from "@/context/language";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import useSkills from "@/hooks/skills/useSkills";
 import { ICreateCvProjectForm } from "@/types/cv-constructor";
@@ -47,8 +48,10 @@ const CvProjectsForm = ({
   closeEditing?: () => void;
   initialData?: ICreateCvProjectForm;
 }) => {
+  const { t } = useLanguage();
   const cvId = useParams().id as string;
   const isEditing = type === "edit" && editingId ? true : false;
+  const action = isEditing ? t("update") : t("add");
   const [isOpen, setIsOpen] = useState(false);
   const { addCvProject, updateCvProject } = useCvConstructor(cvId);
   const { getAllSkills, skills } = useSkills();
@@ -105,14 +108,18 @@ const CvProjectsForm = ({
                 }
               >
                 <Icon variant="add" />
-                <span className="max-lg:sr-only">Add project</span>
+                <span className="max-lg:sr-only uppercase">
+                  {t("add")} {t("project")}
+                </span>
               </Button>
             }
           />
         )}
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{isEditing ? "Upadate" : "Add"} project</DialogTitle>
+            <DialogTitle className={"sentence-case"}>
+              {action} {t("project")}
+            </DialogTitle>
           </DialogHeader>
           <form
             id="project-form"
@@ -122,42 +129,38 @@ const CvProjectsForm = ({
             <div className="grid grid-cols-2 gap-3">
               <FloatingInput
                 {...register("name", {
-                  required: "Project name is required",
-                  minLength: {
-                    value: 2,
-                    message: "Min length is 2 characters",
-                  },
+                  required: `${t("project")}${t("isRequired")}`,
                 })}
-                label="Project"
+                label={t("project")}
                 disabled={isEditing}
               />
               <FloatingInput
                 {...register("domain", {
-                  required: "Domain is required",
+                  required: `${t("domain")}${t("isRequired")}`,
                 })}
-                label="Domain"
+                label={t("domain")}
                 disabled={isEditing}
               />
               <FloatingInput
                 {...register("start_date", {
-                  required: "Start date is required",
+                  required: `${t("startDate")}${t("isRequired")}`,
                 })}
                 type="date"
-                label="Start Date"
+                label={t("startDate")}
               />
               <FloatingInput
                 {...register("end_date", {
-                  required: "End date is required",
+                  required: `${t("endDate")}${t("isRequired")}`,
                 })}
                 type="date"
-                label="End Date"
+                label={t("endDate")}
               />
             </div>
             <FloatingTextarea
               {...register("description", {
-                required: "Description is required",
+                required: `${t("description")}${t("isRequired")}`,
               })}
-              label="Description"
+              label={t("description")}
               disabled={isEditing}
             />
             <Controller
@@ -165,7 +168,7 @@ const CvProjectsForm = ({
               control={control}
               render={({ field }) => (
                 <FloatingSelect
-                  label="Environment"
+                  label={t("environment")}
                   multiple
                   disabled={isEditing}
                   value={field.value}
@@ -184,24 +187,29 @@ const CvProjectsForm = ({
             />
             <FloatingTextarea
               {...register("responsibilities")}
-              label="Responsibilities"
+              label={t("responcibilities")}
             />
           </form>
           <DialogFooter>
             <DialogClose
               render={
-                <Button variant={"outline"} type="button">
-                  CANCEL
+                <Button
+                  variant={"outline"}
+                  className={"uppercase"}
+                  type="button"
+                >
+                  {t("cancel")}
                 </Button>
               }
             />
             <Button
               variant={"primary"}
               type="submit"
+              className={"uppercase"}
               form="project-form"
-              disabled={!isDirty}
+              disabled={!isDirty && isEditing}
             >
-              {isEditing ? "UPDATE" : "ADD"}
+              {action}
             </Button>
           </DialogFooter>
         </DialogContent>

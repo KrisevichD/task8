@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import { useLanguage } from "@/context/language";
 import { useMe } from "@/hooks/auth/useMe";
 import useExportPdf from "@/hooks/cvs/useExportPdf";
 import useSkills from "@/hooks/skills/useSkills";
@@ -18,6 +19,7 @@ import { ICvResponce } from "@/types/cv-constructor";
 import { validateProjectDate } from "@/utils/helpers";
 
 const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
+  const { t } = useLanguage();
   const userId = cvData.user?.id;
   const { skillCategories } = useSkills();
   const { fullName, positionName, languages } = useMe(userId);
@@ -49,18 +51,19 @@ const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
           id="export-pdf-btn"
           variant={"outlinePrimary"}
           size={"sm"}
+          className={"uppercase"}
           onClick={() => handleDownloadPdf()}
           data-html2canvas-ignore
         >
-          EXPORT PDF
+          {t("exportPdf")}
         </Button>
       </header>
       <section className="flex">
         <aside>
           <section className="w-65 py-4 pr-4">
-            <h3>Education</h3>
+            <h3>{t("education")}</h3>
             <p>{cvData.education}</p>
-            <h3>Language proficiency</h3>
+            <h3>{t("languagesProficiency")}</h3>
             <ul>
               {languages?.map((language) => {
                 return (
@@ -70,7 +73,7 @@ const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
                 );
               })}
             </ul>
-            <h3>Domains</h3>
+            <h3>{t("domains")}</h3>
             <ul>
               {cvData.projects?.map((project) => (
                 <li key={`domain-${project.id}`}>{project.domain}</li>
@@ -93,7 +96,7 @@ const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
       </section>
       <section>
         <h2 className="text-[34px] font-normal tracking-wide my-7.5">
-          Projects
+          {t("projects")}
         </h2>
         {cvData.projects?.map((project) => {
           return (
@@ -103,11 +106,11 @@ const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
                 <p>{project.description}</p>
               </header>
               <div className="py-4 pl-6.25 pr-3 border-l border-primary">
-                <h4>Project roles</h4>
+                <h4>{t("projectRoles")}</h4>
                 <p>{positionName}</p>
-                <h4>Period</h4>
+                <h4>{t("period")}</h4>
                 <p>{`${validateProjectDate(project.start_date, "preview")} - ${validateProjectDate(project.end_date, "preview")}`}</p>
-                <h4>Responsibilities</h4>
+                <h4>{t("responcibilities")}</h4>
                 <ul>
                   {project.responsibilities.map((responcibility, index) => (
                     <li
@@ -118,7 +121,7 @@ const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
                     </li>
                   ))}
                 </ul>
-                <h4>Enviroment</h4>
+                <h4>{t("environment")}</h4>
                 {project.environment.join(", ") + "."}
               </div>
             </article>
@@ -127,18 +130,20 @@ const CvPreview = ({ cvData }: { cvData: ICvResponce }) => {
       </section>
       <section>
         <h2 className="text-[34px] font-normal tracking-wide my-7.5">
-          Professional skills
+          {t("professionalSkills")}
         </h2>
         <Table className="text-[14px]">
           <TableHeader>
             <TableRow className=" border-primary font-medium">
-              <TableHead className="align-top px-4 py-2.5">SKILLS</TableHead>
-              <TableHead></TableHead>
-              <TableHead className="align-top px-4 py-2.5 text-center w-28.5">
-                EXPERIENCE <br /> IN YEAR
+              <TableHead className="align-top px-4 py-2.5 uppercase">
+                {t("skills")}
               </TableHead>
-              <TableHead className="align-top px-4 py-2.5 text-center w-35">
-                LAST USED
+              <TableHead></TableHead>
+              <TableHead className="align-top px-4 py-2.5 text-center w-28.5 uppercase">
+                {t("experienceInYears")}
+              </TableHead>
+              <TableHead className="align-top px-4 py-2.5 text-center w-35 uppercase">
+                {t("lastUsed")}
               </TableHead>
             </TableRow>
           </TableHeader>

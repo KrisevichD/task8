@@ -15,6 +15,7 @@ import {
 import { FloatingSelect } from "@/components/ui/floating-select";
 import { Icon } from "@/components/ui/icon";
 import { SelectItem } from "@/components/ui/select";
+import { useLanguage } from "@/context/language";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import useSkills from "@/hooks/skills/useSkills";
 import { ICvResponce } from "@/types/cv-constructor";
@@ -31,8 +32,16 @@ const CvSkillsForm = ({
   userId?: string;
   cvData: ICvResponce;
 }) => {
+  const { t } = useLanguage();
+  const skillMasterySelectItems = [
+    { value: "Novice", label: t("novise") },
+    { value: "Advanced", label: t("advanced") },
+    { value: "Competent", label: t("competent") },
+    { value: "Proficient", label: t("proficient") },
+    { value: "Expert", label: t("expert") },
+  ];
   const isEditing = selectedSkills.length === 1;
-  const action = isEditing ? "Update" : "Add";
+  const action = isEditing ? t("update") : t("add");
   const [isOpen, setIsOpen] = useState(false);
   const [skill, setSkill] = useState<ISkill | null>(null);
   const [skillMastery, setSkillMastery] = useState<TSkillMastery>("Novice");
@@ -71,7 +80,7 @@ const CvSkillsForm = ({
           },
         };
     if (!submitSkill) {
-      toast.error("Choose skill", { position: "top-right" });
+      toast.error(t("toastErrorSkill"), { position: "top-right" });
       return;
     }
     setIsOpen(false);
@@ -100,22 +109,24 @@ const CvSkillsForm = ({
           render={
             <Button variant={"ghost"} className={"uppercase"}>
               {!isEditing && <Icon variant="add" />}
-              {action} SKILL
+              {action} {t("skill")}
             </Button>
           }
         />
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{action} skill</DialogTitle>
+            <DialogTitle className={"sentence-case"}>
+              {action} {t("skill")}
+            </DialogTitle>
           </DialogHeader>
           <form id="cv-skill-form" className="space-y-8" onSubmit={onSubmit}>
             <FloatingSelect
-              label="Skill"
+              label={t("skill")}
               value={isEditing ? selectedSkills[0].name : (skill?.name ?? "")}
               onValueChange={(value) =>
                 setSkill(filteredSkills?.find((e) => e.name === value) ?? null)
               }
-              disabled={isSkillsLoading || isAddingLoading || isEditing}
+              disabled={isSkillsLoading || isEditing}
             >
               {filteredSkills?.map((skill) => {
                 return (
@@ -130,20 +141,27 @@ const CvSkillsForm = ({
             </FloatingSelect>
 
             <FloatingSelect
-              label="Skill mastery"
+              label={t("skillMastery")}
+              items={skillMasterySelectItems}
               value={skillMastery}
               onValueChange={(value) => setSkillMastery(value as TSkillMastery)}
-              disabled={isSkillsLoading || isAddingLoading}
+              disabled={isSkillsLoading}
             >
-              <SelectItem value={"Novice"}>Novice</SelectItem>
-              <SelectItem value={"Advanced"}>Advanced</SelectItem>
-              <SelectItem value={"Competent"}>Competent</SelectItem>
-              <SelectItem value={"Proficient"}>Proficient</SelectItem>
-              <SelectItem value={"Expert"}>Expert</SelectItem>
+              {skillMasterySelectItems.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
             </FloatingSelect>
           </form>
           <DialogFooter>
-            <DialogClose render={<Button variant={"outline"}>CANCEL</Button>} />
+            <DialogClose
+              render={
+                <Button variant={"outline"} className={"uppercase"}>
+                  {t("cancel")}
+                </Button>
+              }
+            />
             <Button
               variant={"primary"}
               type="submit"

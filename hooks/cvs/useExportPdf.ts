@@ -3,9 +3,11 @@ import { useRef } from "react";
 
 import { toast } from "sonner";
 
+import { useLanguage } from "@/context/language";
 import { EXPORT_PDF } from "@/graphql/cv-constructor";
 
 export default function useExportPdf() {
+  const { t } = useLanguage();
   const printRef = useRef<HTMLDivElement>(null);
 
   const [getExportedPdf, { loading: isExporting }] = useMutation(EXPORT_PDF);
@@ -77,7 +79,7 @@ export default function useExportPdf() {
         </html>
       `;
 
-      const { data } = await getExportedPdf({
+      const promise = getExportedPdf({
         variables: {
           pdf: {
             html: fullHtmlPayload,
@@ -91,15 +93,20 @@ export default function useExportPdf() {
         },
       });
 
+      toast.promise(promise, {
+        loading: `${t("downloading")} PDF...`,
+        success: `PDF ${t("successfully")} ${t("downloaded")}!`,
+        error: (err) => `${t("errorMessage")} ${err.message}`,
+        position: "top-right",
+      });
+
+      const { data } = await promise;
+
       if (data?.exportPdf) {
         downloadPdfFromBase64(data?.exportPdf, "resume.pdf");
-        toast.success("PDF successfully downloaded!");
-      } else {
-        toast.error("Failed to generate PDF");
       }
     } catch (error) {
-      console.error("Ошибка при генерации PDF:", error);
-      toast.error("An error occurred during export");
+      console.error("PDF Error:", error);
     }
   };
 

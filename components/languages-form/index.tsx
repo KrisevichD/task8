@@ -15,6 +15,7 @@ import {
 import { FloatingSelect } from "@/components/ui/floating-select";
 import { Icon } from "@/components/ui/icon";
 import { SelectItem } from "@/components/ui/select";
+import { useLanguage } from "@/context/language";
 import useLanguages from "@/hooks/languages/useLanguages";
 import { IProfileLanguage, TLanguageProficiency } from "@/types/languages";
 
@@ -27,8 +28,18 @@ const LanguagesForm = ({
   selectedLanguages: IProfileLanguage[];
   cancelEditing: () => void;
 }) => {
+  const { t } = useLanguage();
+  const languageProficiencySelectItems = [
+    { value: "A1", label: "A1" },
+    { value: "A2", label: "A2" },
+    { value: "B1", label: "B1" },
+    { value: "B2", label: "B2" },
+    { value: "C1", label: "C1" },
+    { value: "C2", label: "C2" },
+    { value: "Native", label: t("native") },
+  ];
   const isEditing = selectedLanguages.length === 1;
-  const action = isEditing ? "Update" : "Add";
+  const action = isEditing ? t("update") : t("add");
   const [isOpen, setIsOpen] = useState(false);
   const [language, setLanguage] = useState<string>("");
   const [languageProficiency, setLanguageProficiency] =
@@ -63,7 +74,7 @@ const LanguagesForm = ({
       proficiency: languageProficiency,
     };
     if (!data.name) {
-      toast.error("Choose language", { position: "top-right" });
+      toast.error(t("toastErrorLanguage"), { position: "top-right" });
       return;
     }
     setIsOpen(false);
@@ -87,17 +98,19 @@ const LanguagesForm = ({
           render={
             <Button variant={"ghost"} className={"uppercase"}>
               {!isEditing && <Icon variant="add" />}
-              {action} LANGUAGE
+              {action} {t("language")}
             </Button>
           }
         />
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{action} language</DialogTitle>
+            <DialogTitle className={"sentence-case"}>
+              {action} {t("language")}
+            </DialogTitle>
           </DialogHeader>
           <form id="language-form" className="space-y-8" onSubmit={onSubmit}>
             <FloatingSelect
-              label="Language"
+              label={t("language")}
               value={isEditing ? selectedLanguages[0].name : language}
               onValueChange={(value) => setLanguage(value as string)}
               disabled={isLanguagesLoading || isEditing}
@@ -115,24 +128,29 @@ const LanguagesForm = ({
             </FloatingSelect>
 
             <FloatingSelect
-              label="Language proficiency"
+              items={languageProficiencySelectItems}
+              label={t("languageProficiency")}
               value={languageProficiency}
               onValueChange={(value) =>
                 setLanguageProficiency(value as TLanguageProficiency)
               }
               disabled={isLanguagesLoading}
             >
-              <SelectItem value={"A1"}>A1</SelectItem>
-              <SelectItem value={"A2"}>A2</SelectItem>
-              <SelectItem value={"B1"}>B1</SelectItem>
-              <SelectItem value={"B2"}>B2</SelectItem>
-              <SelectItem value={"C1"}>C1</SelectItem>
-              <SelectItem value={"C2"}>C2</SelectItem>
-              <SelectItem value={"Native"}>Native</SelectItem>
+              {languageProficiencySelectItems.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
             </FloatingSelect>
           </form>
           <DialogFooter>
-            <DialogClose render={<Button variant={"outline"}>CANCEL</Button>} />
+            <DialogClose
+              render={
+                <Button variant={"outline"} className={"uppercase"}>
+                  {t("cancel")}
+                </Button>
+              }
+            />
             <Button
               variant={"primary"}
               type="submit"

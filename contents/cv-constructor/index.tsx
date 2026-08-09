@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useLanguage } from "@/context/language";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 
 const VALID_TABS = ["details", "projects", "skills", "preview"] as const;
@@ -24,10 +25,13 @@ const DEFAULT_TAB = "details";
 type TTab = (typeof VALID_TABS)[number];
 
 const CvConstructor = ({ cvId }: { cvId: string }) => {
+  const { t } = useLanguage();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const tab = searchParams.get("tab") ?? "";
-  const activeTab = VALID_TABS.includes(tab as TTab) ? tab : DEFAULT_TAB;
+  const activeTab: TTab = VALID_TABS.includes(tab as TTab)
+    ? (tab as TTab)
+    : DEFAULT_TAB;
   const { cvData } = useCvConstructor(cvId);
 
   const handleTabChange = (nextTab: string) => {
@@ -46,10 +50,12 @@ const CvConstructor = ({ cvId }: { cvId: string }) => {
 
   return (
     <div className="px-12 xl:pl-6 xl:pr-6.5 py-4">
-      <Breadcrumb>
+      <Breadcrumb className="mb-1">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink render={<Link href="/cvs" />}>CVs</BreadcrumbLink>
+            <BreadcrumbLink render={<Link href="/cvs" />}>
+              {t("cvs")}
+            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -57,7 +63,9 @@ const CvConstructor = ({ cvId }: { cvId: string }) => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           {activeTab !== "details" && (
-            <BreadcrumbItem className="capitalize">{activeTab}</BreadcrumbItem>
+            <BreadcrumbItem className="capitalize">
+              {t(activeTab)}
+            </BreadcrumbItem>
           )}
         </BreadcrumbList>
       </Breadcrumb>
@@ -68,10 +76,10 @@ const CvConstructor = ({ cvId }: { cvId: string }) => {
         onValueChange={handleTabChange}
       >
         <TabsList className="mb-4">
-          <TabsTrigger value="details">Details</TabsTrigger>
-          <TabsTrigger value="projects">Projects</TabsTrigger>
-          <TabsTrigger value="skills">Skills</TabsTrigger>
-          <TabsTrigger value="preview">Preview</TabsTrigger>
+          <TabsTrigger value="details">{t("details")}</TabsTrigger>
+          <TabsTrigger value="skills">{t("skills")}</TabsTrigger>
+          <TabsTrigger value="projects">{t("projects")}</TabsTrigger>
+          <TabsTrigger value="preview">{t("preview")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="details">

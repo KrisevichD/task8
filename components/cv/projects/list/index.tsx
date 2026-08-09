@@ -23,11 +23,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useLanguage } from "@/context/language";
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
 import { ICvProject } from "@/types/cv-constructor";
 import { validateProjectDate } from "@/utils/helpers";
 
 const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
+  const { t } = useLanguage();
   const cvId = useParams().id as string;
   const { cvData, deleteCvProject } = useCvConstructor(cvId);
   const [editingId, setEditingId] = useState<string>();
@@ -70,7 +72,7 @@ const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
   if (filteredList?.length === 0 && !!searchQuery)
     return (
       <div className="w-full text-xl text-primary text-center">
-        No matches found
+        {t("noMatchesFound")}
       </div>
     );
 
@@ -78,10 +80,10 @@ const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead>Domain</TableHead>
-          <TableHead>Start Date</TableHead>
-          <TableHead>End Date</TableHead>
+          <TableHead>{t("name")}</TableHead>
+          <TableHead>{t("domain")}</TableHead>
+          <TableHead>{t("startDate")}</TableHead>
+          <TableHead>{t("endDate")}</TableHead>
           <TableHead></TableHead>
         </TableRow>
       </TableHeader>
@@ -124,7 +126,7 @@ const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
                         <DropdownMenuItem
                           onClick={() => setEditingId(project.id)}
                         >
-                          Edit
+                          {t("edit")}
                         </DropdownMenuItem>
                       </DropdownMenuGroup>
                       <DropdownMenuSeparator />
@@ -133,7 +135,7 @@ const CvProjectsList = ({ searchQuery }: { searchQuery?: string }) => {
                           variant="destructive"
                           onClick={() => handleDeleteProject(project)}
                         >
-                          Delete
+                          {t("delete")}
                         </DropdownMenuItem>
                       </DropdownMenuGroup>
                     </DropdownMenuContent>

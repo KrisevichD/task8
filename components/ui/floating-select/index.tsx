@@ -8,7 +8,7 @@ import { cn } from "@/utils/shadcn"
 interface FloatingSelectProps extends React.ComponentProps<typeof Select> {
   label: string
   placeholder?: string
-  children: React.ReactNode
+  children?: React.ReactNode
   className?: string
 }
 

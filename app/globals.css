@@ -179,3 +179,11 @@
     @apply font-bold text-[16px]
   }
 }
+
+@utility sentence-case {
+  text-transform: lowercase;
+  
+  &:first-letter {
+    text-transform: uppercase;
+  }
+}
