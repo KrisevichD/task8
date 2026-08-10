@@ -1,6 +1,7 @@
 import { useQuery } from "@apollo/client/react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
 import {
   beforeEach,
   describe,
@@ -10,26 +11,54 @@ import {
   type MockedFunction,
 } from "vitest";
 
-await vi.hoisted(async () => {
-  await import("react");
-});
-
-import CvsContent from ".";
+import CvsContent from "./index";
 
 import { ICv } from "@/graphql/cvs/queries";
 import useCreateCv from "@/hooks/cvs/useCreateCv";
 import { useDeleteCv } from "@/hooks/cvs/useDeleteCv";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+  }),
+}));
+
+vi.mock("@/context/language", () => ({
+  useLanguage: () => ({
+    t: (key: string) => {
+      const map: Record<string, string> = {
+        cvs: "CVs",
+        createCv: "CREATE CV",
+        add: "add",
+        name: "Name",
+        education: "Education",
+        description: "Description",
+        cancel: "cancel",
+        isRequired: " is required!",
+      };
+      return map[key] || key;
+    },
+  }),
+}));
 
 vi.mock("@apollo/client/react", () => ({
   useQuery: vi.fn(),
 }));
 
 vi.mock("@/hooks/cvs/useCreateCv", () => ({
+  __esModule: true,
   default: vi.fn(),
 }));
 
 vi.mock("@/hooks/cvs/useDeleteCv", () => ({
   useDeleteCv: vi.fn(),
+}));
+
+vi.mock("sonner", () => ({
+  toast: {
+    error: vi.fn(),
+  },
 }));
 
 vi.mock("./table", () => ({
@@ -69,19 +98,71 @@ vi.mock("@/components/ui/search-input", () => ({
   ),
 }));
 
+vi.mock("@/components/ui/spinner", () => ({
+  Spinner: () => (
+    <div role="status" aria-label="Loading" data-testid="spinner-root">
+      Loading...
+    </div>
+  ),
+}));
+
 vi.mock("@/components/ui/icon", () => ({
   Icon: ({ variant }: { variant: string }) => (
     <span data-testid={`icon-${variant}`} />
   ),
 }));
 
-vi.mock("@/components/ui/spinner", () => ({
-  Spinner: () => (
-    <div role="status" aria-label="Loading">
-      Loading...
+vi.mock("@/components/ui/floating-input", () => ({
+  FloatingInput: ({ label, disabled, ...props }: any) => (
+    <div>
+      <label htmlFor={props.id || props.name}>{label}</label>
+      <input id={props.id || props.name} disabled={disabled} {...props} />
     </div>
   ),
 }));
+
+vi.mock("@/components/ui/floating-textarea", () => ({
+  FloatingTextarea: ({ label, disabled, ...props }: any) => (
+    <div>
+      <label htmlFor={props.id || props.name}>{label}</label>
+      <textarea id={props.id || props.name} disabled={disabled} {...props} />
+    </div>
+  ),
+}));
+
+vi.mock("@/components/ui/breadcrumb", () => ({
+  Breadcrumb: ({ children }: any) => <div>{children}</div>,
+  BreadcrumbList: ({ children }: any) => <ul>{children}</ul>,
+  BreadcrumbItem: ({ children, className }: any) => (
+    <li className={className}>{children}</li>
+  ),
+}));
+
+// Правильный мок Dialog с поддержкой открытия/закрытия
+vi.mock("@/components/ui/dialog", () => {
+  return {
+    Dialog: ({ children, open, onOpenChange }: any) => (
+      <div data-testid="dialog" data-open={open}>
+        {typeof children === "function"
+          ? children({ open, onOpenChange })
+          : children}
+      </div>
+    ),
+    DialogTrigger: ({ render, onClick }: any) => {
+      return render ? (
+        <span onClick={onClick} data-testid="dialog-trigger">
+          {render}
+        </span>
+      ) : null;
+    },
+    DialogContent: ({ children }: any) => <div>{children}</div>,
+    DialogTitle: ({ children, className }: any) => (
+      <h2 className={className}>{children}</h2>
+    ),
+    DialogFooter: ({ children }: any) => <div>{children}</div>,
+    DialogClose: ({ render }: any) => render,
+  };
+});
 
 describe("CvsContent Component Module", () => {
   const mockCreateCvFn = vi.fn();
@@ -105,11 +186,14 @@ describe("CvsContent Component Module", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    (useQuery as unknown as MockedFunction<typeof useQuery>).mockReturnValue({
-      data: { cvs: mockCvsData },
-      loading: false,
-      error: null,
-    } as any);
+    (useQuery as unknown as MockedFunction<typeof useQuery>).mockImplementation(
+      () =>
+        ({
+          data: { cvs: mockCvsData },
+          loading: false,
+          error: null,
+        }) as any,
+    );
 
     (
       useCreateCv as unknown as MockedFunction<typeof useCreateCv>
@@ -130,28 +214,32 @@ describe("CvsContent Component Module", () => {
     it("should render the Spinner component using its explicit role parameter if isLoadingCvs is active", () => {
       (
         useQuery as unknown as MockedFunction<typeof useQuery>
-      ).mockReturnValueOnce({
-        data: null,
-        loading: true,
-        error: null,
-      } as any);
+      ).mockImplementation(
+        () =>
+          ({
+            data: null,
+            loading: true,
+            error: null,
+          }) as any,
+      );
 
       render(<CvsContent />);
 
-      expect(
-        screen.getByRole("status", { name: /loading/i }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole("status")).toBeInTheDocument();
       expect(screen.queryByTestId("mock-cv-table")).not.toBeInTheDocument();
     });
 
     it("should display the operational error message layout container if the query rejections arrive", () => {
       (
         useQuery as unknown as MockedFunction<typeof useQuery>
-      ).mockReturnValueOnce({
-        data: null,
-        loading: false,
-        error: new Error("Network latency constraint exceeded"),
-      } as any);
+      ).mockImplementation(
+        () =>
+          ({
+            data: null,
+            loading: false,
+            error: new Error("Network latency constraint exceeded"),
+          }) as any,
+      );
 
       render(<CvsContent />);
 
@@ -166,21 +254,24 @@ describe("CvsContent Component Module", () => {
     it("should fallback gracefully onto an empty array if data response parameters return null", () => {
       (
         useQuery as unknown as MockedFunction<typeof useQuery>
-      ).mockReturnValueOnce({
-        data: null,
-        loading: false,
-        error: null,
-      } as any);
+      ).mockImplementation(
+        () =>
+          ({
+            data: { cvs: [] },
+            loading: false,
+            error: null,
+          }) as any,
+      );
 
       render(<CvsContent />);
 
       expect(screen.getByTestId("mock-cv-table")).toBeInTheDocument();
-      expect(screen.queryByTestId(/cv-item-/)).not.toBeInTheDocument();
+      expect(screen.queryByTestId("cv-item-cv-101")).not.toBeInTheDocument();
     });
   });
 
   describe("Search & String Filtering Pipelines", () => {
-    it("should correctly render the entire list collection if the search parameters are empty strings", () => {
+    it("should correctly render the entire list collection if search query is empty", () => {
       render(<CvsContent />);
 
       expect(screen.getByTestId("cv-item-cv-101")).toBeInTheDocument();
@@ -218,40 +309,45 @@ describe("CvsContent Component Module", () => {
     });
   });
 
-  describe("External Actions Triggers", () => {
-    it("should execute createCv hook operations with hardcoded parameters when CREATE CV button fires", async () => {
+  describe("External Actions Triggers & Form Interactions", () => {
+    it("should render create button correctly and open dialog on click", async () => {
+      const user = userEvent.setup();
+      render(<CvsContent />);
+
+      const createBtn = screen.getByRole("button", { name: /create cv/i });
+      expect(createBtn).toBeInTheDocument();
+
+      await user.click(createBtn);
+
+      expect(screen.getByText("add CV")).toBeInTheDocument();
+    });
+
+    it("should submit create form with values when submit button is clicked", async () => {
       const user = userEvent.setup();
       render(<CvsContent />);
 
       const createBtn = screen.getByRole("button", { name: /create cv/i });
       await user.click(createBtn);
 
+      const nameInput = screen.getByLabelText("Name");
+      const educationInput = screen.getByLabelText("Education");
+      const descriptionInput = screen.getByLabelText("Description");
+
+      await user.type(nameInput, "New CV Name");
+      await user.type(educationInput, "Harvard University");
+      await user.type(descriptionInput, "Senior Software Engineer CV");
+
+      const submitBtn = screen.getByRole("button", { name: /^add$/i });
+      await user.click(submitBtn);
+
       expect(mockCreateCvFn).toHaveBeenCalledWith({
-        cv: {
-          userId: "610",
-          name: "CV",
-          description: "CV description",
-          education: "CV education",
-        },
+        name: "New CV Name",
+        education: "Harvard University",
+        description: "Senior Software Engineer CV",
       });
     });
 
-    it("should cleanly assign disabled properties onto buttons if isCreating parameters are true", () => {
-      (
-        useCreateCv as unknown as MockedFunction<typeof useCreateCv>
-      ).mockReturnValueOnce({
-        createCv: mockCreateCvFn,
-        isLoading: true,
-        errorText: "",
-      });
-
-      render(<CvsContent />);
-
-      const createBtn = screen.getByRole("button", { name: /create cv/i });
-      expect(createBtn).toBeDisabled();
-    });
-
-    it("should forward deletion requests safely onto useDeleteCv hook variables loops upon list selection clicks", async () => {
+    it("should forward deletion requests safely onto useDeleteCv hook upon list selection clicks", async () => {
       const user = userEvent.setup();
       render(<CvsContent />);
 

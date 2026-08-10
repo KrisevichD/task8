@@ -18,6 +18,23 @@ vi.mock("next/navigation", () => ({
   useRouter: vi.fn(),
 }));
 
+vi.mock("@/context/language", () => ({
+  useLanguage: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        name: "Name",
+        education: "Education",
+        employee: "Employee",
+        edit: "Edit",
+        delete: "Delete",
+        noResultsFound: "No results found",
+        tryAdjustingSearch: "Try adjusting your search query",
+      };
+      return translations[key] || key;
+    },
+  }),
+}));
+
 vi.mock("lucide-react", () => ({
   ArrowUp: () => <span data-slot="icon-arrow-up">↑</span>,
   ArrowDown: () => <span data-slot="icon-arrow-down">↓</span>,
@@ -128,10 +145,13 @@ describe("CvTable Component Module", () => {
       expect(fallbackDashes.length).toBe(3);
     });
 
-    it("should display a generic searching placeholder if items collection data array arrives empty", () => {
+    it("should display empty state placeholder if items collection data array arrives empty", () => {
       render(<CvTable items={[]} onDelete={mockOnDelete} />);
 
-      expect(screen.getByText("Search...")).toBeInTheDocument();
+      expect(screen.getByText("No results found")).toBeInTheDocument();
+      expect(
+        screen.getByText("Try adjusting your search query"),
+      ).toBeInTheDocument();
     });
   });
 

@@ -1,5 +1,6 @@
 "use client";
-
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { Controller } from "react-hook-form";
 
 import { AvatarSection } from "./avatarSection";
@@ -25,6 +26,7 @@ export const EmployeeDetailsContent = ({
   initialUser,
   isLoading: isUserLoading,
 }: IEmployeeDetailsContentProps) => {
+  const router = useRouter();
   const user = initialUser;
   const { t } = useLanguage();
 
@@ -39,10 +41,14 @@ export const EmployeeDetailsContent = ({
     onSubmit,
   } = useEmployeeDetailsForm(userId, user);
 
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.replace("/employees");
+    }
+  }, [user, isUserLoading, router]);
+
   if (!user) {
-    return (
-      <div className="p-8 text-center text-destructive">User not found</div>
-    );
+    return null;
   }
 
   const initials =

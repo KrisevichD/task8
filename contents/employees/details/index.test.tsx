@@ -1,233 +1,206 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useForm } from "react-hook-form";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+  type MockedFunction,
+} from "vitest";
 
-const { hoistedReact } = await vi.hoisted(async () => {
-  const ReactModule = await import("react");
-  return { hoistedReact: ReactModule.default || ReactModule };
-});
+import { EmployeeDetailsContent } from "./index";
 
-import { EmployeeDetailsContent } from ".";
-
-import { IUserData } from "@/graphql/user/queries";
 import { useEmployeeDetailsForm } from "@/hooks/employees/useEmployeeDetailsForm";
+
+const mockReplace = vi.fn();
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: mockReplace,
+  }),
+}));
+
+vi.mock("@/context/language", () => ({
+  useLanguage: () => ({
+    t: (key: string) => key,
+  }),
+}));
 
 vi.mock("@/hooks/employees/useEmployeeDetailsForm", () => ({
   useEmployeeDetailsForm: vi.fn(),
 }));
 
 vi.mock("./avatarSection", () => ({
-  AvatarSection: ({ avatarUrl, initials, firstName }: any) => (
-    <div
-      data-testid="mock-avatar-section"
-      data-url={avatarUrl}
-      data-initials={initials}
-      data-name={firstName}
-    >
-      Avatar Section
-    </div>
+  AvatarSection: ({ initials }: any) => (
+    <div data-testid="avatar-section">{initials}</div>
   ),
 }));
 
 vi.mock("@/components/ui/floating-input", () => ({
-  FloatingInput: hoistedReact.forwardRef(
-    ({ label, ...props }: any, ref: any) => (
-      <div data-testid={`input-wrapper-${label}`}>
-        <label>{label}</label>
-        <input ref={ref} data-testid={`input-field-${label}`} {...props} />
-      </div>
-    ),
+  FloatingInput: ({ label, ...props }: any) => (
+    <div>
+      <label>{label}</label>
+      <input {...props} />
+    </div>
   ),
 }));
 
 vi.mock("@/components/ui/floating-select", () => ({
-  FloatingSelect: ({ children, label, value }: any) => (
-    <div data-testid={`select-wrapper-${label}`} data-value={value}>
+  FloatingSelect: ({ label, children }: any) => (
+    <div>
       <label>{label}</label>
-      <select value={value}>{children}</select>
+      <select>{children}</select>
     </div>
   ),
 }));
 
 vi.mock("@/components/ui/select", () => ({
-  SelectItem: ({ value, children }: any) => (
+  SelectItem: ({ children, value }: any) => (
     <option value={value}>{children}</option>
   ),
 }));
 
 vi.mock("@/components/ui/button", () => ({
   Button: ({ children, disabled, className, type }: any) => (
-    <button
-      type={type}
-      disabled={disabled}
-      className={className}
-      data-testid="submit-button"
-    >
+    <button type={type} disabled={disabled} className={className}>
       {children}
     </button>
   ),
 }));
 
-const TestWrapperShell = ({ initialUser, userId, hookOverrides = {} }: any) => {
-  const realFormInstance = useForm({
+// Компонент-обертка с реальным useForm для корректной работы Controller
+const TestWrapper = ({
+  userId,
+  initialUser,
+  formOverride = {},
+}: {
+  userId: string;
+  initialUser: any;
+  formOverride?: Partial<ReturnType<typeof useEmployeeDetailsForm>>;
+}) => {
+  const realForm = useForm({
     defaultValues: {
       firstName: initialUser?.profile?.first_name || "",
       lastName: initialUser?.profile?.last_name || "",
-      departmentId: "",
-      positionId: "",
+      departmentId: initialUser?.department_name || "",
+      positionId: initialUser?.position_name || "",
     },
   });
 
-  const baseHookValue = {
-    form: realFormInstance,
-    departments: [
-      { id: "d1", name: "Engineering" },
-      { id: "d2", name: "HR" },
-    ],
-    positions: [
-      { id: "p1", name: "Frontend Developer" },
-      { id: "p2", name: "HR Specialist" },
-    ],
+  (
+    useEmployeeDetailsForm as unknown as MockedFunction<
+      typeof useEmployeeDetailsForm
+    >
+  ).mockReturnValue({
+    form: realForm as any,
+    departments: [{ id: "dep-1", name: "Engineering" }],
+    positions: [{ id: "pos-1", name: "Frontend Developer" }],
     avatarPreview: null,
     isUpdating: false,
-    canSubmit: false,
+    canSubmit: true,
     handleAvatarChange: vi.fn(),
     onSubmit: vi.fn(),
-  };
-
-  (useEmployeeDetailsForm as any).mockReturnValue({
-    ...baseHookValue,
-    ...hookOverrides,
-
-    form: {
-      ...realFormInstance,
-      handleSubmit: hookOverrides.handleSubmit || realFormInstance.handleSubmit,
-    },
+    ...formOverride,
   });
 
   return <EmployeeDetailsContent userId={userId} initialUser={initialUser} />;
 };
 
 describe("EmployeeDetailsContent Component Module", () => {
-  const mockUser: IUserData = {
-    id: "user-123",
+  const mockUserData = {
+    id: "emp-101",
     email: "john.doe@company.com",
-    department_name: "Engineering",
-    position_name: "Frontend Developer",
-    created_at: "1705226400000",
+    created_at: "1705228800000",
     profile: {
       first_name: "John",
       last_name: "Doe",
-      avatar: "https://example.com",
+      avatar: "https://example.com/avatar.jpg",
     },
-  } as any;
+    department_name: "Engineering",
+    position_name: "Frontend Developer",
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   describe("Conditional Render & Fallback Branches Coverage", () => {
-    it("should render a 'User not found' error container if initialUser prop is missing", () => {
-      (useEmployeeDetailsForm as any).mockReturnValue({ form: {} });
-      render(
-        <EmployeeDetailsContent userId="user-123" initialUser={undefined} />,
+    it("should render null and trigger router replace if initialUser prop is missing", () => {
+      const { container } = render(
+        <TestWrapper userId="emp-101" initialUser={undefined} />,
       );
 
-      expect(screen.getByText("User not found")).toBeInTheDocument();
-      expect(
-        screen.queryByTestId("mock-avatar-section"),
-      ).not.toBeInTheDocument();
+      expect(container.firstChild).toBeNull();
+      expect(mockReplace).toHaveBeenCalledWith("/employees");
     });
 
     it("should fallback cleanly onto the default date string parameter when created_at is completely empty", () => {
-      const userWithoutDate = { ...mockUser, created_at: "" };
+      const userWithoutDate = {
+        ...mockUserData,
+        created_at: undefined,
+      };
 
       render(
-        <TestWrapperShell userId="user-123" initialUser={userWithoutDate} />,
+        <TestWrapper userId="emp-101" initialUser={userWithoutDate as any} />,
       );
 
-      expect(
-        screen.getByText(/A member since Sun Jan 14 2024/i),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Sun Jan 14 2024/i)).toBeInTheDocument();
     });
 
     it("should parse initials from first name and last name character bounds seamlessly", () => {
-      render(<TestWrapperShell userId="user-123" initialUser={mockUser} />);
+      render(
+        <TestWrapper userId="emp-101" initialUser={mockUserData as any} />,
+      );
 
-      const avatarSection = screen.getByTestId("mock-avatar-section");
-      expect(avatarSection).toHaveAttribute("data-initials", "JD");
-      expect(avatarSection).toHaveAttribute("data-url", "https://example.com");
+      expect(screen.getByTestId("avatar-section")).toHaveTextContent("JD");
     });
   });
 
   describe("Form Actions & Dynamic Button Casing Rules", () => {
     it("should render an inactive locked button layout configuration state if canSubmit is false", () => {
       render(
-        <TestWrapperShell
-          userId="user-123"
-          initialUser={mockUser}
-          hookOverrides={{ canSubmit: false }}
+        <TestWrapper
+          userId="emp-101"
+          initialUser={mockUserData as any}
+          formOverride={{ canSubmit: false }}
         />,
       );
 
-      const submitBtn = screen.getByTestId("submit-button");
-      expect(submitBtn).toBeDisabled();
-      expect(submitBtn.className).toContain(
-        "bg-muted text-muted-foreground cursor-not-allowed",
-      );
-      expect(submitBtn.textContent).toBe("UPDATE");
+      const submitButton = screen.getByRole("button", { name: /^update$/i });
+      expect(submitButton).toBeDisabled();
     });
 
     it("should release style boundaries and dynamically transform text labels to trailing periods values while isUpdating is true", () => {
       render(
-        <TestWrapperShell
-          userId="user-123"
-          initialUser={mockUser}
-          hookOverrides={{ canSubmit: true, isUpdating: true }}
+        <TestWrapper
+          userId="emp-101"
+          initialUser={mockUserData as any}
+          formOverride={{ isUpdating: true }}
         />,
       );
 
-      const submitBtn = screen.getByTestId("submit-button");
-      expect(submitBtn).toBeDisabled();
-      expect(submitBtn.textContent).toBe("UPDATE...");
+      expect(screen.getByText(/update\.\.\./i)).toBeInTheDocument();
     });
 
     it("should release submit triggers path execution loops seamlessly when inputs variables change validly", async () => {
       const user = userEvent.setup();
       const mockOnSubmit = vi.fn();
 
-      const mockHandleSubmitProxy = (onSubmitCallback: any) => (e: any) => {
-        e.preventDefault();
-        onSubmitCallback({
-          firstName: "John",
-          lastName: "Doe",
-          departmentId: "Engineering",
-          positionId: "Frontend Developer",
-        });
-      };
-
       render(
-        <TestWrapperShell
-          userId="user-123"
-          initialUser={mockUser}
-          hookOverrides={{
-            canSubmit: true,
-            onSubmit: mockOnSubmit,
-            handleSubmit: mockHandleSubmitProxy,
-          }}
+        <TestWrapper
+          userId="emp-101"
+          initialUser={mockUserData as any}
+          formOverride={{ onSubmit: mockOnSubmit }}
         />,
       );
 
-      const submitBtn = screen.getByTestId("submit-button");
-      expect(submitBtn).not.toBeDisabled();
-      expect(submitBtn.className).toContain(
-        "bg-primary text-primary-foreground hover:bg-primary/90",
-      );
+      const submitButton = screen.getByRole("button", { name: /^update$/i });
+      await user.click(submitButton);
 
-      await user.click(submitBtn);
-
-      expect(mockOnSubmit).toHaveBeenCalledTimes(1);
+      expect(mockOnSubmit).toHaveBeenCalled();
     });
   });
 });

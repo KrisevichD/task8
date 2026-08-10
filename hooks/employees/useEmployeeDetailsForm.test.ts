@@ -1,6 +1,6 @@
-// @vitest-environment jsdom
 import { useQuery } from "@apollo/client/react";
 import { act, renderHook, waitFor } from "@testing-library/react";
+import { toast } from "sonner";
 import {
   beforeEach,
   describe,
@@ -12,26 +12,33 @@ import {
 
 import { useEmployeeDetailsForm } from "./useEmployeeDetailsForm";
 
+import { useLanguage } from "@/context/language";
 import { GET_DEPARTMENTS } from "@/graphql/department/queries";
 import { GET_POSITIONS } from "@/graphql/position/queries";
 import { useUpdateUser } from "@/hooks/user/useUpdateUser";
-import { getUserIdFromToken } from "@/utils/jwt";
 
 vi.mock("@apollo/client/react", () => ({
   useQuery: vi.fn(),
+}));
+
+vi.mock("sonner", () => ({
+  toast: {
+    promise: vi.fn(),
+    error: vi.fn(),
+  },
+}));
+
+vi.mock("@/context/language", () => ({
+  useLanguage: vi.fn(),
 }));
 
 vi.mock("@/hooks/user/useUpdateUser", () => ({
   useUpdateUser: vi.fn(),
 }));
 
-vi.mock("@/utils/jwt", () => ({
-  getUserIdFromToken: vi.fn(),
-}));
-
 describe("useEmployeeDetailsForm Hook Module", () => {
   const mockUpdateUserFn = vi.fn();
-  const mockAlert = vi.fn();
+  const mockT = vi.fn((key: string) => key);
 
   const mockUserPayload = {
     id: "user-target-456",
@@ -59,11 +66,12 @@ describe("useEmployeeDetailsForm Hook Module", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.stubGlobal("alert", mockAlert);
 
     (
-      getUserIdFromToken as unknown as MockedFunction<typeof getUserIdFromToken>
-    ).mockReturnValue("user-target-456");
+      useLanguage as unknown as MockedFunction<typeof useLanguage>
+    ).mockReturnValue({
+      t: mockT,
+    } as any);
 
     (
       useUpdateUser as unknown as MockedFunction<typeof useUpdateUser>
@@ -85,47 +93,8 @@ describe("useEmployeeDetailsForm Hook Module", () => {
     );
   });
 
-  describe("🎯 SSR & Owner Authorization Checking Branches", () => {
-    it("should set currentUserId to undefined if executed inside an SSR environment", () => {
-      (
-        getUserIdFromToken as unknown as MockedFunction<
-          typeof getUserIdFromToken
-        >
-      ).mockImplementationOnce(() => {
-        return undefined;
-      });
-
-      const { result } = renderHook(() =>
-        useEmployeeDetailsForm("different-id", mockUserPayload as any),
-      );
-
-      expect(result.current.isOwner).toBe(false);
-    });
-
-    it("should authorize ownership if currentUserId matches target userId parameter", () => {
-      const { result } = renderHook(() =>
-        useEmployeeDetailsForm("user-target-456", mockUserPayload as any),
-      );
-      expect(result.current.isOwner).toBe(true);
-    });
-
-    it("should authorize ownership if currentUserId matches target user object nested id reference", () => {
-      (
-        getUserIdFromToken as unknown as MockedFunction<
-          typeof getUserIdFromToken
-        >
-      ).mockReturnValue("owner-id");
-      const customUser = { id: "owner-id" };
-
-      const { result } = renderHook(() =>
-        useEmployeeDetailsForm("different-id", customUser as any),
-      );
-      expect(result.current.isOwner).toBe(true);
-    });
-  });
-
   describe("🎯 Avatar Modification Upload and File Size Guard Blocks", () => {
-    it("should block asset processing and throw window.alert exceptions if file sizes cross the 0.5MB limit", () => {
+    it("should block asset processing and trigger toast.error if file size crosses 0.5MB limit", () => {
       const { result } = renderHook(() =>
         useEmployeeDetailsForm("user-target-456", mockUserPayload as any),
       );
@@ -141,8 +110,9 @@ describe("useEmployeeDetailsForm Hook Module", () => {
         } as any);
       });
 
-      expect(mockAlert).toHaveBeenCalledWith(
-        "File size should be no more than 0.5MB",
+      expect(toast.error).toHaveBeenCalledWith(
+        expect.stringContaining("File size should be no more than 0.5MB"),
+        expect.objectContaining({ position: "top-right" }),
       );
       expect(result.current.avatarPreview).toBeNull();
     });
@@ -205,8 +175,11 @@ describe("useEmployeeDetailsForm Hook Module", () => {
     });
   });
 
-  describe("🎯 Submit Conversions & Name-to-ID Lookup Branches Mapping", () => {
-    it("should populate object data properties via form values mapping definitions", async () => {
+  describe("🎯 Submit Conversions, Toast & Name-to-ID Lookup Branches", () => {
+    it("should populate object data properties via form values mapping definitions and trigger toast.promise", async () => {
+      const mockPromise = Promise.resolve({ data: true });
+      mockUpdateUserFn.mockReturnValue(mockPromise);
+
       const { result } = renderHook(() =>
         useEmployeeDetailsForm("user-target-456", mockUserPayload as any),
       );
@@ -243,9 +216,18 @@ describe("useEmployeeDetailsForm Hook Module", () => {
         avatarFile: null,
         avatarBase64: null,
       });
+
+      expect(toast.promise).toHaveBeenCalledWith(
+        mockPromise,
+        expect.objectContaining({
+          position: "top-right",
+        }),
+      );
     });
 
     it("should fall back directly on raw string form values if ID mapping parameters miss matching names", async () => {
+      mockUpdateUserFn.mockReturnValue(Promise.resolve({ data: true }));
+
       const { result } = renderHook(() =>
         useEmployeeDetailsForm("user-target-456", mockUserPayload as any),
       );

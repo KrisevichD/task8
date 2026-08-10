@@ -2,10 +2,8 @@
 
 import { useQuery } from "@apollo/client/react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { use, useEffect, useState } from "react";
-
-import { toast } from "sonner";
 
 import {
   Breadcrumb,
@@ -17,7 +15,6 @@ import {
 } from "@/components/ui/breadcrumb";
 
 import { Icon } from "@/components/ui/icon";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { EmployeeDetailsContent } from "@/contents/employees/details";
 import LanguagesContent from "@/contents/languages";
@@ -25,9 +22,10 @@ import SettingsContent from "@/contents/settings";
 import SkillsContent from "@/contents/skills";
 import { useLanguage } from "@/context/language";
 import { GET_USER } from "@/graphql/user/queries";
+import { useMe } from "@/hooks/auth/useMe";
 
 type TabType = "PROFILE" | "SKILLS" | "LANGUAGES" | "SETTINGS";
-const TABS: TabType[] = ["PROFILE", "SKILLS", "LANGUAGES", "SETTINGS"];
+const ALL_TABS: TabType[] = ["PROFILE", "SKILLS", "LANGUAGES", "SETTINGS"];
 const DEFAULT_TAB: TabType = "PROFILE";
 
 interface IPageProps {
@@ -36,14 +34,26 @@ interface IPageProps {
 
 export default function EmployeeDetailsPage({ params }: IPageProps) {
   const { id } = use(params);
+  const router = useRouter();
   const { t } = useLanguage();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const { user: currentUser } = useMe();
+  const isOwner = currentUser?.id === id;
+
+  const availableTabs = ALL_TABS.filter((tab) => tab !== "SETTINGS" || isOwner);
   const currentTabParam = searchParams.get("tab")?.toUpperCase() as TabType;
-  const initialTab = TABS.includes(currentTabParam)
+  const initialTab = availableTabs.includes(currentTabParam)
     ? currentTabParam
     : DEFAULT_TAB;
+
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
+
+  if (!isOwner && activeTab === "SETTINGS") {
+    setActiveTab(DEFAULT_TAB);
+  }
+
   const {
     data,
     loading: isLoading,
@@ -51,6 +61,22 @@ export default function EmployeeDetailsPage({ params }: IPageProps) {
   } = useQuery(GET_USER, {
     variables: { userId: id },
   });
+
+  const user = data?.user;
+
+  useEffect(() => {
+    if (!isLoading && (error || !user)) {
+      router.replace("/employees");
+    }
+  }, [isLoading, error, user, router]);
+
+  if (isLoading || error || !user) {
+    return (
+      <div className="flex-1 flex justify-center items-center h-full w-full">
+        <Spinner />
+      </div>
+    );
+  }
 
   const handleTabChange = (nextTab: TabType) => {
     setActiveTab(nextTab);
@@ -68,17 +94,9 @@ export default function EmployeeDetailsPage({ params }: IPageProps) {
     window.history.replaceState(null, "", newUrl);
   };
 
-  const user = data?.user;
-
   const userName = user?.profile?.first_name
     ? `${user.profile.first_name} ${user.profile.last_name || ""}`.trim()
     : "User";
-
-  useEffect(() => {
-    if (error) {
-      toast.error(`Error loading employee details: ${error.message}`);
-    }
-  }, [error]);
 
   const tabLabels: Record<TabType, string> = {
     PROFILE: t("profile"),
@@ -103,18 +121,14 @@ export default function EmployeeDetailsPage({ params }: IPageProps) {
             <BreadcrumbItem>
               <BreadcrumbPage className="flex items-center gap-1.5">
                 <Icon variant="user" size="sm" />
-                {isLoading ? (
-                  <Skeleton className="h-4 w-32 rounded bg-muted animate-pulse" />
-                ) : (
-                  <span>{userName}</span>
-                )}
+                <span>{userName}</span>
               </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <div className="flex items-center mt-2">
-          {TABS.map((tab) => {
+          {availableTabs.map((tab) => {
             const isActive = activeTab === tab;
 
             return (
@@ -140,38 +154,30 @@ export default function EmployeeDetailsPage({ params }: IPageProps) {
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto pt-4 flex flex-col">
-        {isLoading ? (
-          <div className="flex-1 flex justify-center items-center">
-            <Spinner />
+        {activeTab === "PROFILE" && (
+          <EmployeeDetailsContent
+            userId={id}
+            initialUser={user}
+            isLoading={isLoading}
+          />
+        )}
+
+        {activeTab === "SKILLS" && (
+          <div className="px-5">
+            <SkillsContent userId={id} />
           </div>
-        ) : (
-          <>
-            {activeTab === "PROFILE" && (
-              <EmployeeDetailsContent
-                userId={id}
-                initialUser={user}
-                isLoading={isLoading}
-              />
-            )}
+        )}
 
-            {activeTab === "SKILLS" && (
-              <div className="px-5">
-                <SkillsContent userId={id} />
-              </div>
-            )}
+        {activeTab === "LANGUAGES" && (
+          <div className="px-5">
+            <LanguagesContent userId={id} />
+          </div>
+        )}
 
-            {activeTab === "LANGUAGES" && (
-              <div className="px-5">
-                <LanguagesContent userId={id} />
-              </div>
-            )}
-
-            {activeTab === "SETTINGS" && (
-              <div className="px-5">
-                <SettingsContent />
-              </div>
-            )}
-          </>
+        {activeTab === "SETTINGS" && isOwner && (
+          <div className="px-5">
+            <SettingsContent />
+          </div>
         )}
       </div>
     </div>

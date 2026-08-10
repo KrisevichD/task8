@@ -28,6 +28,8 @@ export const translations = {
     name: "Name",
     education: "Education",
     employee: "Employee",
+    noEmployeesFound: "No employees found",
+    noResultsFound: "No results found",
 
     // Tabs & Profile
     profile: "Profile",
@@ -106,6 +108,7 @@ export const translations = {
     cv: "CV",
     downloading: "Downloading",
     downloaded: "Downloaded",
+    tryAdjustingSearch: "Try adjusting your search query",
   },
   ru: {
     // Navigation / Sidebar
@@ -136,6 +139,8 @@ export const translations = {
     name: "Имя",
     education: "Образование",
     employee: "Сотрудник",
+    noEmployeesFound: "Сотрудники не найдены",
+    noResultsFound: "Ничего не найдено",
 
     // Tabs & Profile
     profile: "Профиль",
@@ -213,6 +218,7 @@ export const translations = {
     updated: "обновлен",
     downloaded: "экспортирован",
     errorMessage: "Ошибка:",
+    tryAdjustingSearch: "Попробуйте изменить поисковый запрос",
   },
 } as const;
 

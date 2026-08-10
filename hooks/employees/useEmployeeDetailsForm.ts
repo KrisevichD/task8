@@ -1,12 +1,13 @@
 import { useQuery } from "@apollo/client/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
+import { useLanguage } from "@/context/language";
 import { GET_DEPARTMENTS } from "@/graphql/department/queries";
 import { GET_POSITIONS } from "@/graphql/position/queries";
 import { IUserData } from "@/graphql/user/queries";
 import { useUpdateUser } from "@/hooks/user/useUpdateUser";
-import { getUserIdFromToken } from "@/utils/jwt";
 
 export interface IProfileFormValues {
   firstName: string;
@@ -16,19 +17,8 @@ export interface IProfileFormValues {
 }
 
 export const useEmployeeDetailsForm = (userId: string, user?: IUserData) => {
+  const { t } = useLanguage();
   const { updateUser, isLoading: isUpdating } = useUpdateUser();
-
-  const [currentUserId] = useState<string | undefined>(() => {
-    if (typeof window === "undefined") return undefined;
-    const id = getUserIdFromToken();
-    return id !== undefined ? String(id) : undefined;
-  });
-
-  const isOwner = Boolean(
-    currentUserId &&
-    (String(currentUserId) === String(userId) ||
-      String(currentUserId) === String(user?.id)),
-  );
 
   const { data: departmentsData } = useQuery(GET_DEPARTMENTS);
   const { data: positionsData } = useQuery(GET_POSITIONS);
@@ -70,7 +60,12 @@ export const useEmployeeDetailsForm = (userId: string, user?: IUserData) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 0.5 * 1024 * 1024) {
-        alert("File size should be no more than 0.5MB");
+        toast.error(
+          `${t("errorMessage")} File size should be no more than 0.5MB`,
+          {
+            position: "top-right",
+          },
+        );
         return;
       }
 
@@ -94,7 +89,7 @@ export const useEmployeeDetailsForm = (userId: string, user?: IUserData) => {
       (p) => p.name === values.positionId || p.id === values.positionId,
     );
 
-    await updateUser({
+    const updatePromise = updateUser({
       userId,
       firstName: values.firstName,
       lastName: values.lastName,
@@ -104,9 +99,21 @@ export const useEmployeeDetailsForm = (userId: string, user?: IUserData) => {
       avatarBase64,
     });
 
-    setAvatarFile(null);
-    setAvatarBase64(null);
-    reset(values);
+    toast.promise(updatePromise, {
+      loading: `${t("updating")} ${t("profile").toLowerCase()}...`,
+      success: `${t("profile")} ${t("successfully")} ${t("updated")}!`,
+      error: (err) => `${t("errorMessage")} ${err.message}`,
+      position: "top-right",
+    });
+
+    try {
+      await updatePromise;
+      setAvatarFile(null);
+      setAvatarBase64(null);
+      reset(values);
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
   };
 
   const isAvatarChanged = Boolean(avatarFile);
@@ -114,7 +121,6 @@ export const useEmployeeDetailsForm = (userId: string, user?: IUserData) => {
 
   return {
     form,
-    isOwner,
     departments,
     positions,
     avatarPreview,

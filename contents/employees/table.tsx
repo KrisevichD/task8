@@ -155,12 +155,20 @@ export const EmployeeTable = ({ employees }: IEmployeeTableProps) => {
               );
             })
           ) : (
-            <TableRow>
+            <TableRow className="hover:bg-transparent border-b-0">
               <TableCell
                 colSpan={7}
-                className="h-24 text-center text-muted-foreground text-sm"
+                className="h-48 text-center text-muted-foreground text-sm"
               >
-                {t("search")}...
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <Icon variant="search" className="size-8 opacity-40" />
+                  <p className="font-medium text-base text-foreground">
+                    {t("noEmployeesFound") || "No employees found"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {t("tryAdjustingSearch")}{" "}
+                  </p>
+                </div>
               </TableCell>
             </TableRow>
           )}

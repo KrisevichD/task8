@@ -16,6 +16,23 @@ vi.mock("next/navigation", () => ({
   useRouter: vi.fn(),
 }));
 
+vi.mock("@/context/language", () => ({
+  useLanguage: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        firstName: "First Name",
+        lastName: "Last Name",
+        email: "Email",
+        department: "Department",
+        position: "Position",
+        noEmployeesFound: "No employees found",
+        tryAdjustingSearch: "Try adjusting your search query",
+      };
+      return translations[key] || key;
+    },
+  }),
+}));
+
 vi.mock("@/components/ui/avatar", () => ({
   Avatar: ({ children, className }: any) => (
     <div data-testid="avatar-root" className={className}>
@@ -106,10 +123,13 @@ describe("EmployeeTable Component Module", () => {
       expect(fallbacks[1].textContent).toBe("ZM");
     });
 
-    it("should display a generic searching placeholder if employees dataset array arrives empty", () => {
+    it("should display empty state placeholder if employees dataset array arrives empty", () => {
       render(<EmployeeTable employees={[]} />);
 
-      expect(screen.getByText("Search...")).toBeInTheDocument();
+      expect(screen.getByText("No employees found")).toBeInTheDocument();
+      expect(
+        screen.getByText("Try adjusting your search query"),
+      ).toBeInTheDocument();
     });
   });
 
