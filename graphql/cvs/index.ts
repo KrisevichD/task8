@@ -1,6 +1,11 @@
-import { gql } from "@apollo/client";
+import { gql, TypedDocumentNode } from "@apollo/client";
 
-export const CREATE_CV_MUTATION = gql`
+import { ICreateCvData, ICreateCvVariables } from "@/types/cvs";
+
+export const CREATE_CV_MUTATION: TypedDocumentNode<
+  ICreateCvData,
+  ICreateCvVariables
+> = gql`
   mutation CreateCV($cv: CreateCvInput!) {
     createCv(cv: $cv) {
       id

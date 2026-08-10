@@ -3,6 +3,10 @@
 import { useQuery } from "@apollo/client/react";
 import { useState } from "react";
 
+import { useForm } from "react-hook-form";
+
+import { toast } from "sonner";
+
 import { CvTable } from "./table";
 
 import {
@@ -11,6 +15,16 @@ import {
   BreadcrumbList,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { FloatingInput } from "@/components/ui/floating-input";
+import { FloatingTextarea } from "@/components/ui/floating-textarea";
 import { Icon } from "@/components/ui/icon";
 import { SearchInput } from "@/components/ui/search-input";
 import { Spinner } from "@/components/ui/spinner";
@@ -19,28 +33,39 @@ import { CREATE_CV_MUTATION } from "@/graphql/cvs";
 import { GET_CVS, ICv } from "@/graphql/cvs/queries";
 import useCreateCv from "@/hooks/cvs/useCreateCv";
 import { useDeleteCv } from "@/hooks/cvs/useDeleteCv";
+import { ICreateCvInput } from "@/types/cvs";
 
 const CvsContent = () => {
+  const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const { deleteCv } = useDeleteCv();
+  const { data, loading: isLoadingCvs, error } = useQuery(GET_CVS);
+  const { createCv, isLoading: isCreating } = useCreateCv(CREATE_CV_MUTATION);
+  const [isOpen, setIsOpen] = useState(false);
+  const cvs = data?.cvs || [];
+  const { handleSubmit, reset, register } = useForm({
+    defaultValues: {
+      name: "",
+      education: "",
+      description: "",
+    },
+  });
+
   const handleDeleteCv = async (cv: ICv) => {
     deleteCv(cv.id);
   };
-  const { data, loading: isLoadingCvs, error } = useQuery(GET_CVS);
-  const { createCv, isLoading: isCreating } = useCreateCv(CREATE_CV_MUTATION);
-  const { t } = useLanguage();
 
-  const cvs = data?.cvs || [];
+  const onSubmit = (formData: Omit<ICreateCvInput, "userId">) => {
+    setIsOpen(false);
+    reset();
+    createCv(formData);
+  };
 
-  const handleCreateCv = async () => {
-    await createCv({
-      cv: {
-        userId: "610",
-        name: "CV",
-        description: "CV description",
-        education: "CV education",
-      },
-    });
+  const onValidationError = (errors: any) => {
+    const firstErrorField = Object.keys(errors)[0];
+    const errorMessage =
+      errors[firstErrorField]?.message || "Please fill in all required fields";
+    toast.error(errorMessage, { position: "top-right" });
   };
 
   const filteredCvs = cvs.filter(
@@ -74,15 +99,70 @@ const CvsContent = () => {
         <div className="flex items-center justify-between pl-5">
           <SearchInput value={search} onChange={setSearch} />
 
-          <Button
-            variant="ghost"
-            onClick={handleCreateCv}
-            disabled={isCreating}
-            className="text-primary hover:text-primary/80 font-semibold gap-1.5 uppercase tracking-wide cursor-pointer"
-          >
-            <Icon variant="add" />
-            {t("createCv")}
-          </Button>
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  disabled={isCreating}
+                  className="text-primary hover:text-primary/80 font-semibold gap-1.5 uppercase tracking-wide cursor-pointer"
+                >
+                  <Icon variant="add" />
+                  {t("createCv")}
+                </Button>
+              }
+            />
+            <DialogContent>
+              <DialogTitle className={"sentence-case"}>
+                {t("add")} CV
+              </DialogTitle>
+              <form
+                id="cv-create-form"
+                className="space-y-4"
+                onSubmit={handleSubmit(onSubmit, onValidationError)}
+              >
+                <FloatingInput
+                  label={t("name")}
+                  {...register("name", {
+                    required: `${t("name")}${t("isRequired")}`,
+                  })}
+                  disabled={isCreating}
+                />
+                <FloatingInput
+                  label={t("education")}
+                  {...register("education", {
+                    required: `${t("education")}${t("isRequired")}`,
+                  })}
+                  disabled={isCreating}
+                />
+                <FloatingTextarea
+                  label={t("description")}
+                  {...register("description", {
+                    required: `${t("description")}${t("isRequired")}`,
+                  })}
+                  disabled={isCreating}
+                />
+              </form>
+              <DialogFooter>
+                <DialogClose
+                  render={
+                    <Button variant={"outline"} className={"uppercase"}>
+                      {t("cancel")}
+                    </Button>
+                  }
+                />
+                <Button
+                  variant={"primary"}
+                  type="submit"
+                  disabled={isCreating}
+                  form="cv-create-form"
+                  className={"uppercase"}
+                >
+                  {t("add")}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
