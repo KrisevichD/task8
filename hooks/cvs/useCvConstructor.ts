@@ -29,21 +29,16 @@ export default function useCvConstructor(cvId: string) {
   const [deleteProject] = useMutation(DELETE_PROJECT, {
     refetchQueries: ["GetCv"],
   });
-  const [
-    executeAddCvProject,
-    { loading: isCvProjectLoading, error: cvProjectError },
-  ] = useMutation(ADD_CV_PROJECT_MUTATION);
+  const [executeAddCvProject, { loading: isCvProjectLoading }] = useMutation(
+    ADD_CV_PROJECT_MUTATION,
+  );
 
   const [executeUpdateCvProject] = useMutation(UPDATE_CV_PROJECT);
   const [executeUpdateCv] = useMutation(UPDATE_CV);
   const [executeAddCvSkill] = useMutation(ADD_CV_SKILL);
   const [executeUpdateCvSkill] = useMutation(UPDATE_CV_SKILL);
   const [executeDeleteCvSkill] = useMutation(DELETE_CV_SKILL);
-  const {
-    data,
-    loading: isCvLoading,
-    error: cvError,
-  } = useQuery(GET_CV, {
+  const { data } = useQuery(GET_CV, {
     variables: { cvId: cvId },
     skip: !cvId,
   });
@@ -235,12 +230,9 @@ export default function useCvConstructor(cvId: string) {
 
   return {
     cvData,
-    isCvLoading,
-    cvError,
     addCvProject,
     updateCvProject,
     isCvProjectLoading,
-    cvProjectError,
     deleteCvProject,
     addCvSkill,
     updateCvSkill,

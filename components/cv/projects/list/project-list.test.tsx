@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useParams } from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import CvProjectsList from ".";
 
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
-import { ICvProject, ICvResponce } from "@/types/cv-constructor";
+import { ICvProject } from "@/types/cv-constructor";
 
 vi.mock("next/navigation", () => ({
   useParams: vi.fn(),
@@ -16,114 +16,196 @@ vi.mock("@/hooks/cvs/useCvConstructor", () => ({
   default: vi.fn(),
 }));
 
-vi.mock("@/utils/helpers", () => ({
-  validateProjectDate: (date: string) => date,
+vi.mock("../form", () => ({
+  default: ({ type, editingId, closeEditing, id }: any) => (
+    <div
+      data-testid="mock-projects-form"
+      data-type={type}
+      data-editing={!!editingId}
+      data-id={id}
+    >
+      <button data-testid="close-edit-btn" onClick={closeEditing}>
+        Close Edit
+      </button>
+    </div>
+  ),
 }));
 
-vi.mock("../form", () => ({
-  default: vi.fn(() => <div data-testid="cv-projects-form-mock" />),
+vi.mock("@/components/ui/icon", () => ({
+  Icon: ({ variant }: { variant: string }) => (
+    <span data-testid={`icon-${variant}`} />
+  ),
+}));
+
+vi.mock("@/components/ui/spinner", () => ({
+  Spinner: () => <div data-testid="spinner">Loading...</div>,
+}));
+
+vi.mock("@/components/ui/dropdown-menu", () => ({
+  DropdownMenu: ({ children }: any) => (
+    <div data-testid="dropdown-menu">{children}</div>
+  ),
+  DropdownMenuTrigger: ({ render }: any) => (
+    <div data-testid="dropdown-trigger">{render}</div>
+  ),
+  DropdownMenuContent: ({ children }: any) => (
+    <div data-testid="dropdown-content">{children}</div>
+  ),
+  DropdownMenuGroup: ({ children }: any) => <div>{children}</div>,
+  DropdownMenuItem: ({ children, onClick }: any) => (
+    <button
+      onClick={onClick}
+      data-testid={`dropdown-item-${children?.toString().toLowerCase()}`}
+    >
+      {children}
+    </button>
+  ),
+  DropdownMenuSeparator: () => <hr />,
 }));
 
 describe("CvProjectsList Component", () => {
   const mockDeleteCvProject = vi.fn();
 
-  const mockProject: ICvProject = {
-    id: "proj-item-1",
-    name: "E-Commerce System",
-    domain: "Retail",
-    start_date: "2023-01-01",
-    end_date: "2024-01-01",
-    description: "High-load online store",
-    environment: ["React", "TypeScript"],
-    responsibilities: ["Frontend Lead", "Code Review"],
-    project: { id: "p-1" },
-  } as unknown as ICvProject;
-
-  const mockCvData: ICvResponce = {
-    id: "cv-123",
-    projects: [
-      mockProject,
-      {
-        id: "proj-item-2",
-        name: "Banking App",
-        domain: "Fintech",
-        start_date: "2022-01-01",
-        end_date: "2022-12-31",
-        description: "Mobile banking interface",
-        environment: ["React Native"],
-        responsibilities: ["UI Developer"],
-        project: { id: "p-2" },
-      } as unknown as ICvProject,
-    ],
-  } as unknown as ICvResponce;
+  const mockProjects: ICvProject[] = [
+    {
+      id: "cp-1",
+      name: "Alpha Dashboard",
+      domain: "Healthcare",
+      start_date: "2026-01-01",
+      end_date: "2026-05-01",
+      description: "A secure diagnostic data portal",
+      environment: ["React", "GraphQL"],
+      responsibilities: ["Developed charts Canvas", "Managed state machine"],
+      project: { id: "p-99" },
+    } as any,
+    {
+      id: "cp-2",
+      name: "Beta Payments",
+      domain: "Fintech",
+      start_date: "2025-06-01",
+      end_date: "2025-12-01",
+      description: "High throughput ledger engine processing",
+      environment: ["Node.js", "Postgres"],
+      responsibilities: [
+        "Optimized indexing operations",
+        "Wrote migrations script",
+      ],
+      project: { id: "p-100" },
+    } as any,
+  ];
 
   beforeEach(() => {
     vi.clearAllMocks();
 
-    (useParams as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      id: "cv-123",
-    });
+    (useParams as any).mockReturnValue({ id: "cv-123" });
 
-    (useCvConstructor as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      cvData: mockCvData,
+    (useCvConstructor as any).mockReturnValue({
+      cvData: { id: "cv-123", projects: mockProjects },
       deleteCvProject: mockDeleteCvProject,
     });
   });
 
-  it("renders spinner when cvData is missing", () => {
-    (useCvConstructor as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      cvData: null,
-      deleteCvProject: mockDeleteCvProject,
+  describe("Base Rendering states", () => {
+    it("should render a Spinner component if cvData is missing or loading", () => {
+      (useCvConstructor as any).mockReturnValue({ cvData: null });
+      render(<CvProjectsList />);
+      expect(screen.getByTestId("spinner")).toBeInTheDocument();
     });
 
-    render(<CvProjectsList />);
+    it("should map table structure grids, column arrays, and description nodes correctly", () => {
+      render(<CvProjectsList />);
 
-    expect(screen.getByRole("status")).toBeInTheDocument();
-  });
+      expect(screen.getByText("Alpha Dashboard")).toBeInTheDocument();
+      expect(screen.getByText("Healthcare")).toBeInTheDocument();
+      expect(
+        screen.getByText("A secure diagnostic data portal"),
+      ).toBeInTheDocument();
 
-  it("renders list of projects correctly", () => {
-    render(<CvProjectsList />);
-
-    expect(screen.getByText("E-Commerce System")).toBeInTheDocument();
-    expect(screen.getByText("Retail")).toBeInTheDocument();
-    expect(screen.getByText("High-load online store")).toBeInTheDocument();
-    expect(screen.getByText("Frontend Lead")).toBeInTheDocument();
-
-    expect(screen.getByText("Banking App")).toBeInTheDocument();
-    expect(screen.getByText("Fintech")).toBeInTheDocument();
-  });
-
-  it("filters projects according to searchQuery", () => {
-    render(<CvProjectsList searchQuery="Fintech" />);
-
-    expect(screen.getByText("Banking App")).toBeInTheDocument();
-    expect(screen.queryByText("E-Commerce System")).not.toBeInTheDocument();
-  });
-
-  it("shows 'No matches found' when searchQuery does not match any project", () => {
-    render(<CvProjectsList searchQuery="Crypto" />);
-
-    expect(screen.getByText("No matches found")).toBeInTheDocument();
-  });
-
-  it("calls deleteCvProject when clicking Delete in dropdown menu", async () => {
-    const user = userEvent.setup();
-
-    render(<CvProjectsList />);
-
-    const settingsBtns = screen.getAllByRole("button", {
-      name: /open settings/i,
+      expect(screen.getByText("Developed charts Canvas")).toBeInTheDocument();
+      expect(screen.getByText("Managed state machine")).toBeInTheDocument();
+      expect(
+        screen.getByText("Optimized indexing operations"),
+      ).toBeInTheDocument();
     });
-    await user.click(settingsBtns[0]);
+  });
 
-    const deleteOption = await screen.findByText("Delete");
-    await user.click(deleteOption);
+  describe("Dropdown Actions Coverage (Delete & Edit triggers)", () => {
+    it("should fire deleteCvProject mutation successfully when the trigger inside dropdown items is clicked", async () => {
+      const user = userEvent.setup();
+      render(<CvProjectsList />);
 
-    await waitFor(() => {
+      const deleteButtons = screen.getAllByTestId("dropdown-item-delete");
+      await user.click(deleteButtons[0]);
+
       expect(mockDeleteCvProject).toHaveBeenCalledWith({
         cvId: "cv-123",
-        project: mockProject,
+        project: mockProjects[0],
       });
+    });
+
+    it("should toggle editingId state variables when Edit action trigger fires", async () => {
+      const user = userEvent.setup();
+      render(<CvProjectsList />);
+
+      const editButtons = screen.getAllByTestId("dropdown-item-edit");
+      await user.click(editButtons[0]);
+
+      const editForm = screen.getAllByTestId("mock-projects-form");
+      expect(editForm[0]).toHaveAttribute("data-editing", "true");
+
+      const closeBtn = screen.getAllByTestId("close-edit-btn");
+      await user.click(closeBtn[0]);
+      expect(editForm[0]).toHaveAttribute("data-editing", "false");
+    });
+
+    it("should update local style background identifiers state during hover movements", () => {
+      render(<CvProjectsList />);
+
+      const tableRows = screen.getAllByRole("row");
+      const firstRow = tableRows[1];
+
+      fireEvent.mouseEnter(firstRow);
+      expect(firstRow.className).toContain("bg-muted/50");
+
+      fireEvent.mouseLeave(firstRow);
+      expect(firstRow.className).toContain("bg-background");
+    });
+  });
+
+  describe("Search queries list filtering pipeline branches", () => {
+    it("should return the entire data collection if search query variables arrive empty", () => {
+      render(<CvProjectsList searchQuery="   " />);
+      expect(screen.getByText("Alpha Dashboard")).toBeInTheDocument();
+      expect(screen.getByText("Beta Payments")).toBeInTheDocument();
+    });
+
+    it("should filter results accurately when a search query matches the project name", () => {
+      render(<CvProjectsList searchQuery="Alpha" />);
+      expect(screen.getByText("Alpha Dashboard")).toBeInTheDocument();
+      expect(screen.queryByText("Beta Payments")).not.toBeInTheDocument();
+    });
+
+    it("should filter results accurately when a search query matches the project domain", () => {
+      render(<CvProjectsList searchQuery="Fintech" />);
+      expect(screen.queryByText("Alpha Dashboard")).not.toBeInTheDocument();
+      expect(screen.getByText("Beta Payments")).toBeInTheDocument();
+    });
+
+    it("should filter results accurately when a search query matches the project description", () => {
+      render(<CvProjectsList searchQuery="diagnostic" />);
+      expect(screen.getByText("Alpha Dashboard")).toBeInTheDocument();
+      expect(screen.queryByText("Beta Payments")).not.toBeInTheDocument();
+    });
+
+    it("should filter results accurately when a search query matches a nested responsibility string tag", () => {
+      render(<CvProjectsList searchQuery="migrations" />);
+      expect(screen.queryByText("Alpha Dashboard")).not.toBeInTheDocument();
+      expect(screen.getByText("Beta Payments")).toBeInTheDocument();
+    });
+
+    it("should display a fallback 'No matches found' view screen if the search payload yields zero matches", () => {
+      render(<CvProjectsList searchQuery="Web3 Blockchain Ledger" />);
+      expect(screen.getByText("No matches found")).toBeInTheDocument();
     });
   });
 });

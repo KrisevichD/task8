@@ -107,6 +107,7 @@ export default function useExportPdf() {
       }
     } catch (error) {
       console.error("PDF Error:", error);
+      throw error;
     }
   };
 

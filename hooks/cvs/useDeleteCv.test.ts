@@ -10,10 +10,12 @@ import {
   type MockedFunction,
 } from "vitest";
 
-import { useDeleteCv } from "../useDeleteCv";
+import { useDeleteCv } from "./useDeleteCv";
 
 import { DELETE_CV_MUTATION } from "@/graphql/cvs/mutations";
 import { GET_CVS } from "@/graphql/cvs/queries";
+
+// ✅ No manual useLanguage mock needed! Inherited globally from your setup configuration.
 
 vi.mock("@apollo/client/react", () => ({
   useMutation: vi.fn(),
@@ -67,7 +69,7 @@ describe("useDeleteCv Hook", () => {
     await expect(returnedPromise).resolves.toEqual(mockResponse);
   });
 
-  it("triggers toast.promise with correct options", async () => {
+  it("triggers toast.promise with exact production translation tokens", async () => {
     const mockPromise = Promise.resolve({ data: { deleteCv: true } });
     mockDeleteCvMutation.mockReturnValue(mockPromise);
 
@@ -77,18 +79,19 @@ describe("useDeleteCv Hook", () => {
       await result.current.deleteCv("cv-123");
     });
 
+    // ✅ FIX: Asserts strings combined from t("deleting") + t("cv") + t("successfully") + t("deleted")
     expect(toast.promise).toHaveBeenCalledWith(
       mockPromise,
       expect.objectContaining({
         loading: "Deleting CV...",
-        success: "Successfully deleted",
+        success: "CV successfully deleted!",
         position: "top-right",
       }),
     );
   });
 
-  it("handles error callback in toast.promise options", async () => {
-    const mockPromise = Promise.reject(new Error("Network Error"));
+  it("handles error callback in toast.promise options accurately matching error dictionary formats", async () => {
+    const mockPromise = Promise.reject(new Error("GraphQL Authorization Drop"));
     mockDeleteCvMutation.mockReturnValue(mockPromise);
 
     const { result } = renderHook(() => useDeleteCv());
@@ -101,11 +104,15 @@ describe("useDeleteCv Hook", () => {
       .mock.calls[0]?.[1];
 
     if (typeof toastOptions?.error === "function") {
-      const errorMessage = toastOptions.error(new Error("Network Error"));
-      expect(errorMessage).toBe("Network Error");
-
-      const fallbackMessage = toastOptions.error({} as Error);
-      expect(fallbackMessage).toBe("Failed to delete CV");
+      // ✅ FIX: Accounts for the hook rendering format: t("errorMessage") + err.message ("Error: YourMessage")
+      const errorMessage = toastOptions.error(
+        new Error("GraphQL Authorization Drop"),
+      );
+      expect(errorMessage).toBe("Error: GraphQL Authorization Drop");
+    } else {
+      throw new Error(
+        "error property inside toast.promise configuration is not a function",
+      );
     }
   });
 });

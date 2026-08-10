@@ -31,6 +31,12 @@ vi.mock("@/components/ui/skill-badge", () => ({
   ),
 }));
 
+vi.mock("@/components/ui/icon", () => ({
+  Icon: ({ variant }: { variant: string }) => (
+    <span data-testid={`icon-${variant}`} />
+  ),
+}));
+
 describe("SkillsContent Component", () => {
   const mockDeleteProfileSkills = vi.fn();
 
@@ -54,6 +60,10 @@ describe("SkillsContent Component", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+
+    if (typeof window !== "undefined" && !window.PointerEvent) {
+      window.PointerEvent = class extends Event {} as any;
+    }
 
     (useSkills as ReturnType<typeof vi.fn>).mockReturnValue({
       skillCategories: mockCategories,
@@ -81,21 +91,24 @@ describe("SkillsContent Component", () => {
       expect(screen.getByText("Error loading skills")).toBeInTheDocument();
     });
 
-    it("returns null while loading categories or skills", () => {
+    it("renders spinner component while loading categories or skills", () => {
       (useMe as ReturnType<typeof vi.fn>).mockReturnValue({
         skills: null,
         isLoading: true,
         error: null,
       });
 
-      const { container } = render(<SkillsContent userId="user-1" />);
+      render(<SkillsContent userId="user-1" />);
 
-      expect(container).toBeEmptyDOMElement();
+      expect(
+        screen.getByRole("status", { name: /loading/i }),
+      ).toBeInTheDocument();
     });
 
     it("renders categories and corresponding skills correctly", () => {
       render(<SkillsContent userId="user-1" />);
 
+      expect(screen.getByText("Skills")).toBeInTheDocument();
       expect(screen.getByText("Frontend")).toBeInTheDocument();
       expect(screen.getByText("React")).toBeInTheDocument();
       expect(screen.getByText("Backend")).toBeInTheDocument();
@@ -127,7 +140,7 @@ describe("SkillsContent Component", () => {
 
       expect(screen.queryByTestId("skills-form")).not.toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: /^cancel$/i }),
+        screen.getByRole("button", { name: /cancel/i }),
       ).toBeInTheDocument();
     });
 
@@ -139,7 +152,7 @@ describe("SkillsContent Component", () => {
       await user.click(screen.getByRole("button", { name: /react/i }));
       await user.click(screen.getByRole("button", { name: /node\.js/i }));
 
-      const cancelBtn = screen.getByRole("button", { name: /^cancel$/i });
+      const cancelBtn = screen.getByRole("button", { name: /cancel/i });
       await user.click(cancelBtn);
 
       expect(screen.getByTestId("skills-form")).toBeInTheDocument();

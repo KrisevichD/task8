@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { SearchInput } from "./";
 
-// Мокаем контекст языка
+
 vi.mock("@/context/language", () => ({
   useLanguage: () => ({
     t: (key: string) => (key === "search" ? "Search..." : key),

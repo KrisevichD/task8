@@ -11,6 +11,7 @@ export interface FloatingInputProps extends React.ComponentProps<typeof Input> {
 
 const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
   ({ className, label, id, value, defaultValue, onChange, ...props }, ref) => {
+    const inputId = id ?? React.useId();
     const [hasValue, setHasValue] = React.useState(
       Boolean(value) || Boolean(defaultValue)
     )
@@ -27,7 +28,7 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
     return (
       <div className="relative w-full border-none bg-transparent">
         <Input
-          id={id}
+          id={inputId}
           ref={ref}
           value={value}
           defaultValue={defaultValue}
@@ -40,7 +41,7 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
           {...props}
         />
         <Label
-          htmlFor={id}
+          htmlFor={inputId}
           className={cn(
             `absolute left-2 -top-2.5 z-10 
             pointer-events-none transition-all duration-200 will-change-transform

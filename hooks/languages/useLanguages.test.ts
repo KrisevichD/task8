@@ -68,12 +68,20 @@ describe("useLanguages Hook", () => {
       { data: mockAllLanguages, loading: false },
     ] as any);
 
+    // ✅ FIX: Configure each mutation mock trigger to explicitly return a resolved promise
+    mockExecuteAddProfileLanguage.mockResolvedValue({ data: {} });
+    mockExecuteUpdateProfileLanguage.mockResolvedValue({ data: {} });
+    mockExecuteDeleteProfileLanguages.mockResolvedValue({ data: {} });
+
     (useMutation as unknown as MockedFunction<typeof useMutation>)
       .mockReturnValueOnce([
         mockExecuteAddProfileLanguage,
         { loading: false },
       ] as any)
-      .mockReturnValueOnce([mockExecuteUpdateProfileLanguage] as any)
+      .mockReturnValueOnce([
+        mockExecuteUpdateProfileLanguage,
+        { loading: false },
+      ] as any)
       .mockReturnValueOnce([
         mockExecuteDeleteProfileLanguages,
         { loading: false },
@@ -121,10 +129,10 @@ describe("useLanguages Hook", () => {
       );
 
       expect(toast.promise).toHaveBeenCalledWith(
-        undefined,
+        expect.any(Promise),
         expect.objectContaining({
-          loading: "Adding language",
-          success: "Successfully added",
+          loading: "Adding language...",
+          success: "Language successfully added!",
           position: "top-right",
         }),
       );
@@ -154,10 +162,11 @@ describe("useLanguages Hook", () => {
       );
 
       expect(toast.promise).toHaveBeenCalledWith(
-        undefined,
+        expect.any(Promise),
         expect.objectContaining({
-          loading: "Updating language",
-          success: "Successfully updated",
+          loading: "Updating language...",
+          success: "Language successfully updated!",
+          position: "top-right",
         }),
       );
     });
@@ -181,10 +190,11 @@ describe("useLanguages Hook", () => {
       );
 
       expect(toast.promise).toHaveBeenCalledWith(
-        undefined,
+        expect.any(Promise),
         expect.objectContaining({
-          loading: "Deleting language",
-          success: "Successfully deleted",
+          loading: "Deleting language...",
+          success: "Language successfully deleted!",
+          position: "top-right",
         }),
       );
     });

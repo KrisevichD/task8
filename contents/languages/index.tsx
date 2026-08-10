@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
+import { Spinner } from "@/components/ui/spinner";
 import { Toggle } from "@/components/ui/toggle";
 import { useLanguage } from "@/context/language";
 import { useMe } from "@/hooks/auth/useMe";
@@ -71,7 +72,7 @@ export const LanguagesContent = ({
 
   if (error)
     return <div className="p-4 text-destructive">Error loading languages</div>;
-  if (!languages || isLoading) return null;
+  if (!languages || isLoading) return <Spinner />;
 
   return (
     <>

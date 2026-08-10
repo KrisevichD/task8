@@ -7,8 +7,8 @@ import { EmployeeTable } from "./table";
 import { SearchInput } from "@/components/ui/search-input";
 import { Spinner } from "@/components/ui/spinner";
 import { useLanguage } from "@/context/language";
+import { useDebounce } from "@/hooks/common/useDebounce";
 import { useEmployees } from "@/hooks/employees/useEmployees";
-import { useDebounce } from "@/hooks/useDebounce";
 
 export const EmployeesContent = () => {
   const [search, setSearch] = useState("");

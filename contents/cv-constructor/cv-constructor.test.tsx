@@ -38,6 +38,10 @@ describe("CvConstructor Component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
+    if (typeof window !== "undefined" && !window.PointerEvent) {
+      window.PointerEvent = class extends Event {} as any;
+    }
+
     (usePathname as ReturnType<typeof vi.fn>).mockReturnValue("/cvs/cv-1");
     (useCvConstructor as ReturnType<typeof vi.fn>).mockReturnValue({
       cvData: mockCvData,
@@ -55,6 +59,9 @@ describe("CvConstructor Component", () => {
 
       render(<CvConstructor cvId="cv-1" />);
 
+      expect(
+        screen.getByRole("status", { name: /loading/i }),
+      ).toBeInTheDocument();
       expect(screen.queryByTestId("details-form")).not.toBeInTheDocument();
     });
 
@@ -87,7 +94,8 @@ describe("CvConstructor Component", () => {
       render(<CvConstructor cvId="cv-1" />);
 
       expect(screen.getByTestId("skills-component")).toBeInTheDocument();
-      expect(screen.getByText("skills")).toBeInTheDocument();
+
+      expect(screen.getByRole("tab", { name: /skills/i })).toBeInTheDocument();
     });
   });
 

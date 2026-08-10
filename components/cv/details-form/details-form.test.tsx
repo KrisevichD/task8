@@ -2,6 +2,11 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const { hoistedReact } = await vi.hoisted(async () => {
+  const ReactModule = await import("react");
+  return { hoistedReact: ReactModule.default || ReactModule };
+});
+
 import CvDetailsForm from ".";
 
 import useCvConstructor from "@/hooks/cvs/useCvConstructor";
@@ -11,73 +16,99 @@ vi.mock("@/hooks/cvs/useCvConstructor", () => ({
   default: vi.fn(),
 }));
 
+vi.mock("../../ui/floating-input", () => ({
+  FloatingInput: hoistedReact.forwardRef(
+    ({ label, ...props }: any, ref: any) => (
+      <div data-testid={`input-wrapper-${label}`}>
+        <label>{label}</label>
+        <input ref={ref} data-testid={`input-field-${label}`} {...props} />
+      </div>
+    ),
+  ),
+}));
+
+vi.mock("@/components/ui/floating-textarea", () => ({
+  FloatingTextarea: hoistedReact.forwardRef(
+    ({ label, ...props }: any, ref: any) => (
+      <div data-testid={`textarea-wrapper-${label}`}>
+        <label>{label}</label>
+        <textarea
+          ref={ref}
+          data-testid={`textarea-field-${label}`}
+          {...props}
+        />
+      </div>
+    ),
+  ),
+}));
+
 describe("CvDetailsForm Component", () => {
   const mockUpdateCv = vi.fn();
 
   const mockCvData: ICvResponce = {
-    id: "cv-123",
-    name: "John Doe CV",
-    education: "MIT University",
-    description: "Experienced Frontend Engineer",
-  } as unknown as ICvResponce;
+    id: "cv-999",
+    name: "John Doe Senior Resume",
+    education: "MIT Computer Science",
+    description: "Experienced Full Stack Engineer",
+    projects: [],
+    skills: [],
+    languages: [],
+    user: { id: "u-1" } as any,
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
 
-    (useCvConstructor as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+    (useCvConstructor as any).mockReturnValue({
       updateCv: mockUpdateCv,
     });
   });
 
-  it("populates inputs with initial cvData values", () => {
-    const { container } = render(<CvDetailsForm cvData={mockCvData} />);
+  describe("Branch Condition Coverage (Lines 32-49)", () => {
+    it("should pre-populate and reset all form inputs inside the state hook when cvData mounts", () => {
+      render(<CvDetailsForm cvData={mockCvData} />);
 
-    const nameInput = container.querySelector('input[name="name"]');
-    const educationInput = container.querySelector('input[name="education"]');
-    const descriptionTextarea = container.querySelector(
-      'textarea[name="description"]',
-    );
+      expect(screen.getByTestId("input-field-Name")).toHaveValue(
+        "John Doe Senior Resume",
+      );
+      expect(screen.getByTestId("input-field-Education")).toHaveValue(
+        "MIT Computer Science",
+      );
+      expect(screen.getByTestId("textarea-field-Description")).toHaveValue(
+        "Experienced Full Stack Engineer",
+      );
+    });
 
-    expect(nameInput).toHaveValue("John Doe CV");
-    expect(educationInput).toHaveValue("MIT University");
-    expect(descriptionTextarea).toHaveValue("Experienced Frontend Engineer");
+    it("should keep the form action trigger button locked if variables remain identical to defaults", () => {
+      render(<CvDetailsForm cvData={mockCvData} />);
+
+      const submitBtn = screen.getByRole("button", { name: /update/i });
+      expect(submitBtn).toBeDisabled();
+    });
   });
 
-  it("keeps UPDATE button disabled when form is not dirty and enables it on user input", async () => {
-    const user = userEvent.setup();
-    const { container } = render(<CvDetailsForm cvData={mockCvData} />);
+  describe("Mutation Executions", () => {
+    it("should release button lock states upon input modification and fire updateCv mutation with custom dataset payload", async () => {
+      const user = userEvent.setup();
+      render(<CvDetailsForm cvData={mockCvData} />);
 
-    const updateBtn = screen.getByRole("button", { name: /update/i });
-    expect(updateBtn).toBeDisabled();
+      const nameField = screen.getByTestId("input-field-Name");
 
-    const nameInput = container.querySelector(
-      'input[name="name"]',
-    ) as HTMLInputElement;
-    await user.type(nameInput, " Updated");
+      await user.clear(nameField);
+      await user.type(nameField, "John Doe Principal Resume");
 
-    expect(updateBtn).not.toBeDisabled();
-  });
+      const submitBtn = screen.getByRole("button", { name: /update/i });
+      expect(submitBtn).not.toBeDisabled();
 
-  it("calls updateCv with updated values on form submission", async () => {
-    const user = userEvent.setup();
-    const { container } = render(<CvDetailsForm cvData={mockCvData} />);
+      await user.click(submitBtn);
 
-    const nameInput = container.querySelector(
-      'input[name="name"]',
-    ) as HTMLInputElement;
-
-    await user.clear(nameInput);
-    await user.type(nameInput, "Jane Doe CV");
-
-    const updateBtn = screen.getByRole("button", { name: /update/i });
-    await user.click(updateBtn);
-
-    await waitFor(() => {
-      expect(mockUpdateCv).toHaveBeenCalledWith({
-        cvId: "cv-123",
-        name: "Jane Doe CV",
-        education: "MIT University",
-        description: "Experienced Frontend Engineer",
+      await waitFor(() => {
+        expect(mockUpdateCv).toHaveBeenCalledWith({
+          cvId: "cv-999",
+          name: "John Doe Principal Resume",
+          education: "MIT Computer Science",
+          description: "Experienced Full Stack Engineer",
+        });
       });
     });
   });

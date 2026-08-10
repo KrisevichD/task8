@@ -7,6 +7,7 @@ import { cn } from "@/utils/shadcn"
 
 interface FloatingSelectProps extends React.ComponentProps<typeof Select> {
   label: string
+  id?: string;
   placeholder?: string
   children?: React.ReactNode
   className?: string
@@ -15,15 +16,17 @@ interface FloatingSelectProps extends React.ComponentProps<typeof Select> {
 export function FloatingSelect({
   label,
   placeholder = " ",
+  id,
   children,
   className,
   value,
   ...props
 }: FloatingSelectProps) {
+  const selectId = id ?? React.useId();
   const safeValue = value ?? ""
   return (
     <div className="relative w-full border-none bg-transparent group/select">
-      <Select  value={safeValue} {...props}>
+      <Select  value={safeValue} {...props} id={selectId}>
         <SelectTrigger
           className={cn(
             "peer",
@@ -36,6 +39,7 @@ export function FloatingSelect({
       </Select>
 
       <Label
+        htmlFor={selectId}
         className="
           absolute left-2 -top-2.5 z-10
             pointer-events-none transition-all duration-200 will-change-transform

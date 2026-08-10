@@ -4,15 +4,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import LanguagesContent from ".";
 
-import { useLanguage } from "@/context/language";
 import { useMe } from "@/hooks/auth/useMe";
 import useLanguages from "@/hooks/languages/useLanguages";
 import { IProfileLanguage } from "@/types/languages";
 import { getUserIdFromToken } from "@/utils/jwt";
-
-vi.mock("@/context/language", () => ({
-  useLanguage: vi.fn(),
-}));
 
 vi.mock("@/hooks/auth/useMe", () => ({
   useMe: vi.fn(),
@@ -35,9 +30,14 @@ vi.mock("@/components/languages-form", () => ({
   ),
 }));
 
+vi.mock("@/components/ui/icon", () => ({
+  Icon: ({ variant }: { variant: string }) => (
+    <span data-testid={`icon-${variant}`} />
+  ),
+}));
+
 describe("LanguagesContent Component", () => {
   const mockDeleteProfileLanguages = vi.fn();
-  const mockT = vi.fn((key: string) => key);
 
   const mockLanguagesList: IProfileLanguage[] = [
     { name: "English", proficiency: "Native" } as unknown as IProfileLanguage,
@@ -47,9 +47,9 @@ describe("LanguagesContent Component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    (useLanguage as ReturnType<typeof vi.fn>).mockReturnValue({
-      t: mockT,
-    });
+    if (typeof window !== "undefined" && !window.PointerEvent) {
+      window.PointerEvent = class extends Event {} as any;
+    }
 
     (getUserIdFromToken as ReturnType<typeof vi.fn>).mockReturnValue("user-1");
 
@@ -77,20 +77,24 @@ describe("LanguagesContent Component", () => {
       expect(screen.getByText("Error loading languages")).toBeInTheDocument();
     });
 
-    it("returns null when loading or languages are empty", () => {
+    it("renders spinner component while loading languages", () => {
       (useMe as ReturnType<typeof vi.fn>).mockReturnValue({
         languages: null,
         isLoading: true,
         error: null,
       });
 
-      const { container } = render(<LanguagesContent />);
+      render(<LanguagesContent />);
 
-      expect(container).toBeEmptyDOMElement();
+      expect(
+        screen.getByRole("status", { name: /loading/i }),
+      ).toBeInTheDocument();
     });
 
     it("renders languages list correctly", () => {
       render(<LanguagesContent />);
+
+      expect(screen.getByText("Languages")).toBeInTheDocument();
 
       expect(screen.getByText("English")).toBeInTheDocument();
       expect(screen.getByText("Native")).toBeInTheDocument();
@@ -125,8 +129,9 @@ describe("LanguagesContent Component", () => {
       await user.click(spanishToggle);
 
       expect(screen.queryByTestId("languages-form")).not.toBeInTheDocument();
+
       expect(
-        screen.getByRole("button", { name: /^cancel$/i }),
+        screen.getByRole("button", { name: /cancel/i }),
       ).toBeInTheDocument();
     });
 
@@ -138,7 +143,7 @@ describe("LanguagesContent Component", () => {
       await user.click(screen.getByRole("button", { name: /english/i }));
       await user.click(screen.getByRole("button", { name: /spanish/i }));
 
-      const cancelBtn = screen.getByRole("button", { name: /^cancel$/i });
+      const cancelBtn = screen.getByRole("button", { name: /cancel/i });
       await user.click(cancelBtn);
 
       expect(screen.getByTestId("languages-form")).toBeInTheDocument();
@@ -168,7 +173,7 @@ describe("LanguagesContent Component", () => {
       render(<LanguagesContent />);
 
       const removeAllBtn = screen.getByRole("button", {
-        name: /removeLanguages/i,
+        name: /remove languages/i,
       });
       await user.click(removeAllBtn);
 

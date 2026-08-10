@@ -98,8 +98,8 @@ export const translations = {
     adding: "Adding",
     deleting: "Deleting",
     updating: "Updating",
-    successfully: "succsessfully",
-    errorMessage: "Error: ",
+    successfully: "successfully",
+    errorMessage: "Error:",
     added: "added",
     deleted: "deleted",
     updated: "updated",
@@ -212,7 +212,7 @@ export const translations = {
     deleted: "удален",
     updated: "обновлен",
     downloaded: "экспортирован",
-    errorMessage: "Ошибка: ",
+    errorMessage: "Ошибка:",
   },
 } as const;
 

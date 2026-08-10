@@ -53,7 +53,15 @@ describe("Field UI Component", () => {
 
     const errorMsg = screen.getByRole("alert");
     expect(errorMsg).toBeInTheDocument();
-    expect(errorMsg).toHaveTextContent("Username is required");
+    expect(errorMsg).toMatchInlineSnapshot(`
+      <div
+        class="text-xs font-normal text-destructive"
+        data-slot="field-error"
+        role="alert"
+      >
+        Username is required
+      </div>
+    `);
   });
 
   it("renders list of unique error messages when multiple errors are passed", () => {

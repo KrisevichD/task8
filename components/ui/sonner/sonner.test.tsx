@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Toaster } from ".";
 
-// Мокаем next-themes
+
 vi.mock("next-themes", () => ({
   useTheme: () => ({
     theme: "dark",
@@ -14,7 +14,7 @@ describe("Toaster UI Component", () => {
   it("renders toaster section element correctly", () => {
     render(<Toaster />);
 
-    // Находим секцию уведомлений Sonner по её роли accessibility
+    
     const region = screen.getByRole("region", {
       name: /notifications/i,
     });

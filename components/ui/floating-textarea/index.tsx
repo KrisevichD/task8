@@ -12,6 +12,7 @@ export interface FloatingTextareaProps extends React.ComponentProps<typeof Texta
 
 const FloatingTextarea = React.forwardRef<HTMLTextAreaElement, FloatingTextareaProps>(
   ({ className, label, id, value, defaultValue, onChange, ...props }, ref) => {
+    const textAreaId = id ?? React.useId();
     const [hasValue, setHasValue] = React.useState(
       Boolean(value) || Boolean(defaultValue)
     )
@@ -28,7 +29,7 @@ const FloatingTextarea = React.forwardRef<HTMLTextAreaElement, FloatingTextareaP
     return (
       <div className="relative w-full border-none bg-transparent">
         <Textarea
-          id={id}
+          id={textAreaId}
           ref={ref}
           value={value}
           defaultValue={defaultValue}
@@ -41,7 +42,7 @@ const FloatingTextarea = React.forwardRef<HTMLTextAreaElement, FloatingTextareaP
           {...props}
         />
         <Label
-          htmlFor={id}
+          htmlFor={textAreaId}
           className={cn(
             `absolute left-2 -top-2.5 z-10 
             pointer-events-none transition-all duration-200 will-change-transform

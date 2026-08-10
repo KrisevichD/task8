@@ -87,6 +87,11 @@ describe("useSkills Hook", () => {
       { data: mockAllSkills, loading: false },
     ] as any);
 
+    // ✅ FIX: Configure each mutation mock trigger to explicitly return a resolved promise
+    mockExecuteAddProfileSkill.mockResolvedValue({ data: {} });
+    mockExecuteUpdateProfileSkill.mockResolvedValue({ data: {} });
+    mockExecuteDeleteProfileSkills.mockResolvedValue({ data: {} });
+
     (useMutation as unknown as MockedFunction<typeof useMutation>)
       .mockReturnValueOnce([
         mockExecuteAddProfileSkill,
@@ -147,10 +152,10 @@ describe("useSkills Hook", () => {
       );
 
       expect(toast.promise).toHaveBeenCalledWith(
-        undefined,
+        expect.any(Promise),
         expect.objectContaining({
-          loading: "Adding skill",
-          success: "Successfully added",
+          loading: "Adding skill...",
+          success: "Skill successfully added!",
           position: "top-right",
         }),
       );
@@ -181,10 +186,10 @@ describe("useSkills Hook", () => {
       );
 
       expect(toast.promise).toHaveBeenCalledWith(
-        undefined,
+        expect.any(Promise),
         expect.objectContaining({
-          loading: "Updating skill mastery",
-          success: "Skill is updated",
+          loading: "Updating skill...",
+          success: "Skill successfully updated!",
           position: "top-right",
         }),
       );
@@ -209,10 +214,10 @@ describe("useSkills Hook", () => {
       );
 
       expect(toast.promise).toHaveBeenCalledWith(
-        undefined,
+        expect.any(Promise),
         expect.objectContaining({
-          loading: "Deleting skills",
-          success: "Successfully deleted",
+          loading: "Deleting skill...",
+          success: "Skill successfully deleted!",
           position: "top-right",
         }),
       );

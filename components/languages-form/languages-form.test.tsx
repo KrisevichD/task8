@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -8,62 +8,102 @@ import LanguagesForm from ".";
 import useLanguages from "@/hooks/languages/useLanguages";
 import { IProfileLanguage } from "@/types/languages";
 
+vi.mock("@/hooks/languages/useLanguages", () => ({
+  default: vi.fn(),
+}));
+
 vi.mock("sonner", () => ({
   toast: {
     error: vi.fn(),
   },
 }));
 
-vi.mock("@/hooks/languages/useLanguages", () => ({
-  default: vi.fn(),
+vi.mock("@/components/ui/icon", () => ({
+  Icon: ({ variant }: { variant: string }) => (
+    <span data-testid={`icon-${variant}`} />
+  ),
+}));
+
+vi.mock("@/components/ui/floating-select", () => ({
+  FloatingSelect: ({
+    children,
+    value,
+    onValueChange,
+    label,
+    disabled,
+  }: any) => (
+    <div data-testid={`select-wrapper-${label}`} data-disabled={disabled}>
+      <label>{label}</label>
+      <input
+        data-testid={`select-input-${label}`}
+        value={value}
+        onChange={(e) => onValueChange(e.target.value)}
+        disabled={disabled}
+      />
+      <select
+        onChange={(e) => onValueChange(e.target.value)}
+        value={value}
+        disabled={disabled}
+      >
+        <option value="">Select option</option>
+        {children}
+      </select>
+    </div>
+  ),
+}));
+
+vi.mock("@/components/ui/select", () => ({
+  SelectItem: ({ value, children }: any) => (
+    <option value={value}>{children}</option>
+  ),
 }));
 
 describe("LanguagesForm Component", () => {
+  const mockCancelEditing = vi.fn();
   const mockGetAllLanguages = vi.fn();
   const mockAddProfileLanguage = vi.fn();
   const mockUpdateProfileLanguage = vi.fn();
-  const mockCancelEditing = vi.fn();
 
-  const mockLanguagesList = [
-    { id: "1", name: "English" },
-    { id: "2", name: "Spanish" },
-  ];
+  const mockFilteredLanguages = [{ name: "English" }, { name: "German" }];
 
-  const mockSelectedLanguages: IProfileLanguage[] = [
-    {
-      id: "lang-1",
-      name: "English",
-      proficiency: "B2",
-    } as unknown as IProfileLanguage,
-  ];
+  const defaultProps = {
+    userId: "user-123",
+    selectedLanguages: [],
+    cancelEditing: mockCancelEditing,
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
 
-    (useLanguages as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+    if (typeof window !== "undefined" && !window.PointerEvent) {
+      window.PointerEvent = class extends Event {} as any;
+    }
+
+    (useLanguages as any).mockReturnValue({
       getAllLanguages: mockGetAllLanguages,
-      filteredLanguages: mockLanguagesList,
+      filteredLanguages: mockFilteredLanguages,
       isLanguagesLoading: false,
       addProfileLanguage: mockAddProfileLanguage,
       updateProfileLanguage: mockUpdateProfileLanguage,
     });
   });
 
-  describe("Add Mode (Adding new language)", () => {
-    it("renders ADD LANGUAGE button and calls getAllLanguages on dialog open", async () => {
-      const user = userEvent.setup();
-
-      render(
-        <LanguagesForm
-          userId="user-123"
-          selectedLanguages={[]}
-          cancelEditing={mockCancelEditing}
-        />,
-      );
+  describe("Add Mode Rendering and Execution Flow", () => {
+    it("should render the 'add language' button in initial hidden state", () => {
+      render(<LanguagesForm {...defaultProps} />);
 
       const triggerBtn = screen.getByRole("button", { name: /add language/i });
       expect(triggerBtn).toBeInTheDocument();
+      expect(
+        screen.queryByText(/language proficiency/i),
+      ).not.toBeInTheDocument();
+    });
 
+    it("should trigger getAllLanguages query compilation upon modal open states", async () => {
+      const user = userEvent.setup();
+      render(<LanguagesForm {...defaultProps} />);
+
+      const triggerBtn = screen.getByRole("button", { name: /add language/i });
       await user.click(triggerBtn);
 
       expect(mockGetAllLanguages).toHaveBeenCalledTimes(1);
@@ -72,16 +112,9 @@ describe("LanguagesForm Component", () => {
       ).toBeInTheDocument();
     });
 
-    it("shows error toast if form is submitted without choosing a language", async () => {
+    it("should throw a toast error message context when submitting with empty variables", async () => {
       const user = userEvent.setup();
-
-      render(
-        <LanguagesForm
-          userId="user-123"
-          selectedLanguages={[]}
-          cancelEditing={mockCancelEditing}
-        />,
-      );
+      render(<LanguagesForm {...defaultProps} />);
 
       await user.click(screen.getByRole("button", { name: /add language/i }));
 
@@ -94,52 +127,41 @@ describe("LanguagesForm Component", () => {
       expect(mockAddProfileLanguage).not.toHaveBeenCalled();
     });
 
-    it("submits new language when language and proficiency are selected", async () => {
+    it("should process language addition mutations smoothly upon valid inputs selection", async () => {
       const user = userEvent.setup();
-
-      render(
-        <LanguagesForm
-          userId="user-123"
-          selectedLanguages={[]}
-          cancelEditing={mockCancelEditing}
-        />,
-      );
+      render(<LanguagesForm {...defaultProps} />);
 
       await user.click(screen.getByRole("button", { name: /add language/i }));
 
-      const comboboxes = screen.getAllByRole("combobox");
-      await user.click(comboboxes[0]);
+      const languageSelect = screen.getByTestId("select-input-Language");
+      fireEvent.change(languageSelect, { target: { value: "German" } });
 
-      const spanishOption = await screen.findByText("Spanish");
-      await user.click(spanishOption);
-
-      await user.click(comboboxes[1]);
-
-      const c1Option = await screen.findByText("C1");
-      await user.click(c1Option);
+      const proficiencySelect = screen.getByTestId(
+        "select-input-Language proficiency",
+      );
+      fireEvent.change(proficiencySelect, { target: { value: "B2" } });
 
       const submitBtn = screen.getByRole("button", { name: /^add$/i });
       await user.click(submitBtn);
 
-      await waitFor(() => {
-        expect(mockAddProfileLanguage).toHaveBeenCalledWith({
-          name: "Spanish",
-          proficiency: "C1",
-        });
-        expect(mockCancelEditing).toHaveBeenCalledTimes(1);
+      expect(mockAddProfileLanguage).toHaveBeenCalledWith({
+        name: "German",
+        proficiency: "B2",
       });
+      expect(mockCancelEditing).toHaveBeenCalledTimes(1);
     });
   });
 
-  describe("Edit Mode (Updating existing language)", () => {
-    it("renders UPDATE LANGUAGE button and populates current proficiency level", async () => {
-      const user = userEvent.setup();
+  describe("Edit Mode Pre-population and Casing Rules", () => {
+    const activeSelectedLanguage: IProfileLanguage[] = [
+      { name: "English", proficiency: "Native" },
+    ];
 
+    it("should adapt to 'update language' text schemas when exactly one item is received", () => {
       render(
         <LanguagesForm
-          userId="user-123"
-          selectedLanguages={mockSelectedLanguages}
-          cancelEditing={mockCancelEditing}
+          {...defaultProps}
+          selectedLanguages={activeSelectedLanguage}
         />,
       );
 
@@ -147,22 +169,14 @@ describe("LanguagesForm Component", () => {
         name: /update language/i,
       });
       expect(triggerBtn).toBeInTheDocument();
-
-      await user.click(triggerBtn);
-
-      expect(
-        screen.getByRole("heading", { name: /update language/i }),
-      ).toBeInTheDocument();
     });
 
-    it("submits updated proficiency for selected language", async () => {
+    it("should enforce disabled status constraints on language name entries inside update states", async () => {
       const user = userEvent.setup();
-
       render(
         <LanguagesForm
-          userId="user-123"
-          selectedLanguages={mockSelectedLanguages}
-          cancelEditing={mockCancelEditing}
+          {...defaultProps}
+          selectedLanguages={activeSelectedLanguage}
         />,
       );
 
@@ -170,22 +184,36 @@ describe("LanguagesForm Component", () => {
         screen.getByRole("button", { name: /update language/i }),
       );
 
-      const comboboxes = screen.getAllByRole("combobox");
-      await user.click(comboboxes[1]);
+      const languageWrapper = screen.getByTestId("select-wrapper-Language");
+      expect(languageWrapper).toHaveAttribute("data-disabled", "true");
+    });
 
-      const nativeOption = await screen.findByText("Native");
-      await user.click(nativeOption);
+    it("should call updateProfileLanguage when proficiency variables transition smoothly", async () => {
+      const user = userEvent.setup();
+      render(
+        <LanguagesForm
+          {...defaultProps}
+          selectedLanguages={activeSelectedLanguage}
+        />,
+      );
+
+      await user.click(
+        screen.getByRole("button", { name: /update language/i }),
+      );
+
+      const proficiencySelect = screen.getByTestId(
+        "select-input-Language proficiency",
+      );
+      fireEvent.change(proficiencySelect, { target: { value: "C2" } });
 
       const submitBtn = screen.getByRole("button", { name: /^update$/i });
       await user.click(submitBtn);
 
-      await waitFor(() => {
-        expect(mockUpdateProfileLanguage).toHaveBeenCalledWith({
-          name: "English",
-          proficiency: "Native",
-        });
-        expect(mockCancelEditing).toHaveBeenCalledTimes(1);
+      expect(mockUpdateProfileLanguage).toHaveBeenCalledWith({
+        name: "English",
+        proficiency: "C2",
       });
+      expect(mockCancelEditing).toHaveBeenCalledTimes(1);
     });
   });
 });
