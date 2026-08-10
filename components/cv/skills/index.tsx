@@ -95,7 +95,7 @@ const CvSkills = ({ cvData }: { cvData: ICvResponce }) => {
         </div>
       ))}
 
-      <div className="flex justify-end w-fill gap-4 sticky bottom-1">
+      <div className="bg-background py-1 flex justify-end w-fill gap-4 sticky bottom-0 max-lg:bottom-15">
         {selectedSkills.length > 1 ? (
           <Button
             variant={"outline"}

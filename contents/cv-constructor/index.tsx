@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { notFound, usePathname, useSearchParams } from "next/navigation";
 
 import CvDetailsForm from "@/components/cv/details-form";
 import CvPreview from "@/components/cv/preview";
@@ -32,7 +32,7 @@ const CvConstructor = ({ cvId }: { cvId: string }) => {
   const activeTab: TTab = VALID_TABS.includes(tab as TTab)
     ? (tab as TTab)
     : DEFAULT_TAB;
-  const { cvData } = useCvConstructor(cvId);
+  const { cvData, cvError } = useCvConstructor(cvId);
 
   const handleTabChange = (nextTab: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -46,6 +46,7 @@ const CvConstructor = ({ cvId }: { cvId: string }) => {
     window.history.replaceState(null, "", newUrl);
   };
 
+  if (cvError) notFound();
   if (!cvData) return <Spinner />;
 
   return (
@@ -61,11 +62,13 @@ const CvConstructor = ({ cvId }: { cvId: string }) => {
           <BreadcrumbItem>
             <BreadcrumbPage>{cvData.name || "CV"}</BreadcrumbPage>
           </BreadcrumbItem>
-          <BreadcrumbSeparator />
           {activeTab !== "details" && (
-            <BreadcrumbItem className="capitalize">
-              {t(activeTab)}
-            </BreadcrumbItem>
+            <>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem className="capitalize">
+                {t(activeTab)}
+              </BreadcrumbItem>
+            </>
           )}
         </BreadcrumbList>
       </Breadcrumb>

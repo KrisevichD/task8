@@ -38,7 +38,7 @@ export default function useCvConstructor(cvId: string) {
   const [executeAddCvSkill] = useMutation(ADD_CV_SKILL);
   const [executeUpdateCvSkill] = useMutation(UPDATE_CV_SKILL);
   const [executeDeleteCvSkill] = useMutation(DELETE_CV_SKILL);
-  const { data } = useQuery(GET_CV, {
+  const { data, error: cvError } = useQuery(GET_CV, {
     variables: { cvId: cvId },
     skip: !cvId,
   });
@@ -230,6 +230,7 @@ export default function useCvConstructor(cvId: string) {
 
   return {
     cvData,
+    cvError,
     addCvProject,
     updateCvProject,
     isCvProjectLoading,

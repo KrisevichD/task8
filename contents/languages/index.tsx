@@ -76,11 +76,13 @@ export const LanguagesContent = ({
 
   return (
     <>
-      <Breadcrumb className="ml-11 mt-4">
-        <BreadcrumbList>
-          <BreadcrumbItem>{t("languages")}</BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      {!customUserId && (
+        <Breadcrumb className="ml-11 mt-4">
+          <BreadcrumbList>
+            <BreadcrumbItem>{t("languages")}</BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      )}
       <div className="space-y-6 mt-4 ml-6 mr-6.5 xl:ml-42.25 xl:mr-42.75">
         <div className="flex flex-wrap gap-2">
           {languages.map((language) => {
@@ -113,7 +115,7 @@ export const LanguagesContent = ({
           })}
         </div>
 
-        <div className="flex justify-end gap-4 w-full pt-4">
+        <div className="bg-background py-1 flex justify-end gap-4 w-full pt-4 sticky bottom-0 max-lg:bottom-15">
           {selectedLanguages.length > 1 ? (
             <Button
               variant={"outline"}

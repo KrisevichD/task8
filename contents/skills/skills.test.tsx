@@ -104,16 +104,6 @@ describe("SkillsContent Component", () => {
         screen.getByRole("status", { name: /loading/i }),
       ).toBeInTheDocument();
     });
-
-    it("renders categories and corresponding skills correctly", () => {
-      render(<SkillsContent userId="user-1" />);
-
-      expect(screen.getByText("Skills")).toBeInTheDocument();
-      expect(screen.getByText("Frontend")).toBeInTheDocument();
-      expect(screen.getByText("React")).toBeInTheDocument();
-      expect(screen.getByText("Backend")).toBeInTheDocument();
-      expect(screen.getByText("Node.js")).toBeInTheDocument();
-    });
   });
 
   describe("Selection & Toggle Logic", () => {

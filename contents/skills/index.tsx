@@ -80,11 +80,13 @@ const SkillsContent = ({ userId }: { userId?: string }) => {
 
   return (
     <>
-      <Breadcrumb className="ml-11 mt-4">
-        <BreadcrumbList>
-          <BreadcrumbItem>{t("skills")}</BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      {!userId && (
+        <Breadcrumb className="ml-11 mt-4">
+          <BreadcrumbList>
+            <BreadcrumbItem>{t("skills")}</BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      )}
       <div className="ml-6 mr-6.5 xl:ml-42.25 xl:mr-42.75">
         <div className="pl-6 pt-8">
           {filteredList.map((category) => (
@@ -118,7 +120,7 @@ const SkillsContent = ({ userId }: { userId?: string }) => {
           ))}
         </div>
 
-        <div className="flex justify-end gap-4 w-fill sticky bottom-1">
+        <div className="bg-background py-1 flex justify-end gap-4 w-fill sticky bottom-0 max-lg:bottom-15">
           {selectedSkills.length > 1 ? (
             <Button
               variant={"outline"}
